@@ -16,7 +16,7 @@ Referência completa, para consulta rápida durante os capítulos 4 e 5. A nota�
 
 | Não-terminal | Regra |
 |---|---|
-| `class` | `'class'` className `'{'` classVarDec* subroutineDec* `'}'` |
+| `class` | `'class'` className `'{'` classVarDec\* subroutineDec\* `'}'` |
 | `classVarDec` | (`'static'`\|`'field'`) type varName (`','` varName)* `';'` |
 | `type` | `'int'` \| `'char'` \| `'boolean'` \| className |
 | `subroutineDec` | (`'constructor'`\|`'function'`\|`'method'`) (`'void'`\|type) subroutineName `'('` parameterList `')'` subroutineBody |
