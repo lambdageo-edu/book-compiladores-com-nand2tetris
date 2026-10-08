@@ -1442,7 +1442,7 @@
 <h2 id="representacoes-graficas-arvore-de-derivacao-e-ast">Representações gráficas: árvore de derivação e AST<a class="headerlink" href="#representacoes-graficas-arvore-de-derivacao-e-ast" title="Permanent link">&para;</a></h2>
 <p>A <strong>árvore de derivação</strong> (<em>parse tree</em>), produzida diretamente pelo analisador sintático (Unidade 1), inclui <strong>todos</strong> os símbolos da gramática — parênteses, ponto-e-vírgula, palavras-chave estruturais. Ela é fiel à sintaxe, mas carregada de detalhes irrelevantes para o significado do programa.</p>
 <p>A <strong>árvore sintática abstrata</strong> (AST) retém apenas a estrutura essencial: operadores, operandos, e a hierarquia que expressa precedência e associatividade — mas descarta tudo que é "só sintaxe". Para uma AST não importa se um bloco é demarcado por chaves, por <code>begin</code>/<code>end</code>, ou por indentação; importa apenas "isto é um comando condicional, com esta condição, este ramo verdadeiro e este ramo falso".</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>Parse tree de &quot;2 + 3 * 4&quot;          AST equivalente
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>Parse tree de "2 + 3 * 4"          AST equivalente
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>        expr                              +
 <a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>       /    \                            / \

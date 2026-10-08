@@ -2,90 +2,90 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://lambdageo.github.io/nand2tetris-compilador/</loc>
-         <lastmod>2026-08-12</lastmod>
+         <lastmod>2026-10-08</lastmod>
     </url>
     <url>
          <loc>https://lambdageo.github.io/nand2tetris-compilador/apendices/a-gramatica-jack/</loc>
-         <lastmod>2026-08-12</lastmod>
+         <lastmod>2026-10-08</lastmod>
     </url>
     <url>
          <loc>https://lambdageo.github.io/nand2tetris-compilador/apendices/b-especificacao-vm/</loc>
-         <lastmod>2026-08-12</lastmod>
+         <lastmod>2026-10-08</lastmod>
     </url>
     <url>
          <loc>https://lambdageo.github.io/nand2tetris-compilador/apendices/c-especificacao-assembly-hack/</loc>
-         <lastmod>2026-08-12</lastmod>
+         <lastmod>2026-10-08</lastmod>
     </url>
     <url>
          <loc>https://lambdageo.github.io/nand2tetris-compilador/apendices/d-ambiente-e-ferramentas/</loc>
-         <lastmod>2026-08-12</lastmod>
+         <lastmod>2026-10-08</lastmod>
     </url>
     <url>
          <loc>https://lambdageo.github.io/nand2tetris-compilador/apendices/e-referencias/</loc>
-         <lastmod>2026-08-12</lastmod>
+         <lastmod>2026-10-08</lastmod>
     </url>
     <url>
          <loc>https://lambdageo.github.io/nand2tetris-compilador/unidade-1-frontend/00-introducao/</loc>
-         <lastmod>2026-08-12</lastmod>
+         <lastmod>2026-10-08</lastmod>
     </url>
     <url>
          <loc>https://lambdageo.github.io/nand2tetris-compilador/unidade-1-frontend/01-linguagens-e-gramaticas/</loc>
-         <lastmod>2026-08-12</lastmod>
+         <lastmod>2026-10-08</lastmod>
     </url>
     <url>
          <loc>https://lambdageo.github.io/nand2tetris-compilador/unidade-1-frontend/02-aquecimento-tradutor/</loc>
-         <lastmod>2026-08-12</lastmod>
+         <lastmod>2026-10-08</lastmod>
     </url>
     <url>
          <loc>https://lambdageo.github.io/nand2tetris-compilador/unidade-1-frontend/03-a-linguagem-jack/</loc>
-         <lastmod>2026-08-12</lastmod>
+         <lastmod>2026-10-08</lastmod>
     </url>
     <url>
          <loc>https://lambdageo.github.io/nand2tetris-compilador/unidade-1-frontend/04-analisador-lexico/</loc>
-         <lastmod>2026-08-12</lastmod>
+         <lastmod>2026-10-08</lastmod>
     </url>
     <url>
          <loc>https://lambdageo.github.io/nand2tetris-compilador/unidade-1-frontend/05-analisador-sintatico/</loc>
-         <lastmod>2026-08-12</lastmod>
+         <lastmod>2026-10-08</lastmod>
     </url>
     <url>
          <loc>https://lambdageo.github.io/nand2tetris-compilador/unidade-2-middleend/06-tabela-de-simbolos/</loc>
-         <lastmod>2026-08-12</lastmod>
+         <lastmod>2026-10-08</lastmod>
     </url>
     <url>
          <loc>https://lambdageo.github.io/nand2tetris-compilador/unidade-2-middleend/07-representacoes-intermediarias/</loc>
-         <lastmod>2026-08-12</lastmod>
+         <lastmod>2026-10-08</lastmod>
     </url>
     <url>
          <loc>https://lambdageo.github.io/nand2tetris-compilador/unidade-2-middleend/08-a-vm-hack/</loc>
-         <lastmod>2026-08-12</lastmod>
+         <lastmod>2026-10-08</lastmod>
     </url>
     <url>
          <loc>https://lambdageo.github.io/nand2tetris-compilador/unidade-2-middleend/09-codegen-expressoes-comandos/</loc>
-         <lastmod>2026-08-12</lastmod>
+         <lastmod>2026-10-08</lastmod>
     </url>
     <url>
          <loc>https://lambdageo.github.io/nand2tetris-compilador/unidade-2-middleend/10-codegen-subrotinas-objetos/</loc>
-         <lastmod>2026-08-12</lastmod>
+         <lastmod>2026-10-08</lastmod>
     </url>
     <url>
          <loc>https://lambdageo.github.io/nand2tetris-compilador/unidade-2-middleend/12-vm-translator-parte1/</loc>
-         <lastmod>2026-08-12</lastmod>
+         <lastmod>2026-10-08</lastmod>
     </url>
     <url>
          <loc>https://lambdageo.github.io/nand2tetris-compilador/unidade-3-backend/11-assembly-hack/</loc>
-         <lastmod>2026-08-12</lastmod>
+         <lastmod>2026-10-08</lastmod>
     </url>
     <url>
          <loc>https://lambdageo.github.io/nand2tetris-compilador/unidade-3-backend/13-vm-translator-parte2/</loc>
-         <lastmod>2026-08-12</lastmod>
+         <lastmod>2026-10-08</lastmod>
     </url>
     <url>
          <loc>https://lambdageo.github.io/nand2tetris-compilador/unidade-3-backend/14-geracao-codigo-alvo/</loc>
-         <lastmod>2026-08-12</lastmod>
+         <lastmod>2026-10-08</lastmod>
     </url>
     <url>
          <loc>https://lambdageo.github.io/nand2tetris-compilador/unidade-3-backend/15-construindo-o-assembler/</loc>
-         <lastmod>2026-08-12</lastmod>
+         <lastmod>2026-10-08</lastmod>
     </url>
 </urlset>
