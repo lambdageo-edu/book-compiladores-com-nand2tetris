@@ -4,7 +4,7 @@ A Parte 1 (capítulo 11) traduziu aritmética e acesso à memória — comandos 
 
 ## Rótulos com escopo de função
 
-Um `label LOOP` dentro de uma função não pode colidir com um `label LOOP` de outra — mas a VM (capítulo 8) não exige nomes globalmente únicos, só únicos **dentro da função**. A solução do VM Translator é qualificar cada rótulo com o nome da função corrente antes de traduzi-lo para Assembly:
+Um `label LOOP` dentro de uma função não pode colidir com um `label LOOP` de outra — mas a VM (capítulo 7) não exige nomes globalmente únicos, só únicos **dentro da função**. A solução do VM Translator é qualificar cada rótulo com o nome da função corrente antes de traduzi-lo para Assembly:
 
 ```
 label LOOP     (dentro de Main.fibonacci)   →   (Main.fibonacci$LOOP)

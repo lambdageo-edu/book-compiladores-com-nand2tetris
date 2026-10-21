@@ -77,9 +77,9 @@ nav:
       - unidade-1-frontend/04-analisador-lexico.md
       - unidade-1-frontend/05-analisador-sintatico.md
   - "Parte 2 — O Compilador (Geração de Código VM)":
-      - unidade-2-middleend/06-tabela-de-simbolos.md
-      - unidade-2-middleend/07-representacoes-intermediarias.md
-      - unidade-2-middleend/08-a-vm-hack.md
+      - unidade-2-middleend/06-representacoes-intermediarias.md
+      - unidade-2-middleend/07-a-vm-hack.md
+      - unidade-2-middleend/08-tabela-de-simbolos.md
       - unidade-2-middleend/09-codegen-expressoes-comandos.md
       - unidade-2-middleend/10-codegen-subrotinas-objetos.md
   - "Parte 3 — O Tradutor VM (Geração de Código Assembly)":

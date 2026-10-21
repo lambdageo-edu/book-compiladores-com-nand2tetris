@@ -1,6 +1,6 @@
 # Apêndice B — Especificação da VM Hack
 
-Referência compacta, extraída do capítulo 8, para consulta rápida durante os capítulos 9–12.
+Referência compacta, extraída do capítulo 7, para consulta rápida durante os capítulos 9–12.
 
 ## Segmentos
 
@@ -10,7 +10,7 @@ Referência compacta, extraída do capítulo 8, para consulta rápida durante os
 | `argument` | Argumentos recebidos pela subroutine |
 | `static` | Variáveis de classe, compartilhadas por todas as instâncias |
 | `this` | Campos do objeto atual |
-| `that` | Segundo "objeto atual" — usado por arrays e por métodos de outros objetos |
+| `that` | Elemento de array corrente (endereço-base em `pointer 1`) |
 | `constant` | Pseudo-segmento somente leitura, para literais |
 | `pointer` | 2 células: `pointer 0` = `this`, `pointer 1` = `that` |
 | `temp` | 8 células de uso livre |
@@ -52,4 +52,19 @@ call nome nArgs
 return
 ```
 
-Convenção: toda subroutine — `void` ou não — deixa exatamente um valor na pilha antes do `return` (por convenção, `push constant 0` para as que não têm valor útil).
+Convenção: toda subroutine — `void` ou não — deixa exatamente um valor na pilha antes do `return` (por convenção, `push constant 0` para as que não têm valor útil). Do lado de quem chama, o valor devolvido por uma chamada feita apenas pelo efeito (o comando `do` de Jack) é descartado com `pop temp 0`.
+
+## Mapeamento padrão de Jack (resumo)
+
+| Jack | VM |
+|---|---|
+| subroutine `yyy` da classe `Xxx` | função `Xxx.yyy` |
+| `method` com *k* parâmetros | função com *k* + 1 argumentos (`argument 0` = objeto) |
+| `var` / parâmetro / `static` / `field` | `local` / `argument` / `static` / `this` |
+| `arr[i]` | `pointer 1` ← `arr + i`; acesso via `that 0` |
+| `null`, `false` / `true` | `0` / `-1` (`push constant 1`, `neg`) |
+| `*`, `/` | `call Math.multiply 2`, `call Math.divide 2` |
+| constante string | `String.new` + `String.appendChar` |
+| construtor | `Memory.alloc(nCampos)`, `pop pointer 0` |
+
+Detalhes no capítulo 7.

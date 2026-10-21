@@ -53,6 +53,6 @@ Referência completa, para consulta rápida durante os capítulos 4 e 5. A nota�
 
 ## Notas de implementação
 
-- `term` é o único não-terminal que exige mais de um token de *lookahead* para decidir a produção: ao ver um `identifier`, o parser precisa olhar o token seguinte (`[`, `(`, `.`, ou nenhum dos três) para diferenciar variável simples, acesso a array, e chamada de subroutine (qualificada ou não). Ver capítulo 5.
+- `term` (e, pelo mesmo motivo, `subroutineCall`) é o único ponto em que o primeiro token não basta para decidir a produção: ao ver um `identifier`, o parser precisa olhar o token seguinte (`[`, `(`, `.`, ou nenhum dos três) para diferenciar variável simples, acesso a array e chamada de subroutine (qualificada ou não). Ver capítulo 5.
 - A ausência de precedência de operadores em Jack (capítulo 3) é o que permite `expression` ser `term (op term)*` — um único nível, sem a cadeia `expression → term → factor` que uma gramática com precedência exigiria.
-- Esta gramática já é LL(1): não há recursão à esquerda nem produções alternativas com o mesmo símbolo inicial dentro do mesmo não-terminal, exceto o *lookahead* extra de `term` descrito acima.
+- Esta gramática é LL(1) em todos os não-terminais, exceto `term` e `subroutineCall`, que, como estão escritos, são LL(2). Fatorar à esquerda o `identifier` comum às alternativas (capítulo 1) torna esses dois casos LL(1) — é o que o parser do capítulo 5 faz ao consumir o identificador antes de decidir.

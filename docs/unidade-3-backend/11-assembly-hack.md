@@ -102,7 +102,7 @@ Escrever programas inteiros em endereços numéricos seria impraticável — Ass
 ### Símbolos pré-definidos
 
 - **Registradores virtuais** `R0`–`R15`: referem-se diretamente a `RAM[0]`–`RAM[15]`.
-- **Ponteiros de segmento** `SP`, `LCL`, `ARG`, `THIS`, `THAT`: referem-se a `RAM[0]`–`RAM[4]` — os mesmos endereços de `R0`–`R4`, apenas com nomes mnemônicos para o papel que cumprem na VM (capítulos 8, 11 e 12).
+- **Ponteiros de segmento** `SP`, `LCL`, `ARG`, `THIS`, `THAT`: referem-se a `RAM[0]`–`RAM[4]` — os mesmos endereços de `R0`–`R4`, apenas com nomes mnemônicos para o papel que cumprem na VM (capítulos 7, 11 e 12).
 - **Mapas de E/S** `SCREEN` (RAM 16384) e `KBD` (RAM 24576): endereço-base do mapa de memória da tela e o registrador de teclado, respectivamente.
 
 ### Rótulos

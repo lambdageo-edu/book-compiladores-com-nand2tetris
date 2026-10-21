@@ -1,6 +1,6 @@
-# 6. Tabela de símbolos
+# 8. Tabela de símbolos
 
-Antes de gerar qualquer código, o compilador precisa responder a uma pergunta simples toda vez que encontra um identificador: *o que é isso?* Uma variável local? Um campo do objeto? Um parâmetro? De que tipo? Em que posição, dentro do seu segmento, ela vive? Este capítulo constrói a estrutura de dados que responde a essas perguntas — a **tabela de símbolos** — e a integra ao `CompilationEngine` da Unidade 1, fechando a lacuna de análise semântica que faltava para começar a gerar código de verdade nos capítulos 9 e 10.
+O capítulo 7 definiu o alvo: cada variável de Jack mora em um segmento da VM (`local`, `argument`, `static` ou `this`), em uma posição dada por um índice. Para gerar um único `push` ou `pop`, portanto, o compilador precisa responder a uma pergunta toda vez que encontra um identificador: *o que é isso?* Uma variável local? Um campo do objeto? Um parâmetro? De que tipo? Em que posição, dentro do seu segmento, ela vive? Este capítulo constrói a estrutura de dados que responde a essas perguntas — a **tabela de símbolos** — e a integra ao `CompilationEngine` da Unidade 1, fechando a lacuna de análise semântica que faltava para começar a gerar código de verdade nos capítulos 9 e 10.
 
 ## Por que uma tabela de símbolos
 
@@ -8,7 +8,7 @@ Um programa de alto nível introduz e manipula muitos identificadores. Toda vez 
 
 ## As quatro categorias de variável em Jack
 
-Jack tem exatamente quatro categorias (`kind`) de variável, cada uma com um tempo de vida e um segmento de memória VM associado (o capítulo 8 detalha a VM Hack; por ora, note apenas a categoria):
+Jack tem exatamente quatro categorias (`kind`) de variável, cada uma com um tempo de vida e — pelo mapeamento padrão do capítulo 7 — um segmento de memória VM associado:
 
 | Categoria (`kind`) | Onde é declarada | Tempo de vida | Segmento VM |
 |---|---|---|---|
@@ -30,7 +30,21 @@ A tabela expõe uma API pequena e direta:
 | `varCount(kind)` | Quantas variáveis de uma dada categoria já foram definidas no escopo atual |
 | `resolve(name)` | Busca um identificador, devolvendo categoria, tipo e índice |
 
-O índice devolvido por `resolve` (e atribuído automaticamente por `define`) é sempre relativo à sua própria categoria: a primeira `field` é índice 0, a segunda `field` é índice 1, mesmo que entre elas haja uma `static` (que tem sua própria contagem independente). É exatamente esse índice — categoria + posição — que vira o segmento e o deslocamento de um comando `push`/`pop` da VM.
+O índice devolvido por `resolve` (e atribuído automaticamente por `define`) é sempre relativo à sua própria categoria: a primeira `field` é índice 0, a segunda `field` é índice 1, mesmo que entre elas haja uma `static` (que tem sua própria contagem independente). É exatamente esse índice — categoria + posição — que vira o segmento e o deslocamento de um comando `push`/`pop` da VM. Por exemplo, na classe `Point` com `field int x, y;` e um método `distance(Point other)` com `var int dx, dy;`, a tabela fica:
+
+| Nome | Tipo | Categoria | Índice | Acesso na VM |
+|---|---|---|---|---|
+| `x` | `int` | `field` | 0 | `this 0` |
+| `y` | `int` | `field` | 1 | `this 1` |
+| `this` | `Point` | `arg` | 0 | `argument 0` |
+| `other` | `Point` | `arg` | 1 | `argument 1` |
+| `dx` | `int` | `var` | 0 | `local 0` |
+| `dy` | `int` | `var` | 1 | `local 1` |
+
+e `let dx = x - other.getx();` só pode ser traduzido porque a tabela informa que `x` é `this 0`, `other` é `argument 1` e `dx` é `local 0`.
+
+!!! note "Comparação com a API do Nand2Tetris"
+    O livro do Nand2Tetris propõe uma API com três consultas separadas — `kindOf(name)`, `typeOf(name)` e `indexOf(name)`. Aqui elas foram reunidas em `resolve(name)`, que devolve as três informações de uma vez em um `Symbol` (ou `null`, o equivalente ao `NONE` de `kindOf`). `startSubroutine`, `define` e `varCount` têm o mesmo papel nas duas versões.
 
 ```java
 public class SymbolTable {
@@ -139,7 +153,7 @@ void parseSubroutineDec() {
 }
 ```
 
-O truque de `if (subroutineType == METHOD) symbolTable.define("this", className, Kind.ARG)` merece destaque: em Jack, um método é sempre chamado com o objeto receptor como **primeiro argumento implícito** (o compilador insere isso na chamada, como veremos no capítulo 10) — logo, registrá-lo como `arg` de índice 0 *antes* de processar a lista de parâmetros declarados garante que o primeiro parâmetro *de fato* declarado pelo programador já saia com índice 1, exatamente onde ele estará em tempo de execução.
+O truque de `if (subroutineType == METHOD) symbolTable.define("this", className, Kind.ARG)` merece destaque: pelo mapeamento padrão (capítulo 7), um método é sempre chamado com o objeto receptor como **primeiro argumento implícito** (o compilador insere isso na chamada, como veremos no capítulo 10) — logo, registrá-lo como `arg` de índice 0 *antes* de processar a lista de parâmetros declarados garante que o primeiro parâmetro *de fato* declarado pelo programador já saia com índice 1, exatamente onde ele estará em tempo de execução.
 
 ## O que a tabela ainda não faz
 
@@ -147,4 +161,4 @@ Esta tabela responde "que categoria, que tipo, que índice" — o suficiente par
 
 ## O que vem a seguir
 
-Com a tabela de símbolos pronta, o próximo capítulo dá um passo atrás para revisar, em teoria geral, o papel de uma representação intermediária — preparando o terreno para a especificação da VM Hack (capítulo 8) e, finalmente, para a geração de código de verdade (capítulos 9 e 10), agora que sabemos exatamente onde cada identificador vive.
+Com a tabela de símbolos pronta, temos as três peças: a estrutura do programa (o parser da Unidade 1), o alvo (a VM Hack do capítulo 7) e a ponte entre os nomes de Jack e os segmentos da VM. Os capítulos 9 e 10 juntam as três e começam a gerar código de verdade, agora que sabemos exatamente onde cada identificador vive.

@@ -14,7 +14,7 @@ Bem-vindo(a) à disciplina de Compiladores. Este livro constrói, unidade a unid
 | Parte | Foco | Projetos Relacionados (Nand2Tetris) |
 |---|---|---|
 | 1 — Front-end (Análise Sintática) | Linguagens, gramáticas, analisador léxico e analisador sintático para a linguagem Jack. | Projeto 10 (Compiler I - Syntax Analysis) |
-| 2 — O Compilador (Geração de Código VM) | Tabelas de símbolos, representações intermediárias e geração de código VM para Jack. | Projeto 11 (Compiler II - Code Generation) |
+| 2 — O Compilador (Geração de Código VM) | Representações intermediárias, especificação da VM Hack, tabela de símbolos e geração de código VM para Jack. | Projeto 11 (Compiler II - Code Generation) |
 | 3 — O Tradutor VM (Geração de Código Assembly) | Tradução de aritmética, memória, controle de fluxo e funções de código VM para Assembly Hack. | Projetos 7 e 8 (VM Translator) |
 | 4 — O Montador (Assembly para Código de Máquina) | Especificação do Assembly Hack e construção do Montador (Assembler) para produzir o binário. | Projeto 6 (Assembler) |
 

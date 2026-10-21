@@ -1,10 +1,10 @@
 # 10. Geração de código: subrotinas e objetos
 
-Este capítulo fecha o compilador Jack → VM: variáveis (usando a tabela de símbolos do capítulo 6), a declaração completa de `function`/`method`/`constructor` (com o prólogo que aloca variáveis locais e, para construtores, memória de objeto), chamadas de subroutine, e o mapeamento de arrays via aritmética de ponteiros. Ao final, o **Project 11** do Nand2Tetris estará completo: qualquer programa Jack válido poderá ser compilado para VM.
+Este capítulo fecha o compilador Jack → VM: variáveis (usando a tabela de símbolos do capítulo 8), a declaração completa de `function`/`method`/`constructor` (com o prólogo que aloca variáveis locais e, para construtores, memória de objeto), chamadas de subroutine, e o mapeamento de arrays via aritmética de ponteiros. Ao final, o **Project 11** do Nand2Tetris estará completo: qualquer programa Jack válido poderá ser compilado para VM.
 
 ## De categoria para segmento
 
-A tabela de símbolos (capítulo 6) guarda a *categoria* de uma variável (`STATIC`, `FIELD`, `ARG`, `VAR`); a VM (capítulo 8) trabalha com *segmentos* (`static`, `this`, `argument`, `local`). Uma função pura faz essa ponte — e é usada em todo lugar que o compilador precisa gerar `push`/`pop` para uma variável:
+A tabela de símbolos (capítulo 8) guarda a *categoria* de uma variável (`STATIC`, `FIELD`, `ARG`, `VAR`); a VM (capítulo 7) trabalha com *segmentos* (`static`, `this`, `argument`, `local`). Uma função pura faz essa ponte — e é usada em todo lugar que o compilador precisa gerar `push`/`pop` para uma variável:
 
 ```java
 private Segment kind2Segment(Kind kind) {
@@ -74,7 +74,7 @@ void parseClass() {
 }
 ```
 
-O comando `function` só pode ser emitido depois que **todas** as variáveis locais já foram registradas na tabela de símbolos (capítulo 6) — porque `nLocais` é exatamente `symbolTable.varCount(Kind.VAR)`. Por isso a emissão acontece no corpo da subroutine, não na sua declaração:
+O comando `function` só pode ser emitido depois que **todas** as variáveis locais já foram registradas na tabela de símbolos (capítulo 8) — porque `nLocais` é exatamente `symbolTable.varCount(Kind.VAR)`. Por isso a emissão acontece no corpo da subroutine, não na sua declaração:
 
 ```java
 void parseSubroutineBody(String functionName) {
@@ -149,7 +149,7 @@ return                    // return this
 
 ## Métodos: recebendo `this`
 
-Um método Jack (`p.getX()`) é, na VM, uma função comum que recebe o objeto receptor como **primeiro argumento**. O capítulo 6 já garantiu que, ao compilar um método, `"this"` foi registrado como `arg` de índice 0 — falta apenas, no prólogo do método, **materializar** esse argumento no registrador `pointer 0`, para que o restante do corpo possa usar `this 0`, `this 1` etc. normalmente:
+Um método Jack (`p.getX()`) é, na VM, uma função comum que recebe o objeto receptor como **primeiro argumento**. O capítulo 8 já garantiu que, ao compilar um método, `"this"` foi registrado como `arg` de índice 0 — falta apenas, no prólogo do método, **materializar** esse argumento no registrador `pointer 0`, para que o restante do corpo possa usar `this 0`, `this 1` etc. normalmente:
 
 ```java
 if (subroutineType == METHOD) {
@@ -213,6 +213,36 @@ call Point.distance 2
 pop local 2
 ```
 
+### O comando `do` e o valor descartado
+
+Pelo mapeamento padrão (capítulo 7), toda função VM devolve um valor — inclusive as que correspondem a subroutines `void`, que devolvem `0`. Uma chamada usada como `term` de uma expressão aproveita esse valor; já o comando `do` chama a subroutine só pelo efeito, e o valor que sobra no topo da pilha precisa ser descartado. Por isso `parseDo` emite um `pop temp 0` logo depois da chamada:
+
+```java
+void parseDo() {
+    expectPeek(DO);
+    expectPeek(IDENT);
+    parseSubroutineCall();
+    expectPeek(SEMICOLON);
+    vmWriter.writePop(Segment.TEMP, 0);   // descarta o valor devolvido
+}
+```
+
+O programa `Seven` do Project 11 mostra os dois lados desse contrato em poucas linhas:
+
+```
+// do Output.printInt(1 + (2 * 3));  return;
+function Main.main 0
+push constant 1
+push constant 2
+push constant 3
+call Math.multiply 2
+add
+call Output.printInt 1
+pop temp 0            // quem chama: descarta o valor devolvido
+push constant 0       // quem é chamado (main é void): devolve 0
+return
+```
+
 ## Arrays: aritmética de ponteiros
 
 Um array Jack é, para o compilador, apenas um ponteiro para o endereço-base de um bloco contíguo no heap — `arr[i]` é açúcar sintático para "o valor no endereço `arr + i`". A VM não tem um comando de "acesso indexado" dedicado; ela oferece **endereçamento indireto** através do par `pointer 1` / segmento `that`: gravar um endereço em `pointer 1` faz `that 0` passar a se referir àquela célula de memória.
@@ -263,7 +293,7 @@ Como exercício de verificação, vale compilar mentalmente (ou de fato, testand
 
 ## Fechando o Project 11
 
-Com variáveis, funções, construtores, métodos, chamadas e arrays todos gerando código VM, o compilador Jack → VM está completo — qualquer arquivo `.jack` válido, de qualquer complexidade, agora compila para um `.vm` executável no VM Emulator do Nand2Tetris. É um bom momento para rodar contra os programas de exemplo maiores do Project 11 (`Seven`, `ConvertToBin`, `Square`, `Pong`, `Average`) e comparar a saída — quando não bate byte a byte com a referência oficial, normalmente ainda é possível validar comportamentalmente, executando ambos no VM Emulator e comparando o resultado observável.
+Com variáveis, funções, construtores, métodos, chamadas e arrays todos gerando código VM, o compilador Jack → VM está completo — qualquer arquivo `.jack` válido, de qualquer complexidade, agora compila para um `.vm` executável no VM Emulator do Nand2Tetris. É um bom momento para rodar contra os programas de teste do Project 11, nesta ordem — `Seven` (expressão com constantes, `do` e `return`), `ConvertToBin` (comandos procedurais e funções), `Square` (construtores, métodos e campos), `Average` (arrays e strings), `Pong` (aplicação orientada a objetos completa, com variáveis `static`) e `ComplexArrays` (índices de array aninhados) — e comparar a saída. Quando ela não bate byte a byte com a referência oficial, normalmente ainda é possível validar comportamentalmente, executando ambos no VM Emulator e comparando o resultado observável. Para executar, carregue no emulador o diretório inteiro do programa: o VM Emulator já traz uma implementação embutida das oito classes do sistema operacional Jack; em qualquer outro ambiente, os oito arquivos `.vm` do sistema operacional (capítulo 7) precisam estar no mesmo diretório dos `.vm` gerados.
 
 ## O que vem a seguir
 

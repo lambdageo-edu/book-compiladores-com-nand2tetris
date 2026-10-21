@@ -37,7 +37,7 @@ public class VMWriter {
 }
 ```
 
-O `Parser` ganha uma instância de `VMWriter` (além do `SymbolTable` do capítulo 6), e um método `VMOutput()` espelhando o `XMLOutput()` que já existia. A partir daqui, cada seção da gramática de expressões e comandos ganha, além do reconhecimento sintático, a emissão de código correspondente — construída e testada incrementalmente, como sempre.
+O `Parser` ganha uma instância de `VMWriter` (além do `SymbolTable` do capítulo 8), e um método `VMOutput()` espelhando o `XMLOutput()` que já existia. A partir daqui, cada seção da gramática de expressões e comandos ganha, além do reconhecimento sintático, a emissão de código correspondente — construída e testada incrementalmente, como sempre.
 
 ## Literais
 
@@ -65,8 +65,8 @@ Os literais `true`/`false`/`null`/`this` seguem a mesma receita, mas cada um map
 |---|---|---|
 | `false` | `push constant 0` | falso é 0 |
 | `null` | `push constant 0` | `null` também é representado como 0 |
-| `true` | `push constant 0` seguido de `not` | não existe literal `-1`; `not 0` produz `-1` (todos os bits em 1) |
-| `this` | `push pointer 0` | `this` é sempre o conteúdo do registrador `pointer 0` (capítulo 8) |
+| `true` | `push constant 0` seguido de `not` | não existe literal `-1`; `not 0` produz `-1` (todos os bits em 1) — a especificação sugere `push constant 1` seguido de `neg`, que dá o mesmo resultado |
+| `this` | `push pointer 0` | `this` é sempre o conteúdo do registrador `pointer 0` (capítulo 7) |
 
 ```java
 case FALSE: case NULL: case TRUE:
@@ -127,7 +127,19 @@ void compileOperator(TokenType op) {
 }
 ```
 
-`*` e `/` são o único caso especial: como a VM não tem comandos nativos para eles (capítulo 8), viram chamadas a `Math.multiply`/`Math.divide` — o compilador "esconde" essa diferença do programador Jack, que escreve `a * b` sem saber que isso é, por baixo, uma chamada de função.
+Esse laço emite cada operador assim que o termo à sua direita foi compilado — ou seja, avalia da esquerda para a direita, sem precedência. É a convenção do compilador de referência do Nand2Tetris (capítulo 3): `a + b * c` gera
+
+```
+push a
+push b
+add
+push c
+call Math.multiply 2
+```
+
+isto é, `(a + b) * c`. A figura 11.4 do livro *The Elements of Computing Systems* ilustra a geração de código para `x + g(2,y,-z) * 5` com a multiplicação feita antes da soma, mas aquele exemplo é sobre o algoritmo de travessia pós-ordem de uma árvore já construída; ele não é a regra de Jack. Para obter `a + (b * c)`, o programador precisa escrever os parênteses — e aí a recursão em `parseTerm` (que trata `'(' expression ')'`) compila `b * c` antes do `add`.
+
+`*` e `/` são o único caso especial: como a VM não tem comandos nativos para eles (capítulo 7), viram chamadas a `Math.multiply`/`Math.divide` — o compilador "esconde" essa diferença do programador Jack, que escreve `a * b` sem saber que isso é, por baixo, uma chamada de função.
 
 Operadores **unários** (`-x`, `~x`) seguem o padrão inverso de um binário: compilam o operando primeiro, emitem a operação depois — mas com apenas um operando na pilha:
 
@@ -154,11 +166,11 @@ void parseReturn() {
 }
 ```
 
-Isso implementa diretamente a convenção do capítulo 8: toda subroutine, `void` ou não, precisa deixar exatamente um valor na pilha antes do `return`.
+Isso implementa diretamente a convenção do capítulo 7: toda subroutine, `void` ou não, precisa deixar exatamente um valor na pilha antes do `return`.
 
 ## Controle de fluxo: `if` e `while`
 
-Linguagens de alto nível têm estruturas de controle ricas; a VM só tem `goto` e `if-goto` (capítulo 8). Cabe ao compilador fazer esse mapeamento — e o ponto delicado é garantir que os **rótulos sejam únicos** dentro de cada subroutine (dois `if`s na mesma função não podem gerar o mesmo `IF_TRUE0`). A solução é um contador de instância, zerado a cada `parseSubroutineDec`:
+Linguagens de alto nível têm estruturas de controle ricas; a VM só tem `goto` e `if-goto` (capítulo 7). Cabe ao compilador fazer esse mapeamento — e o ponto delicado é garantir que os **rótulos sejam únicos** dentro de cada subroutine (dois `if`s na mesma função não podem gerar o mesmo `IF_TRUE0`). A solução é um contador de instância, zerado a cada `parseSubroutineDec`:
 
 ```java
 private int ifLabelNum = 0;
@@ -241,4 +253,4 @@ void parseWhile() {
 
 ## O que levamos daqui
 
-Neste capítulo, expressões e a maior parte dos comandos de Jack já geram código VM real — sempre seguindo o mesmo princípio: reconhecer a estrutura (o parser da Unidade 1 já faz isso) e, no ponto certo da produção, emitir o comando VM correspondente, sem nunca materializar uma árvore sintática intermediária. O que falta — variáveis (usando a tabela de símbolos do capítulo 6 para resolver `push`/`pop` corretos), subroutines completas (com prólogo de função e alocação de objetos) e arrays — é o assunto do capítulo 10, que fecha o Project 11 por completo.
+Neste capítulo, expressões e a maior parte dos comandos de Jack já geram código VM real — sempre seguindo o mesmo princípio: reconhecer a estrutura (o parser da Unidade 1 já faz isso) e, no ponto certo da produção, emitir o comando VM correspondente, sem nunca materializar uma árvore sintática intermediária. O que falta — variáveis (usando a tabela de símbolos do capítulo 8 para resolver `push`/`pop` corretos), subroutines completas (com prólogo de função e alocação de objetos) e arrays — é o assunto do capítulo 10, que fecha o Project 11 por completo.

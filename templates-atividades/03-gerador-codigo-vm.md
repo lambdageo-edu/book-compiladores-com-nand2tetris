@@ -18,7 +18,7 @@ estrutura sintática reconhecida nas entregas anteriores para código da máquin
 > **Importante:** esta atividade dá continuidade ao compilador. O gerador deve ser integrado
 > ao parser já implementado, **reutilizando o mesmo repositório**.
 
-📖 **Leitura de apoio:** capítulos 6 (tabela de símbolos), 8 (especificação da VM Hack),
+📖 **Leitura de apoio:** capítulos 7 (especificação da VM Hack), 8 (tabela de símbolos),
 9 (geração de código: expressões e comandos) e 10 (subrotinas e objetos).
 
 ---
@@ -140,7 +140,7 @@ ls ./projects/11/Seven/Main.vm
 
 ## 🔗 Materiais de apoio
 
-- Capítulos 6, 8, 9 e 10 do livro + Apêndice B (especificação da VM)
+- Capítulos 7, 8, 9 e 10 do livro + Apêndice B (especificação da VM)
 - Ferramentas e arquivos de teste oficiais: <https://www.nand2tetris.org/software>
 - Página da turma: {{LINK_TURMA}}
 

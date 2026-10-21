@@ -1,6 +1,6 @@
-# 7. Representações intermediárias
+# 6. Representações intermediárias
 
-Antes de detalhar a VM Hack (capítulo 8) e começar a gerar código para ela (capítulos 9 e 10), vale um passo atrás: por que compiladores usam uma representação intermediária (IR) em vez de traduzir a linguagem-fonte diretamente para código de máquina? Este capítulo é teoria pura — não constrói nenhum código — mas justifica cada decisão de projeto dos capítulos seguintes.
+Com o analisador sintático pronto (Unidade 1), o compilador já *entende* a estrutura de um programa Jack — falta decidir *para onde* traduzi-lo. Antes de especificar a VM Hack (capítulo 7), construir a tabela de símbolos que liga os identificadores de Jack aos segmentos dessa VM (capítulo 8) e começar a gerar código (capítulos 9 e 10), vale um passo atrás: por que compiladores usam uma representação intermediária (IR) em vez de traduzir a linguagem-fonte diretamente para código de máquina? Este capítulo é teoria pura — não constrói nenhum código — mas justifica cada decisão de projeto dos capítulos seguintes.
 
 ## O problema que uma IR resolve
 
@@ -37,6 +37,8 @@ Parse tree de "2 + 3 * 4"          AST equivalente
      2      3
 ```
 
+Atenção: o exemplo acima segue a precedência usual da matemática (`*` antes de `+`), como em C ou Java. Em Jack não é assim — como vimos no capítulo 3, a linguagem não define precedência entre operadores, e o compilador avalia da esquerda para a direita: em Jack, `2 + 3 * 4` é compilado como `(2 + 3) * 4`.
+
 Este livro, no entanto, **não constrói uma AST persistente**. Como veremos nos capítulos 9 e 10, nosso compilador gera código VM diretamente durante a análise sintática — a árvore existe apenas implicitamente, na pilha de chamadas recursivas do parser. Essa escolha (comum em compiladores de um único passe, *single-pass*) simplifica bastante a implementação, ao custo de tornar mais difíceis otimizações que exigem enxergar o programa inteiro de uma vez — um custo aceitável para os objetivos didáticos deste curso.
 
 ## Representações lineares: códigos de N endereços
@@ -69,7 +71,7 @@ push b
 add
 ```
 
-O preço dessa compactação é que resultados e argumentos são sempre transitórios — a menos que o código os mova explicitamente para a memória (algo que veremos em detalhe no capítulo 8, com os segmentos `local`, `argument`, etc.).
+O preço dessa compactação é que resultados e argumentos são sempre transitórios — a menos que o código os mova explicitamente para a memória (algo que veremos em detalhe no capítulo 7, com os segmentos `local`, `argument`, etc.).
 
 ## Bytecode e máquinas virtuais
 
@@ -101,4 +103,4 @@ Como este curso não implementa um otimizador — o foco é corretude e arquitet
 
 ## O que vem a seguir
 
-O próximo capítulo especifica a VM Hack por completo — seus 8 segmentos de memória e todos os seus comandos — como referência de consulta para os capítulos 9, 10, 11 e 12.
+O próximo capítulo especifica a VM Hack por completo — seus 8 segmentos de memória e todos os seus comandos. É essa especificação que define o *alvo* do compilador: só depois de conhecê-la faz sentido construir a tabela de símbolos (capítulo 8), cuja função é justamente dizer em que segmento e em que posição cada variável de Jack vai morar.

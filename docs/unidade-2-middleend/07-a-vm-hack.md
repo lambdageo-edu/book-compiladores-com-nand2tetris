@@ -1,4 +1,4 @@
-# 8. A VM Hack (especificação)
+# 7. A VM Hack (especificação)
 
 Este capítulo é a especificação de referência da VM Hack — a representação intermediária baseada em pilha para a qual o compilador Jack (capítulos 9 e 10) vai gerar código, e que o VM Translator (capítulos 11 e 12) vai traduzir para Assembly Hack. Não há código de compilador aqui; é a "planta" que orienta os próximos quatro capítulos.
 
@@ -8,16 +8,27 @@ Cada célula de memória da máquina Hack armazena 16 bits, usados para represen
 
 A memória é organizada em **oito segmentos**, cada um endereçado por índice a partir de 0:
 
-| Segmento | Propósito | Mapeado de |
+| Segmento | Propósito | Usado pelo compilador Jack para |
 |---|---|---|
-| `local` | Variáveis locais da subroutine em execução | `var` (tabela de símbolos, capítulo 6) |
-| `argument` | Argumentos recebidos pela subroutine | `arg` |
-| `static` | Variáveis de classe (compartilhadas por todas as instâncias) | `static` |
-| `this` | Campos do objeto atual | `field` (via `this`) |
-| `that` | Um segundo "objeto atual" — usado para arrays e para o objeto de um método invocado sobre outra instância | (uso interno) |
-| `constant` | Pseudo-segmento somente leitura para constantes literais | literais na expressão |
-| `pointer` | Dois registradores (0 e 1) que apontam para `this` e `that`, respectivamente | uso interno do compilador |
-| `temp` | Oito células de uso livre, compartilhadas por toda a VM | uso interno do compilador |
+| `local` | Variáveis locais da subroutine em execução | variáveis declaradas com `var` |
+| `argument` | Argumentos recebidos pela subroutine | parâmetros da subroutine |
+| `static` | Variáveis de classe (compartilhadas por todas as instâncias) | variáveis declaradas com `static` |
+| `this` | Campos do objeto atual | variáveis declaradas com `field` |
+| `that` | Elemento de array corrente | acesso `arr[i]` |
+| `constant` | Pseudo-segmento somente leitura para constantes literais | literais inteiros |
+| `pointer` | Duas células: `pointer 0` guarda o endereço-base de `this`, `pointer 1` o de `that` | ancorar `this` no objeto e `that` no elemento de array |
+| `temp` | Oito células de uso livre, compartilhadas por toda a VM | valores descartados e auxiliares |
+
+`this` e `that` são segmentos "móveis": não têm endereço fixo, e sim o endereço que estiver gravado em `pointer 0` e `pointer 1`. Gravar um endereço `a` em `pointer 0` faz `this i` passar a significar `RAM[a + i]`; o mesmo vale para `pointer 1` e `that i`:
+
+```
+push constant 8000
+pop pointer 0        // this passa a começar em RAM[8000]
+push constant 17
+pop this 1           // RAM[8001] = 17
+```
+
+É esse mecanismo de endereçamento indireto que o compilador vai usar para acessar campos de objetos (via `this`) e elementos de arrays (via `that`).
 
 Além dos segmentos, duas áreas adicionais completam o modelo: a **pilha** (*stack*), usada para armazenar valores temporários durante a avaliação de expressões e para implementar o protocolo de chamada de função (capítulo 12); e o **heap**, a região de RAM dedicada ao armazenamento de objetos e arrays, gerenciada dinamicamente pelas funções `Memory.alloc`/`Memory.deAlloc` do sistema operacional Jack.
 
@@ -131,12 +142,49 @@ function Main.main 1
     push local 0
     call Soma.soma 1
     call Output.printInt 1
+    pop temp 0                // descarta o valor devolvido por Output.printInt
     push constant 0
     return
 ```
 
+O `pop temp 0` logo depois de `call Output.printInt 1` é o outro lado da convenção vista acima. Como toda função devolve um valor — inclusive as `void`, que devolvem 0 —, quem chama uma função apenas pelo efeito colateral precisa descartar esse valor, para que a pilha não acumule lixo.
+
+## O mapeamento padrão de Jack sobre a VM
+
+A VM não sabe nada de classes, objetos ou métodos. Para que programas Jack compilados separadamente (e o sistema operacional Jack, que é ele próprio um conjunto de arquivos `.vm`) funcionem juntos, todo compilador Jack → VM segue as mesmas convenções — o **mapeamento padrão**. Ele é parte da especificação, não da implementação: os capítulos 8 a 10 apenas o colocam em prática.
+
+**Arquivos e subroutines.** Cada `Xxx.jack` é compilado para um `Xxx.vm` separado. Cada subroutine `yyy` da classe `Xxx` — seja `function`, `method` ou `constructor` — vira uma função VM chamada `Xxx.yyy`. Uma `function` ou um `constructor` com *k* parâmetros vira uma função VM de *k* argumentos; um `method` com *k* parâmetros vira uma função VM de *k* + 1 argumentos, porque `argument 0` é sempre uma referência ao objeto sobre o qual o método opera.
+
+**Variáveis.**
+
+| Variável Jack | Segmento VM |
+|---|---|
+| `var` (local da subroutine) | `local` |
+| parâmetro da subroutine | `argument` |
+| `static` | `static` do `.vm` da classe |
+| `field` do objeto corrente | `this`, depois de apontar `pointer 0` para o objeto |
+| elemento `arr[i]` | `that 0`, depois de apontar `pointer 1` para `arr + i` |
+
+**Subroutines.**
+
+- Um **método** começa ancorando `this` no objeto recebido: `push argument 0`, `pop pointer 0`.
+- Um **construtor** começa alocando o objeto no heap com `Memory.alloc(n)`, em que *n* é o número de campos da classe, ancora `this` no endereço devolvido (`pop pointer 0`) e termina devolvendo esse endereço (`push pointer 0`, `return`).
+- Funções e métodos `void` devolvem `constant 0`.
+
+**Chamadas.** Quem chama empilha os argumentos e executa `call`. Se o alvo é um método, o primeiro valor empilhado é a referência ao objeto. Depois de um `do`, o valor devolvido é descartado com `pop temp 0`.
+
+**Constantes.** `null` e `false` são `0`; `true` é `-1`, obtido com `push constant 1` seguido de `neg` (ou, equivalentemente, `push constant 0` seguido de `not`).
+
+**Serviços do sistema operacional.** O sistema operacional Jack é formado por oito classes já compiladas — `Math.vm`, `Memory.vm`, `Screen.vm`, `Output.vm`, `Keyboard.vm`, `String.vm`, `Array.vm` e `Sys.vm` —, que precisam estar no mesmo diretório dos `.vm` gerados pelo compilador (o VM Emulator do Nand2Tetris já traz uma implementação embutida delas, então nesse caso não é preciso copiá-las). O compilador recorre a elas implicitamente:
+
+| Construção Jack | Serviço usado |
+|---|---|
+| `x * y`, `x / y` | `Math.multiply`, `Math.divide` |
+| constante `"abc"` | `String.new(3)` seguido de `String.appendChar` para cada caractere |
+| `Classe.new(...)` (dentro do construtor) | `Memory.alloc(n)` |
+
 ## O que vem a seguir
 
-Com a especificação da VM Hack em mãos, os próximos dois capítulos (9 e 10) evoluem o `CompilationEngine` da Unidade 1 para efetivamente gerar este código, expressão por expressão, comando por comando — fechando o compilador Jack → VM (Project 11) por completo. Os capítulos 11 e 12, na Unidade 3, tratam do outro lado: como traduzir esse código VM para Assembly Hack.
+Com a especificação da VM Hack e o mapeamento padrão em mãos, sabemos exatamente *onde* cada variável Jack precisa morar. O próximo capítulo constrói a estrutura que guarda essa informação durante a compilação — a **tabela de símbolos** —, e os capítulos 9 e 10 evoluem o `CompilationEngine` da Unidade 1 para efetivamente gerar este código, expressão por expressão, comando por comando — fechando o compilador Jack → VM (Project 11) por completo. Os capítulos 11 e 12, na Unidade 3, tratam do outro lado: como traduzir esse código VM para Assembly Hack.
 
 Uma versão tabular desta especificação, para consulta rápida durante esses capítulos, está no [Apêndice B](../apendices/b-especificacao-vm.md).

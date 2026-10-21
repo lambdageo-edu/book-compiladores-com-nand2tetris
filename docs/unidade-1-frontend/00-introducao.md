@@ -69,7 +69,7 @@ Ao longo do curso:
 | Unidade | Foco | Fecha com |
 |---|---|---|
 | 1 — Front-end | Fundamentos teóricos, a linguagem Jack, análise léxica e sintática | Um parser completo para Jack |
-| 2 — Middle-end | Tabela de símbolos, representações intermediárias, geração de código para a VM Hack | Compilador Jack → VM completo + VM Translator (parte 1) |
+| 2 — Middle-end | Representações intermediárias, especificação da VM Hack, tabela de símbolos, geração de código para a VM | Compilador Jack → VM completo + VM Translator (parte 1) |
 | 3 — Back-end | VM Translator (parte 2), geração de código alvo, Assembly e montador | VM Translator completo + Assembler Hack |
 
 A linguagem de demonstração usada no livro é **Java** — todo o código é construído junto com você, capítulo a capítulo, no espírito de [*Crafting Interpreters*](https://craftinginterpreters.com/contents.html). Mas você não precisa usar Java nas suas atividades práticas: é livre para implementar em qualquer linguagem com a qual se sinta confortável. O que importa é entender cada etapa a fundo o suficiente para reproduzi-la.

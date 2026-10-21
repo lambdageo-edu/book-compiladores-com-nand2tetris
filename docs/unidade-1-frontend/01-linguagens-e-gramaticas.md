@@ -217,7 +217,7 @@ A regra de ouro é posicional: se a ação aparece depois do símbolo `X` na pro
 
 ### Os limites de uma gramática
 
-Gramáticas livres de contexto descrevem a maior parte, mas não toda a sintaxe de uma linguagem de programação: regras como "todo identificador deve ser declarado antes do uso" ou "o número de argumentos de uma chamada deve bater com a declaração da função" não são expressáveis em uma GLC. As cadeias de tokens aceitas pelo analisador sintático formam, na verdade, um **superconjunto** da linguagem — cabe à análise semântica (capítulo 6) impor as regras que restam.
+Gramáticas livres de contexto descrevem a maior parte, mas não toda a sintaxe de uma linguagem de programação: regras como "todo identificador deve ser declarado antes do uso" ou "o número de argumentos de uma chamada deve bater com a declaração da função" não são expressáveis em uma GLC. As cadeias de tokens aceitas pelo analisador sintático formam, na verdade, um **superconjunto** da linguagem — cabe à análise semântica (capítulo 8) impor as regras que restam.
 
 ## O que vem a seguir
 

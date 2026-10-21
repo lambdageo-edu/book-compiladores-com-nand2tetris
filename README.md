@@ -15,7 +15,7 @@ back-end), que é deliberadamente diferente da ordem *bottom-up* do Nand2Tetris 
 | Parte | Conteúdo | Projeto Nand2Tetris |
 | --- | --- | --- |
 | 1 — Front-end | Linguagens, gramáticas, analisador léxico e sintático | Project 10 |
-| 2 — O Compilador | Tabela de símbolos, IR, geração de código VM | Project 11 |
+| 2 — O Compilador | IR, especificação da VM Hack, tabela de símbolos, geração de código VM | Project 11 |
 | 3 — O Tradutor VM | Especificação da VM Hack, tradução VM → Assembly | Projects 7 e 8 |
 | 4 — O Montador | Assembly Hack, montagem em duas passagens | Project 6 |
 

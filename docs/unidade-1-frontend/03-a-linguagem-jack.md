@@ -11,7 +11,7 @@ Jack tem uma sintaxe inspirada em Java, mas com uma lista deliberada de simplifi
 | Paradigma | Orientado a objetos, baseado em classes | Suficiente para ensinar tabela de símbolos com escopo e geração de código de objetos |
 | Herança / polimorfismo | Não existem | Remove *dispatch* de métodos e resolução de tipos por hierarquia |
 | Tipagem | Estática, mas fracamente verificada | O compilador não precisa (neste curso) implementar checagem de tipos completa |
-| Precedência de operadores | **Não existe** — associatividade sempre à esquerda | Elimina toda a complexidade de tabelas de precedência na gramática de expressões |
+| Precedência de operadores | **Não existe** — o compilador avalia da esquerda para a direita | Elimina toda a complexidade de tabelas de precedência na gramática de expressões |
 | Tipos primitivos | Apenas `int`, `boolean`, `char` (sem `float`) | Simplifica geração de código e representação de valores (tudo cabe em uma palavra de 16 bits) |
 | Campos de instância | Sempre privados | Não há modificadores de visibilidade para tratar |
 | Métodos | Sempre públicos | Idem |
@@ -99,10 +99,10 @@ Toda variável não inicializada explicitamente recebe um valor padrão: `0` par
 
 ## Expressões: sem precedência de operadores
 
-Esta é talvez a decisão de projeto mais marcante de Jack: **não existe precedência entre operadores**. A avaliação é sempre associada da esquerda para a direita, e cabe ao programador usar parênteses para expressar a ordem desejada:
+Esta é talvez a decisão de projeto mais marcante de Jack: **não existe precedência entre operadores**. A especificação da linguagem não define nenhuma prioridade (só garante que expressões entre parênteses são avaliadas primeiro) e deixa a ordem a cargo do compilador; o compilador de referência do Nand2Tetris, e o que construímos neste livro, avaliam da esquerda para a direita. Cabe ao programador usar parênteses para expressar a ordem desejada:
 
 ```java
-let x = 2 + 3 * 4;     // indefinido pela gramática — evite
+let x = 2 + 3 * 4;     // = 20: avaliado como (2 + 3) * 4 — prefira explicitar
 let x = 2 + (3 * 4);   // = 14
 let x = (2 + 3) * 4;   // = 20
 ```
@@ -190,7 +190,7 @@ var Point pt;
 let pt = Point.new(10, 20);
 ```
 
-Métodos são chamados sobre uma instância (`objeto.metodo(...)`); funções, sobre a classe (`Classe.funcao(...)`). Essa distinção sintática — que não existe em Java, onde tudo é `objeto.metodo` ou `Classe.metodoEstatico` mas o compilador resolve por assinatura — é explícita em Jack através da palavra-chave de declaração, o que facilita bastante a análise semântica no capítulo 6.
+Métodos são chamados sobre uma instância (`objeto.metodo(...)`); funções, sobre a classe (`Classe.funcao(...)`). Essa distinção sintática — que não existe em Java, onde tudo é `objeto.metodo` ou `Classe.metodoEstatico` mas o compilador resolve por assinatura — é explícita em Jack através da palavra-chave de declaração, o que facilita bastante a análise semântica no capítulo 8.
 
 ## Biblioteca padrão (Jack OS)
 

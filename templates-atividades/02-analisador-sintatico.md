@@ -40,9 +40,10 @@ Método por não-terminal (*recursive descent*), traduzindo cada produção dire
 
 - Reutilizar o analisador léxico da entrega anterior
 - Implementar auxiliares equivalentes a `advance()`, `peek()`, `match(tipo)`, `expect(tipo)`
-- Manter **um token de antecipação** (*lookahead*): `term` é o único não-terminal que exige
-  olhar o token seguinte para desambiguar variável simples × acesso a array × chamada de
-  subroutine
+- Manter **um token de antecipação** (*lookahead*): `term` (e `subroutineCall`) é o único ponto
+  em que é preciso olhar o token seguinte ao identificador para desambiguar variável simples ×
+  acesso a array × chamada de subroutine — o único trecho LL(2) da gramática, que se torna
+  LL(1) ao consumir o identificador antes de decidir
 - Detecção de tokens inesperados com mensagem clara indicando a **linha**
 
 ### 3. Saída XML
