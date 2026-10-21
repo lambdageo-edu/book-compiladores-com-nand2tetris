@@ -18,7 +18,7 @@
         <link rel="prev" href="../04-analisador-lexico/">
       
       
-        <link rel="next" href="../../unidade-2-middleend/06-tabela-de-simbolos/">
+        <link rel="next" href="../../unidade-2-middleend/06-representacoes-intermediarias/">
       
       
         
@@ -757,14 +757,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../unidade-2-middleend/06-tabela-de-simbolos/" class="md-nav__link">
+      <a href="../../unidade-2-middleend/06-representacoes-intermediarias/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    6. Tabela de símbolos
+    6. Representações intermediárias
   
 
     
@@ -785,14 +785,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../unidade-2-middleend/07-representacoes-intermediarias/" class="md-nav__link">
+      <a href="../../unidade-2-middleend/07-a-vm-hack/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    7. Representações intermediárias
+    7. A VM Hack (especificação)
   
 
     
@@ -813,14 +813,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../unidade-2-middleend/08-a-vm-hack/" class="md-nav__link">
+      <a href="../../unidade-2-middleend/08-tabela-de-simbolos/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    8. A VM Hack (especificação)
+    8. Tabela de símbolos
   
 
     
@@ -1525,9 +1525,10 @@
 <li><strong>Parsers <em>top-down</em></strong>: começam pela raiz (o não-terminal inicial) e fazem a árvore crescer em direção às folhas, expandindo a cada passo um não-terminal pendente com uma de suas produções.</li>
 </ul>
 <p>Neste livro usamos <strong>top-down</strong>, na sua forma mais direta de implementar à mão: o <strong>analisador preditivo recursivo</strong>, que já introduzimos no capítulo 2. A eficiência (e a própria viabilidade) de um parser top-down depende de escolher a produção certa a cada passo, olhando apenas o token atual — sem <em>backtracking</em>. Uma gramática que permite essa escolha univocamente com um único símbolo de antecipação (<em>lookahead</em>) é chamada <strong>LL(1)</strong>: entrada lida da esquerda para a direita (<em>Left-to-right</em>), construindo a derivação mais à esquerda (<em>Leftmost</em>), com exatamente 1 símbolo de antecipação. Gramáticas LL(1) também são chamadas <strong>preditivas</strong>, e é exatamente esse o cuidado que tivemos, no capítulo 1, ao eliminar recursão à esquerda e fatorar a gramática: sem essas duas propriedades, um parser recursivo simplesmente não funciona.</p>
-<p>A gramática de Jack do capítulo 3 já é LL(1) — não precisamos aplicar nenhuma transformação adicional. A técnica de tradução é a mesma do capítulo 2: <strong>um método por não-terminal</strong>, mapeando cada produção diretamente em código.</p>
+<p>A gramática de Jack do capítulo 3 é <strong>quase</strong> LL(1): não tem recursão à esquerda, e em quase todo não-terminal o primeiro token basta para escolher a produção (um comando que começa com <code>while</code> só pode ser um <code>whileStatement</code>, por exemplo). A única exceção está em <code>term</code> (e, pelo mesmo motivo, em <code>subroutineCall</code>): as alternativas <code>varName</code>, <code>varName '[' expression ']'</code> e as duas formas de <code>subroutineCall</code> começam todas com um <code>identifier</code>, e só o token <strong>seguinte</strong> — <code>[</code>, <code>(</code>, <code>.</code> ou nenhum deles — diz qual delas se aplica. Nesse ponto, e apenas nele, a gramática como está escrita é LL(2).</p>
+<p>Não precisamos reescrever a gramática para lidar com isso. Basta aplicar, no código, a fatoração à esquerda do capítulo 1: o parser consome o <code>identifier</code> comum a todas as alternativas e só então decide, olhando o próximo token. Com essa fatoração implícita, cada decisão do parser é tomada com um único token de antecipação. A técnica de tradução é a mesma do capítulo 2: <strong>um método por não-terminal</strong>, mapeando cada produção diretamente em código.</p>
 <h2 id="tratamento-de-erros-sintaticos">Tratamento de erros sintáticos<a class="headerlink" href="#tratamento-de-erros-sintaticos" title="Permanent link">&para;</a></h2>
-<p>Diferente de erros léxicos (tipicamente erros de digitação — um símbolo que não existe na linguagem), erros sintáticos dizem respeito à <em>estrutura</em>: um <code>;</code> esquecido, um <code>let</code> sem <code>=</code>. Nossa estratégia de tratamento é deliberadamente simples: no primeiro erro encontrado, o parser para e emite uma mensagem no formato <code>Linha N: Esperado 'X' encontrado 'Y'</code>. Não faremos recuperação de erros nem tentaremos continuar a análise após o primeiro problema — isso é suficiente para os objetivos didáticos deste curso. (Também não implementaremos análise semântica neste analisador: erros de tipo, por exemplo, não serão detectados aqui — ficam para o capítulo 6.)</p>
+<p>Diferente de erros léxicos (tipicamente erros de digitação — um símbolo que não existe na linguagem), erros sintáticos dizem respeito à <em>estrutura</em>: um <code>;</code> esquecido, um <code>let</code> sem <code>=</code>. Nossa estratégia de tratamento é deliberadamente simples: no primeiro erro encontrado, o parser para e emite uma mensagem no formato <code>Linha N: Esperado 'X' encontrado 'Y'</code>. Não faremos recuperação de erros nem tentaremos continuar a análise após o primeiro problema — isso é suficiente para os objetivos didáticos deste curso. (Também não implementaremos análise semântica neste analisador: erros de tipo, por exemplo, não serão detectados aqui — ficam para o capítulo 8.)</p>
 <h2 id="estrutura-basica-um-token-de-antecipacao">Estrutura básica: um token de antecipação<a class="headerlink" href="#estrutura-basica-um-token-de-antecipacao" title="Permanent link">&para;</a></h2>
 <p>Boa parte da gramática de Jack pode ser decidida olhando apenas o token atual. Mas uma parte — notavelmente, distinguir uma variável simples de um acesso a array ou de uma chamada de subroutine dentro de <code>term</code> — exige olhar <strong>um token à frente</strong>. Por isso, de forma simétrica ao <code>peekNext()</code> do tokenizador, o parser mantém dois tokens em memória: o token atual (<code>currentToken</code>) e o próximo (<code>peekToken</code>):</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Parser</span><span class="w"> </span><span class="p">{</span>
@@ -1690,7 +1691,7 @@
 <p>A partir daqui, o padrão está estabelecido — cada não-terminal restante segue exatamente a mesma receita (um método, um <code>expectPeek</code> por terminal, uma chamada recursiva por não-terminal, um <code>if</code>/<code>while</code> por <code>?</code>/<code>*</code> da gramática). Fica como exercício guiado completar:</p>
 <ul>
 <li><code>parseSubroutineCall</code> — adicionar a forma qualificada (<code>Classe.metodo(...)</code> / <code>objeto.metodo(...)</code>), usando o <em>lookahead</em> do <code>.</code> versus <code>(</code>.</li>
-<li><code>parseTerm</code> — completar os três casos que faltam: acesso a array (<code>varName '[' expression ']'</code>), chamada de subroutine dentro de uma expressão, expressão entre parênteses, e operador unário (<code>unaryOp term</code>) — todos exigindo o mesmo tipo de <em>lookahead</em> de um token para desambiguar frente a um simples <code>varName</code>.</li>
+<li><code>parseTerm</code> — completar os três casos que faltam: acesso a array (<code>varName '[' expression ']'</code>), chamada de subroutine dentro de uma expressão, expressão entre parênteses, e operador unário (<code>unaryOp term</code>) — todos decididos da mesma forma: consumir o <code>identifier</code> e olhar o token seguinte (<code>[</code>, <code>(</code>, <code>.</code>) para desambiguar frente a um simples <code>varName</code>.</li>
 <li><code>parseExpressionList</code>, <code>parseIf</code>, <code>parseWhile</code>, <code>parseReturn</code>, <code>parseStatements</code> — cada um uma tradução direta de sua produção na tabela do capítulo 3.</li>
 <li><code>parseClassVarDec</code>, <code>parseSubroutineDec</code>, <code>parseParameterList</code>, <code>parseVarDec</code>, <code>parseClass</code> — a "casca" da classe, fechando o topo da gramática.</li>
 </ul>
@@ -1756,7 +1757,7 @@
 <p>Não tente compilar de uma vez um arquivo <code>.jack</code> inteiro contra a gramática completa. Construa o parser exatamente na ordem que fomos construindo aqui: primeiro <code>term</code> simples, depois <code>expression</code>, depois cada comando isoladamente (com testes próprios, como fizemos com <code>parseLet</code> e <code>parseDo</code>), só então subindo para <code>parseStatements</code>, <code>parseSubroutineDec</code> e finalmente <code>parseClass</code>. É a mesma disciplina de "um passo por vez, com teste a cada passo" que usamos desde o capítulo 2.</p>
 </div>
 <h2 id="o-que-vem-a-seguir">O que vem a seguir<a class="headerlink" href="#o-que-vem-a-seguir" title="Permanent link">&para;</a></h2>
-<p>Com um parser completo (mesmo que ainda apenas reconhecendo a estrutura, sem gerar código), fechamos o front-end da Unidade 1. Antes de gerar código de verdade, porém, falta uma peça: saber <strong>onde</strong> cada identificador vive (é uma variável local? um campo do objeto? um parâmetro?) e <strong>que tipo</strong> ele tem. Essa é exatamente a tabela de símbolos — o primeiro capítulo da Unidade 2, e o que finalmente nos permite evoluir este reconhecedor em um compilador que produz código VM de verdade.</p>
+<p>Com um parser completo (mesmo que ainda apenas reconhecendo a estrutura, sem gerar código), fechamos o front-end da Unidade 1. Antes de gerar código de verdade, porém, a Unidade 2 precisa definir <em>para onde</em> traduzir: o capítulo 6 discute representações intermediárias e o capítulo 7 especifica a VM Hack, nosso alvo. Só então faz sentido a última peça — a tabela de símbolos (capítulo 8), que diz <strong>onde</strong> cada identificador vive (é uma variável local? um campo do objeto? um parâmetro?) e <strong>que tipo</strong> ele tem — e que finalmente nos permite evoluir este reconhecedor em um compilador que produz código VM de verdade.</p>
 
 
 

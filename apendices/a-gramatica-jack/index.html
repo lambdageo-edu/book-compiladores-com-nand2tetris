@@ -600,14 +600,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../unidade-2-middleend/06-tabela-de-simbolos/" class="md-nav__link">
+      <a href="../../unidade-2-middleend/06-representacoes-intermediarias/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    6. Tabela de símbolos
+    6. Representações intermediárias
   
 
     
@@ -628,14 +628,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../unidade-2-middleend/07-representacoes-intermediarias/" class="md-nav__link">
+      <a href="../../unidade-2-middleend/07-a-vm-hack/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    7. Representações intermediárias
+    7. A VM Hack (especificação)
   
 
     
@@ -656,14 +656,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../unidade-2-middleend/08-a-vm-hack/" class="md-nav__link">
+      <a href="../../unidade-2-middleend/08-tabela-de-simbolos/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    8. A VM Hack (especificação)
+    8. Tabela de símbolos
   
 
     
@@ -1570,9 +1570,9 @@
 </table>
 <h2 id="notas-de-implementacao">Notas de implementação<a class="headerlink" href="#notas-de-implementacao" title="Permanent link">&para;</a></h2>
 <ul>
-<li><code>term</code> é o único não-terminal que exige mais de um token de <em>lookahead</em> para decidir a produção: ao ver um <code>identifier</code>, o parser precisa olhar o token seguinte (<code>[</code>, <code>(</code>, <code>.</code>, ou nenhum dos três) para diferenciar variável simples, acesso a array, e chamada de subroutine (qualificada ou não). Ver capítulo 5.</li>
+<li><code>term</code> (e, pelo mesmo motivo, <code>subroutineCall</code>) é o único ponto em que o primeiro token não basta para decidir a produção: ao ver um <code>identifier</code>, o parser precisa olhar o token seguinte (<code>[</code>, <code>(</code>, <code>.</code>, ou nenhum dos três) para diferenciar variável simples, acesso a array e chamada de subroutine (qualificada ou não). Ver capítulo 5.</li>
 <li>A ausência de precedência de operadores em Jack (capítulo 3) é o que permite <code>expression</code> ser <code>term (op term)*</code> — um único nível, sem a cadeia <code>expression → term → factor</code> que uma gramática com precedência exigiria.</li>
-<li>Esta gramática já é LL(1): não há recursão à esquerda nem produções alternativas com o mesmo símbolo inicial dentro do mesmo não-terminal, exceto o <em>lookahead</em> extra de <code>term</code> descrito acima.</li>
+<li>Esta gramática é LL(1) em todos os não-terminais, exceto <code>term</code> e <code>subroutineCall</code>, que, como estão escritos, são LL(2). Fatorar à esquerda o <code>identifier</code> comum às alternativas (capítulo 1) torna esses dois casos LL(1) — é o que o parser do capítulo 5 faz ao consumir o identificador antes de decidir.</li>
 </ul>
 
 

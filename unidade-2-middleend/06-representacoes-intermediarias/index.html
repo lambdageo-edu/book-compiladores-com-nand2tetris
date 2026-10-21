@@ -12,13 +12,13 @@
         <meta name="author" content="Prof. Sergio Costa">
       
       
-        <link rel="canonical" href="https://lambdageo.github.io/nand2tetris-compilador/unidade-2-middleend/07-representacoes-intermediarias/">
+        <link rel="canonical" href="https://lambdageo.github.io/nand2tetris-compilador/unidade-2-middleend/06-representacoes-intermediarias/">
       
       
-        <link rel="prev" href="../06-tabela-de-simbolos/">
+        <link rel="prev" href="../../unidade-1-frontend/05-analisador-sintatico/">
       
       
-        <link rel="next" href="../08-a-vm-hack/">
+        <link rel="next" href="../07-a-vm-hack/">
       
       
         
@@ -29,7 +29,7 @@
     
     
       
-        <title>7. Representações intermediárias - Compiladores — do zero ao Hack</title>
+        <title>6. Representações intermediárias - Compiladores — do zero ao Hack</title>
       
     
     
@@ -76,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#7-representacoes-intermediarias" class="md-skip">
+        <a href="#6-representacoes-intermediarias" class="md-skip">
           Ir para o conteúdo
         </a>
       
@@ -112,7 +112,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              7. Representações intermediárias
+              6. Representações intermediárias
             
           </span>
         </div>
@@ -597,34 +597,6 @@
                 
   
   
-  
-  
-    <li class="md-nav__item">
-      <a href="../06-tabela-de-simbolos/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    6. Tabela de símbolos
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
     
   
   
@@ -644,7 +616,7 @@
   <span class="md-ellipsis">
     
   
-    7. Representações intermediárias
+    6. Representações intermediárias
   
 
     
@@ -662,7 +634,7 @@
   <span class="md-ellipsis">
     
   
-    7. Representações intermediárias
+    6. Representações intermediárias
   
 
     
@@ -769,14 +741,42 @@
   
   
     <li class="md-nav__item">
-      <a href="../08-a-vm-hack/" class="md-nav__link">
+      <a href="../07-a-vm-hack/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    8. A VM Hack (especificação)
+    7. A VM Hack (especificação)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../08-tabela-de-simbolos/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    8. Tabela de símbolos
   
 
     
@@ -1428,8 +1428,8 @@
   
 
 
-<h1 id="7-representacoes-intermediarias">7. Representações intermediárias<a class="headerlink" href="#7-representacoes-intermediarias" title="Permanent link">&para;</a></h1>
-<p>Antes de detalhar a VM Hack (capítulo 8) e começar a gerar código para ela (capítulos 9 e 10), vale um passo atrás: por que compiladores usam uma representação intermediária (IR) em vez de traduzir a linguagem-fonte diretamente para código de máquina? Este capítulo é teoria pura — não constrói nenhum código — mas justifica cada decisão de projeto dos capítulos seguintes.</p>
+<h1 id="6-representacoes-intermediarias">6. Representações intermediárias<a class="headerlink" href="#6-representacoes-intermediarias" title="Permanent link">&para;</a></h1>
+<p>Com o analisador sintático pronto (Unidade 1), o compilador já <em>entende</em> a estrutura de um programa Jack — falta decidir <em>para onde</em> traduzi-lo. Antes de especificar a VM Hack (capítulo 7), construir a tabela de símbolos que liga os identificadores de Jack aos segmentos dessa VM (capítulo 8) e começar a gerar código (capítulos 9 e 10), vale um passo atrás: por que compiladores usam uma representação intermediária (IR) em vez de traduzir a linguagem-fonte diretamente para código de máquina? Este capítulo é teoria pura — não constrói nenhum código — mas justifica cada decisão de projeto dos capítulos seguintes.</p>
 <h2 id="o-problema-que-uma-ir-resolve">O problema que uma IR resolve<a class="headerlink" href="#o-problema-que-uma-ir-resolve" title="Permanent link">&para;</a></h2>
 <p>Um compilador "monolítico", que traduz diretamente de uma linguagem-fonte para uma arquitetura-alvo específica, tem um problema de escala: para <strong>N</strong> linguagens-fonte e <strong>M</strong> arquiteturas-alvo, seriam necessários <strong>N × M</strong> compiladores completos, cada um do zero. Introduzir uma representação intermediária comum quebra esse produto em uma soma: um <strong>front-end</strong> por linguagem (que traduz para a IR) e um <strong>back-end</strong> por arquitetura (que traduz da IR para o alvo) — <strong>N + M</strong> componentes, cada um reutilizável independentemente dos demais.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Front-ends (linguagens)        IR comum        Back-ends (arquiteturas)
@@ -1454,6 +1454,7 @@
 <a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>     |      |
 <a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>     2      3
 </code></pre></div>
+<p>Atenção: o exemplo acima segue a precedência usual da matemática (<code>*</code> antes de <code>+</code>), como em C ou Java. Em Jack não é assim — como vimos no capítulo 3, a linguagem não define precedência entre operadores, e o compilador avalia da esquerda para a direita: em Jack, <code>2 + 3 * 4</code> é compilado como <code>(2 + 3) * 4</code>.</p>
 <p>Este livro, no entanto, <strong>não constrói uma AST persistente</strong>. Como veremos nos capítulos 9 e 10, nosso compilador gera código VM diretamente durante a análise sintática — a árvore existe apenas implicitamente, na pilha de chamadas recursivas do parser. Essa escolha (comum em compiladores de um único passe, <em>single-pass</em>) simplifica bastante a implementação, ao custo de tornar mais difíceis otimizações que exigem enxergar o programa inteiro de uma vez — um custo aceitável para os objetivos didáticos deste curso.</p>
 <h2 id="representacoes-lineares-codigos-de-n-enderecos">Representações lineares: códigos de N endereços<a class="headerlink" href="#representacoes-lineares-codigos-de-n-enderecos" title="Permanent link">&para;</a></h2>
 <p>Uma IR <strong>linear</strong> modela pseudocódigo para uma máquina abstrata — uma escolha natural, já que tanto o código-fonte quanto o código de máquina são, em última instância, sequências lineares de instruções. Cooper classifica essas representações pelo número de operandos que cada instrução referencia:</p>
@@ -1476,7 +1477,7 @@
 <a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>push b
 <a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>add
 </code></pre></div>
-<p>O preço dessa compactação é que resultados e argumentos são sempre transitórios — a menos que o código os mova explicitamente para a memória (algo que veremos em detalhe no capítulo 8, com os segmentos <code>local</code>, <code>argument</code>, etc.).</p>
+<p>O preço dessa compactação é que resultados e argumentos são sempre transitórios — a menos que o código os mova explicitamente para a memória (algo que veremos em detalhe no capítulo 7, com os segmentos <code>local</code>, <code>argument</code>, etc.).</p>
 <h2 id="bytecode-e-maquinas-virtuais">Bytecode e máquinas virtuais<a class="headerlink" href="#bytecode-e-maquinas-virtuais" title="Permanent link">&para;</a></h2>
 <p>Quando uma IR de pilha é compilada para um formato binário compacto — tipicamente um byte por opcode —, o resultado é chamado <strong>bytecode</strong>. Uma <strong>máquina virtual</strong> (VM) é o interpretador de software que executa esse bytecode como se fosse uma máquina real, oferecendo portabilidade (o mesmo bytecode roda em qualquer plataforma que tenha a VM) e um ambiente controlado (gerência de memória, isolamento). Java (JVM), Python, C#/.NET e WebAssembly são todos exemplos de linguagens que compilam para bytecode executado por uma VM baseada em pilha.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">f</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
@@ -1495,7 +1496,7 @@
 <p>Resumindo o espectro: ASTs preservam mais estrutura, mas são mais difíceis de gerar diretamente durante o parsing e mais custosas para interpretar (é preciso percorrer a árvore). Códigos de três endereços são o padrão em compiladores de produção com otimizador (GCC, LLVM), porque casam bem com arquiteturas RISC modernas — mas exigem alocação de registradores/temporários, uma complexidade extra. Código de pilha é o mais simples de <strong>gerar</strong> (a notação pós-fixa cai direto de uma travessia pós-ordem da árvore de derivação, como veremos no capítulo 9) e o mais simples de <strong>interpretar</strong> — ao custo de gerar mais instruções por operação complexa e não ser diretamente otimizável sem reconstrução.</p>
 <p>Como este curso não implementa um otimizador — o foco é corretude e arquitetura, não desempenho —, a VM Hack (uma IR de pilha) é a escolha certa: simples de gerar diretamente durante a análise sintática (fechando o capítulo 9), simples de traduzir para Assembly Hack depois (capítulos 11 e 12), e didaticamente transparente em cada etapa.</p>
 <h2 id="o-que-vem-a-seguir">O que vem a seguir<a class="headerlink" href="#o-que-vem-a-seguir" title="Permanent link">&para;</a></h2>
-<p>O próximo capítulo especifica a VM Hack por completo — seus 8 segmentos de memória e todos os seus comandos — como referência de consulta para os capítulos 9, 10, 11 e 12.</p>
+<p>O próximo capítulo especifica a VM Hack por completo — seus 8 segmentos de memória e todos os seus comandos. É essa especificação que define o <em>alvo</em> do compilador: só depois de conhecê-la faz sentido construir a tabela de símbolos (capítulo 8), cuja função é justamente dizer em que segmento e em que posição cada variável de Jack vai morar.</p>
 
 
 

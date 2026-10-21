@@ -785,14 +785,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../unidade-2-middleend/06-tabela-de-simbolos/" class="md-nav__link">
+      <a href="../../unidade-2-middleend/06-representacoes-intermediarias/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    6. Tabela de símbolos
+    6. Representações intermediárias
   
 
     
@@ -813,14 +813,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../unidade-2-middleend/07-representacoes-intermediarias/" class="md-nav__link">
+      <a href="../../unidade-2-middleend/07-a-vm-hack/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    7. Representações intermediárias
+    7. A VM Hack (especificação)
   
 
     
@@ -841,14 +841,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../unidade-2-middleend/08-a-vm-hack/" class="md-nav__link">
+      <a href="../../unidade-2-middleend/08-tabela-de-simbolos/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    8. A VM Hack (especificação)
+    8. Tabela de símbolos
   
 
     
@@ -1602,7 +1602,7 @@
 </tr>
 <tr>
 <td>Precedência de operadores</td>
-<td><strong>Não existe</strong> — associatividade sempre à esquerda</td>
+<td><strong>Não existe</strong> — o compilador avalia da esquerda para a direita</td>
 <td>Elimina toda a complexidade de tabelas de precedência na gramática de expressões</td>
 </tr>
 <tr>
@@ -1703,8 +1703,8 @@
 </code></pre></div>
 <p>Toda variável não inicializada explicitamente recebe um valor padrão: <code>0</code> para <code>int</code>, <code>false</code> para <code>boolean</code>, <code>null</code> para tipos de classe.</p>
 <h2 id="expressoes-sem-precedencia-de-operadores">Expressões: sem precedência de operadores<a class="headerlink" href="#expressoes-sem-precedencia-de-operadores" title="Permanent link">&para;</a></h2>
-<p>Esta é talvez a decisão de projeto mais marcante de Jack: <strong>não existe precedência entre operadores</strong>. A avaliação é sempre associada da esquerda para a direita, e cabe ao programador usar parênteses para expressar a ordem desejada:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">let</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">3</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">4</span><span class="p">;</span><span class="w">     </span><span class="c1">// indefinido pela gramática — evite</span>
+<p>Esta é talvez a decisão de projeto mais marcante de Jack: <strong>não existe precedência entre operadores</strong>. A especificação da linguagem não define nenhuma prioridade (só garante que expressões entre parênteses são avaliadas primeiro) e deixa a ordem a cargo do compilador; o compilador de referência do Nand2Tetris, e o que construímos neste livro, avaliam da esquerda para a direita. Cabe ao programador usar parênteses para expressar a ordem desejada:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">let</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">3</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">4</span><span class="p">;</span><span class="w">     </span><span class="c1">// = 20: avaliado como (2 + 3) * 4 — prefira explicitar</span>
 <a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="n">let</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="mi">3</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">4</span><span class="p">);</span><span class="w">   </span><span class="c1">// = 14</span>
 <a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="n">let</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="mi">2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">4</span><span class="p">;</span><span class="w">   </span><span class="c1">// = 20</span>
 </code></pre></div>
@@ -1798,7 +1798,7 @@
 <div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kd">var</span><span class="w"> </span><span class="n">Point</span><span class="w"> </span><span class="n">pt</span><span class="p">;</span>
 <a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="n">let</span><span class="w"> </span><span class="n">pt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Point</span><span class="p">.</span><span class="na">new</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="mi">20</span><span class="p">);</span>
 </code></pre></div>
-<p>Métodos são chamados sobre uma instância (<code>objeto.metodo(...)</code>); funções, sobre a classe (<code>Classe.funcao(...)</code>). Essa distinção sintática — que não existe em Java, onde tudo é <code>objeto.metodo</code> ou <code>Classe.metodoEstatico</code> mas o compilador resolve por assinatura — é explícita em Jack através da palavra-chave de declaração, o que facilita bastante a análise semântica no capítulo 6.</p>
+<p>Métodos são chamados sobre uma instância (<code>objeto.metodo(...)</code>); funções, sobre a classe (<code>Classe.funcao(...)</code>). Essa distinção sintática — que não existe em Java, onde tudo é <code>objeto.metodo</code> ou <code>Classe.metodoEstatico</code> mas o compilador resolve por assinatura — é explícita em Jack através da palavra-chave de declaração, o que facilita bastante a análise semântica no capítulo 8.</p>
 <h2 id="biblioteca-padrao-jack-os">Biblioteca padrão (Jack OS)<a class="headerlink" href="#biblioteca-padrao-jack-os" title="Permanent link">&para;</a></h2>
 <p>Jack não tem tipos ou operações embutidas além dos três primitivos — tudo o mais (strings, arrays, matemática, entrada/saída, gráficos, gerência de memória) é fornecido por oito classes de uma biblioteca padrão, o "sistema operacional Jack":</p>
 <table>
@@ -1888,7 +1888,7 @@
 <tbody>
 <tr>
 <td><code>classdef</code></td>
-<td><code>'class'</code> className <code>'{'</code> classVarDec<em> subroutineDec</em> <code>'}'</code></td>
+<td><code>'class'</code> className <code>'{'</code> classVarDec* subroutineDec* <code>'}'</code></td>
 </tr>
 <tr>
 <td><code>classVarDec</code></td>

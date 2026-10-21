@@ -808,14 +808,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../unidade-2-middleend/06-tabela-de-simbolos/" class="md-nav__link">
+      <a href="../../unidade-2-middleend/06-representacoes-intermediarias/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    6. Tabela de símbolos
+    6. Representações intermediárias
   
 
     
@@ -836,14 +836,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../unidade-2-middleend/07-representacoes-intermediarias/" class="md-nav__link">
+      <a href="../../unidade-2-middleend/07-a-vm-hack/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    7. Representações intermediárias
+    7. A VM Hack (especificação)
   
 
     
@@ -864,14 +864,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../unidade-2-middleend/08-a-vm-hack/" class="md-nav__link">
+      <a href="../../unidade-2-middleend/08-tabela-de-simbolos/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    8. A VM Hack (especificação)
+    8. Tabela de símbolos
   
 
     
@@ -1769,7 +1769,7 @@
 </code></pre></div>
 <p>A regra de ouro é posicional: se a ação aparece depois do símbolo <code>X</code> na produção, ela deve ser copiada para o método gerado logo <strong>depois</strong> da chamada/casamento correspondente a <code>X</code>. Construir um tradutor dirigido por sintaxe é, portanto, apenas um passo além de construir um analisador preditivo: constrói-se o parser preditivo normalmente, e depois se copiam as ações semânticas para dentro de cada método, respeitando essa posição relativa. É exatamente esse o nome — e o método — que dá título a esta disciplina, e é o que faremos concretamente já no capítulo 2 (onde as "ações" são <code>System.out.println("push ...")</code>, <code>println("add")</code> etc.) e, em escala completa, nos capítulos 9 e 10 da Unidade 2.</p>
 <h3 id="os-limites-de-uma-gramatica">Os limites de uma gramática<a class="headerlink" href="#os-limites-de-uma-gramatica" title="Permanent link">&para;</a></h3>
-<p>Gramáticas livres de contexto descrevem a maior parte, mas não toda a sintaxe de uma linguagem de programação: regras como "todo identificador deve ser declarado antes do uso" ou "o número de argumentos de uma chamada deve bater com a declaração da função" não são expressáveis em uma GLC. As cadeias de tokens aceitas pelo analisador sintático formam, na verdade, um <strong>superconjunto</strong> da linguagem — cabe à análise semântica (capítulo 6) impor as regras que restam.</p>
+<p>Gramáticas livres de contexto descrevem a maior parte, mas não toda a sintaxe de uma linguagem de programação: regras como "todo identificador deve ser declarado antes do uso" ou "o número de argumentos de uma chamada deve bater com a declaração da função" não são expressáveis em uma GLC. As cadeias de tokens aceitas pelo analisador sintático formam, na verdade, um <strong>superconjunto</strong> da linguagem — cabe à análise semântica (capítulo 8) impor as regras que restam.</p>
 <h2 id="o-que-vem-a-seguir">O que vem a seguir<a class="headerlink" href="#o-que-vem-a-seguir" title="Permanent link">&para;</a></h2>
 <p>Com REs, autômatos, GLCs e as duas transformações de gramática (eliminação de recursão à esquerda e fatoração à esquerda) em mãos, o próximo capítulo usa exatamente esse ferramental para construir, de forma incremental, um pequeno tradutor de expressões aritméticas — o aquecimento antes de atacarmos a linguagem Jack por completo.</p>
 

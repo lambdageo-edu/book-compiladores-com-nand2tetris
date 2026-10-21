@@ -600,14 +600,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../06-tabela-de-simbolos/" class="md-nav__link">
+      <a href="../06-representacoes-intermediarias/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    6. Tabela de símbolos
+    6. Representações intermediárias
   
 
     
@@ -628,14 +628,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../07-representacoes-intermediarias/" class="md-nav__link">
+      <a href="../07-a-vm-hack/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    7. Representações intermediárias
+    7. A VM Hack (especificação)
   
 
     
@@ -656,14 +656,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../08-a-vm-hack/" class="md-nav__link">
+      <a href="../08-tabela-de-simbolos/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    8. A VM Hack (especificação)
+    8. Tabela de símbolos
   
 
     
@@ -834,6 +834,23 @@
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Chamadas: distinguindo função, método e método de outro objeto">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#o-comando-do-e-o-valor-descartado" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        O comando do e o valor descartado
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1439,6 +1456,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Chamadas: distinguindo função, método e método de outro objeto">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#o-comando-do-e-o-valor-descartado" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        O comando do e o valor descartado
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -1495,9 +1529,9 @@
 
 
 <h1 id="10-geracao-de-codigo-subrotinas-e-objetos">10. Geração de código: subrotinas e objetos<a class="headerlink" href="#10-geracao-de-codigo-subrotinas-e-objetos" title="Permanent link">&para;</a></h1>
-<p>Este capítulo fecha o compilador Jack → VM: variáveis (usando a tabela de símbolos do capítulo 6), a declaração completa de <code>function</code>/<code>method</code>/<code>constructor</code> (com o prólogo que aloca variáveis locais e, para construtores, memória de objeto), chamadas de subroutine, e o mapeamento de arrays via aritmética de ponteiros. Ao final, o <strong>Project 11</strong> do Nand2Tetris estará completo: qualquer programa Jack válido poderá ser compilado para VM.</p>
+<p>Este capítulo fecha o compilador Jack → VM: variáveis (usando a tabela de símbolos do capítulo 8), a declaração completa de <code>function</code>/<code>method</code>/<code>constructor</code> (com o prólogo que aloca variáveis locais e, para construtores, memória de objeto), chamadas de subroutine, e o mapeamento de arrays via aritmética de ponteiros. Ao final, o <strong>Project 11</strong> do Nand2Tetris estará completo: qualquer programa Jack válido poderá ser compilado para VM.</p>
 <h2 id="de-categoria-para-segmento">De categoria para segmento<a class="headerlink" href="#de-categoria-para-segmento" title="Permanent link">&para;</a></h2>
-<p>A tabela de símbolos (capítulo 6) guarda a <em>categoria</em> de uma variável (<code>STATIC</code>, <code>FIELD</code>, <code>ARG</code>, <code>VAR</code>); a VM (capítulo 8) trabalha com <em>segmentos</em> (<code>static</code>, <code>this</code>, <code>argument</code>, <code>local</code>). Uma função pura faz essa ponte — e é usada em todo lugar que o compilador precisa gerar <code>push</code>/<code>pop</code> para uma variável:</p>
+<p>A tabela de símbolos (capítulo 8) guarda a <em>categoria</em> de uma variável (<code>STATIC</code>, <code>FIELD</code>, <code>ARG</code>, <code>VAR</code>); a VM (capítulo 7) trabalha com <em>segmentos</em> (<code>static</code>, <code>this</code>, <code>argument</code>, <code>local</code>). Uma função pura faz essa ponte — e é usada em todo lugar que o compilador precisa gerar <code>push</code>/<code>pop</code> para uma variável:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kd">private</span><span class="w"> </span><span class="n">Segment</span><span class="w"> </span><span class="nf">kind2Segment</span><span class="p">(</span><span class="n">Kind</span><span class="w"> </span><span class="n">kind</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="k">switch</span><span class="w"> </span><span class="p">(</span><span class="n">kind</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="n">STATIC</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">Segment</span><span class="p">.</span><span class="na">STATIC</span><span class="p">;</span>
@@ -1552,7 +1586,7 @@
 <a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">    </span><span class="c1">// ...</span>
 <a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="p">}</span>
 </code></pre></div>
-<p>O comando <code>function</code> só pode ser emitido depois que <strong>todas</strong> as variáveis locais já foram registradas na tabela de símbolos (capítulo 6) — porque <code>nLocais</code> é exatamente <code>symbolTable.varCount(Kind.VAR)</code>. Por isso a emissão acontece no corpo da subroutine, não na sua declaração:</p>
+<p>O comando <code>function</code> só pode ser emitido depois que <strong>todas</strong> as variáveis locais já foram registradas na tabela de símbolos (capítulo 8) — porque <code>nLocais</code> é exatamente <code>symbolTable.varCount(Kind.VAR)</code>. Por isso a emissão acontece no corpo da subroutine, não na sua declaração:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kt">void</span><span class="w"> </span><span class="nf">parseSubroutineBody</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">functionName</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">    </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">LBRACE</span><span class="p">);</span>
 <a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">    </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">peekTokenIs</span><span class="p">(</span><span class="n">VAR</span><span class="p">))</span><span class="w"> </span><span class="n">parseVarDec</span><span class="p">();</span>
@@ -1610,7 +1644,7 @@
 <a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a>return                    // return this
 </code></pre></div>
 <h2 id="metodos-recebendo-this">Métodos: recebendo <code>this</code><a class="headerlink" href="#metodos-recebendo-this" title="Permanent link">&para;</a></h2>
-<p>Um método Jack (<code>p.getX()</code>) é, na VM, uma função comum que recebe o objeto receptor como <strong>primeiro argumento</strong>. O capítulo 6 já garantiu que, ao compilar um método, <code>"this"</code> foi registrado como <code>arg</code> de índice 0 — falta apenas, no prólogo do método, <strong>materializar</strong> esse argumento no registrador <code>pointer 0</code>, para que o restante do corpo possa usar <code>this 0</code>, <code>this 1</code> etc. normalmente:</p>
+<p>Um método Jack (<code>p.getX()</code>) é, na VM, uma função comum que recebe o objeto receptor como <strong>primeiro argumento</strong>. O capítulo 8 já garantiu que, ao compilar um método, <code>"this"</code> foi registrado como <code>arg</code> de índice 0 — falta apenas, no prólogo do método, <strong>materializar</strong> esse argumento no registrador <code>pointer 0</code>, para que o restante do corpo possa usar <code>this 0</code>, <code>this 1</code> etc. normalmente:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">subroutineType</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">METHOD</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">    </span><span class="n">vmWriter</span><span class="p">.</span><span class="na">writePush</span><span class="p">(</span><span class="n">Segment</span><span class="p">.</span><span class="na">ARG</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
 <a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">    </span><span class="n">vmWriter</span><span class="p">.</span><span class="na">writePop</span><span class="p">(</span><span class="n">Segment</span><span class="p">.</span><span class="na">POINTER</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span><span class="w">  </span><span class="c1">// this = argument 0</span>
@@ -1660,45 +1694,68 @@
 <a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>call Point.distance 2
 <a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>pop local 2
 </code></pre></div>
+<h3 id="o-comando-do-e-o-valor-descartado">O comando <code>do</code> e o valor descartado<a class="headerlink" href="#o-comando-do-e-o-valor-descartado" title="Permanent link">&para;</a></h3>
+<p>Pelo mapeamento padrão (capítulo 7), toda função VM devolve um valor — inclusive as que correspondem a subroutines <code>void</code>, que devolvem <code>0</code>. Uma chamada usada como <code>term</code> de uma expressão aproveita esse valor; já o comando <code>do</code> chama a subroutine só pelo efeito, e o valor que sobra no topo da pilha precisa ser descartado. Por isso <code>parseDo</code> emite um <code>pop temp 0</code> logo depois da chamada:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="kt">void</span><span class="w"> </span><span class="nf">parseDo</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="w">    </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">DO</span><span class="p">);</span>
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">    </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">IDENT</span><span class="p">);</span>
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="w">    </span><span class="n">parseSubroutineCall</span><span class="p">();</span>
+<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="w">    </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">SEMICOLON</span><span class="p">);</span>
+<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a><span class="w">    </span><span class="n">vmWriter</span><span class="p">.</span><span class="na">writePop</span><span class="p">(</span><span class="n">Segment</span><span class="p">.</span><span class="na">TEMP</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span><span class="w">   </span><span class="c1">// descarta o valor devolvido</span>
+<a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a><span class="p">}</span>
+</code></pre></div>
+<p>O programa <code>Seven</code> do Project 11 mostra os dois lados desse contrato em poucas linhas:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>// do Output.printInt(1 + (2 * 3));  return;
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>function Main.main 0
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>push constant 1
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>push constant 2
+<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>push constant 3
+<a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a>call Math.multiply 2
+<a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a>add
+<a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a>call Output.printInt 1
+<a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a>pop temp 0            // quem chama: descarta o valor devolvido
+<a id="__codelineno-14-10" name="__codelineno-14-10" href="#__codelineno-14-10"></a>push constant 0       // quem é chamado (main é void): devolve 0
+<a id="__codelineno-14-11" name="__codelineno-14-11" href="#__codelineno-14-11"></a>return
+</code></pre></div>
 <h2 id="arrays-aritmetica-de-ponteiros">Arrays: aritmética de ponteiros<a class="headerlink" href="#arrays-aritmetica-de-ponteiros" title="Permanent link">&para;</a></h2>
 <p>Um array Jack é, para o compilador, apenas um ponteiro para o endereço-base de um bloco contíguo no heap — <code>arr[i]</code> é açúcar sintático para "o valor no endereço <code>arr + i</code>". A VM não tem um comando de "acesso indexado" dedicado; ela oferece <strong>endereçamento indireto</strong> através do par <code>pointer 1</code> / segmento <code>that</code>: gravar um endereço em <code>pointer 1</code> faz <code>that 0</code> passar a se referir àquela célula de memória.</p>
 <p>Uma primeira tentativa ingênua — calcular o endereço, apontar <code>that</code> para lá, e então avaliar o lado direito — quebra em casos como <code>let a[i] = b[j]</code>, porque avaliar <code>b[j]</code> (o lado direito) também precisa usar <code>pointer 1</code>/<code>that</code>, sobrescrevendo o endereço que tínhamos acabado de calcular para <code>a[i]</code>. A solução é guardar o valor do lado direito em <code>temp 0</code> <strong>antes</strong> de mexer em <code>pointer 1</code>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>// let arr[expr1] = expr2
-<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>código VM de arr (push do segmento/índice de arr)
-<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>código VM de expr1
-<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>add                    // topo da pilha = endereço de arr[expr1]
-<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>código VM de expr2     // calcula o valor a atribuir
-<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a>pop temp 0             // guarda o valor calculado, ANTES de mexer em pointer 1
-<a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a>pop pointer 1           // agora sim: that passa a apontar para arr[expr1]
-<a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a>push temp 0
-<a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a>pop that 0              // arr[expr1] = valor
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>// let arr[expr1] = expr2
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>código VM de arr (push do segmento/índice de arr)
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>código VM de expr1
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>add                    // topo da pilha = endereço de arr[expr1]
+<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>código VM de expr2     // calcula o valor a atribuir
+<a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a>pop temp 0             // guarda o valor calculado, ANTES de mexer em pointer 1
+<a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a>pop pointer 1           // agora sim: that passa a apontar para arr[expr1]
+<a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a>push temp 0
+<a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a>pop that 0              // arr[expr1] = valor
 </code></pre></div>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="c1">// dentro de parseLet, ao ver LBRACKET:</span>
-<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="n">expectPeek</span><span class="p">(</span><span class="n">LBRACKET</span><span class="p">);</span>
-<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="n">vmWriter</span><span class="p">.</span><span class="na">writePush</span><span class="p">(</span><span class="n">kind2Segment</span><span class="p">(</span><span class="n">symbol</span><span class="p">.</span><span class="na">kind</span><span class="p">()),</span><span class="w"> </span><span class="n">symbol</span><span class="p">.</span><span class="na">index</span><span class="p">());</span>
-<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="n">parseExpression</span><span class="p">();</span>
-<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="n">vmWriter</span><span class="p">.</span><span class="na">writeArithmetic</span><span class="p">(</span><span class="n">Command</span><span class="p">.</span><span class="na">ADD</span><span class="p">);</span>
-<a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="n">expectPeek</span><span class="p">(</span><span class="n">RBRACKET</span><span class="p">);</span>
-<a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a><span class="n">isArray</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="p">;</span>
-<a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a><span class="c1">// ... depois de compilar a expressão do lado direito do '=':</span>
-<a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">isArray</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-14-10" name="__codelineno-14-10" href="#__codelineno-14-10"></a><span class="w">    </span><span class="n">vmWriter</span><span class="p">.</span><span class="na">writePop</span><span class="p">(</span><span class="n">Segment</span><span class="p">.</span><span class="na">TEMP</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
-<a id="__codelineno-14-11" name="__codelineno-14-11" href="#__codelineno-14-11"></a><span class="w">    </span><span class="n">vmWriter</span><span class="p">.</span><span class="na">writePop</span><span class="p">(</span><span class="n">Segment</span><span class="p">.</span><span class="na">POINTER</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
-<a id="__codelineno-14-12" name="__codelineno-14-12" href="#__codelineno-14-12"></a><span class="w">    </span><span class="n">vmWriter</span><span class="p">.</span><span class="na">writePush</span><span class="p">(</span><span class="n">Segment</span><span class="p">.</span><span class="na">TEMP</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
-<a id="__codelineno-14-13" name="__codelineno-14-13" href="#__codelineno-14-13"></a><span class="w">    </span><span class="n">vmWriter</span><span class="p">.</span><span class="na">writePop</span><span class="p">(</span><span class="n">Segment</span><span class="p">.</span><span class="na">THAT</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
-<a id="__codelineno-14-14" name="__codelineno-14-14" href="#__codelineno-14-14"></a><span class="p">}</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="c1">// dentro de parseLet, ao ver LBRACKET:</span>
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="n">expectPeek</span><span class="p">(</span><span class="n">LBRACKET</span><span class="p">);</span>
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="n">vmWriter</span><span class="p">.</span><span class="na">writePush</span><span class="p">(</span><span class="n">kind2Segment</span><span class="p">(</span><span class="n">symbol</span><span class="p">.</span><span class="na">kind</span><span class="p">()),</span><span class="w"> </span><span class="n">symbol</span><span class="p">.</span><span class="na">index</span><span class="p">());</span>
+<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="n">parseExpression</span><span class="p">();</span>
+<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="n">vmWriter</span><span class="p">.</span><span class="na">writeArithmetic</span><span class="p">(</span><span class="n">Command</span><span class="p">.</span><span class="na">ADD</span><span class="p">);</span>
+<a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a><span class="n">expectPeek</span><span class="p">(</span><span class="n">RBRACKET</span><span class="p">);</span>
+<a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a><span class="n">isArray</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="p">;</span>
+<a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a><span class="c1">// ... depois de compilar a expressão do lado direito do '=':</span>
+<a id="__codelineno-16-9" name="__codelineno-16-9" href="#__codelineno-16-9"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">isArray</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-16-10" name="__codelineno-16-10" href="#__codelineno-16-10"></a><span class="w">    </span><span class="n">vmWriter</span><span class="p">.</span><span class="na">writePop</span><span class="p">(</span><span class="n">Segment</span><span class="p">.</span><span class="na">TEMP</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
+<a id="__codelineno-16-11" name="__codelineno-16-11" href="#__codelineno-16-11"></a><span class="w">    </span><span class="n">vmWriter</span><span class="p">.</span><span class="na">writePop</span><span class="p">(</span><span class="n">Segment</span><span class="p">.</span><span class="na">POINTER</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
+<a id="__codelineno-16-12" name="__codelineno-16-12" href="#__codelineno-16-12"></a><span class="w">    </span><span class="n">vmWriter</span><span class="p">.</span><span class="na">writePush</span><span class="p">(</span><span class="n">Segment</span><span class="p">.</span><span class="na">TEMP</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
+<a id="__codelineno-16-13" name="__codelineno-16-13" href="#__codelineno-16-13"></a><span class="w">    </span><span class="n">vmWriter</span><span class="p">.</span><span class="na">writePop</span><span class="p">(</span><span class="n">Segment</span><span class="p">.</span><span class="na">THAT</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
+<a id="__codelineno-16-14" name="__codelineno-16-14" href="#__codelineno-16-14"></a><span class="p">}</span>
 </code></pre></div>
 <p><strong>Ler</strong> um elemento de array (dentro de <code>parseTerm</code>, quando o identificador é seguido de <code>[</code>) é mais simples, porque não há um segundo acesso a <code>that</code> em conflito — apenas calcule o endereço, aponte <code>that</code> para lá, e empilhe o valor:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="n">vmWriter</span><span class="p">.</span><span class="na">writePush</span><span class="p">(</span><span class="n">kind2Segment</span><span class="p">(</span><span class="n">sym</span><span class="p">.</span><span class="na">kind</span><span class="p">()),</span><span class="w"> </span><span class="n">sym</span><span class="p">.</span><span class="na">index</span><span class="p">());</span>
-<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="n">parseExpression</span><span class="p">();</span>
-<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="n">vmWriter</span><span class="p">.</span><span class="na">writeArithmetic</span><span class="p">(</span><span class="n">Command</span><span class="p">.</span><span class="na">ADD</span><span class="p">);</span>
-<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="n">expectPeek</span><span class="p">(</span><span class="n">RBRACKET</span><span class="p">);</span>
-<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="n">vmWriter</span><span class="p">.</span><span class="na">writePop</span><span class="p">(</span><span class="n">Segment</span><span class="p">.</span><span class="na">POINTER</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
-<a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a><span class="n">vmWriter</span><span class="p">.</span><span class="na">writePush</span><span class="p">(</span><span class="n">Segment</span><span class="p">.</span><span class="na">THAT</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="n">vmWriter</span><span class="p">.</span><span class="na">writePush</span><span class="p">(</span><span class="n">kind2Segment</span><span class="p">(</span><span class="n">sym</span><span class="p">.</span><span class="na">kind</span><span class="p">()),</span><span class="w"> </span><span class="n">sym</span><span class="p">.</span><span class="na">index</span><span class="p">());</span>
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="n">parseExpression</span><span class="p">();</span>
+<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="n">vmWriter</span><span class="p">.</span><span class="na">writeArithmetic</span><span class="p">(</span><span class="n">Command</span><span class="p">.</span><span class="na">ADD</span><span class="p">);</span>
+<a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="n">expectPeek</span><span class="p">(</span><span class="n">RBRACKET</span><span class="p">);</span>
+<a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="n">vmWriter</span><span class="p">.</span><span class="na">writePop</span><span class="p">(</span><span class="n">Segment</span><span class="p">.</span><span class="na">POINTER</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
+<a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a><span class="n">vmWriter</span><span class="p">.</span><span class="na">writePush</span><span class="p">(</span><span class="n">Segment</span><span class="p">.</span><span class="na">THAT</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
 </code></pre></div>
 <p>Como exercício de verificação, vale compilar mentalmente (ou de fato, testando) uma expressão deliberadamente hostil como <code>let a[a[i]] = a[b[a[b[j]]]]</code> — se o <code>temp 0</code> intermediário estiver no lugar certo, mesmo esse emaranhado de acessos aninhados produz código correto.</p>
 <h2 id="fechando-o-project-11">Fechando o Project 11<a class="headerlink" href="#fechando-o-project-11" title="Permanent link">&para;</a></h2>
-<p>Com variáveis, funções, construtores, métodos, chamadas e arrays todos gerando código VM, o compilador Jack → VM está completo — qualquer arquivo <code>.jack</code> válido, de qualquer complexidade, agora compila para um <code>.vm</code> executável no VM Emulator do Nand2Tetris. É um bom momento para rodar contra os programas de exemplo maiores do Project 11 (<code>Seven</code>, <code>ConvertToBin</code>, <code>Square</code>, <code>Pong</code>, <code>Average</code>) e comparar a saída — quando não bate byte a byte com a referência oficial, normalmente ainda é possível validar comportamentalmente, executando ambos no VM Emulator e comparando o resultado observável.</p>
+<p>Com variáveis, funções, construtores, métodos, chamadas e arrays todos gerando código VM, o compilador Jack → VM está completo — qualquer arquivo <code>.jack</code> válido, de qualquer complexidade, agora compila para um <code>.vm</code> executável no VM Emulator do Nand2Tetris. É um bom momento para rodar contra os programas de teste do Project 11, nesta ordem — <code>Seven</code> (expressão com constantes, <code>do</code> e <code>return</code>), <code>ConvertToBin</code> (comandos procedurais e funções), <code>Square</code> (construtores, métodos e campos), <code>Average</code> (arrays e strings), <code>Pong</code> (aplicação orientada a objetos completa, com variáveis <code>static</code>) e <code>ComplexArrays</code> (índices de array aninhados) — e comparar a saída. Quando ela não bate byte a byte com a referência oficial, normalmente ainda é possível validar comportamentalmente, executando ambos no VM Emulator e comparando o resultado observável. Para executar, carregue no emulador o diretório inteiro do programa: o VM Emulator já traz uma implementação embutida das oito classes do sistema operacional Jack; em qualquer outro ambiente, os oito arquivos <code>.vm</code> do sistema operacional (capítulo 7) precisam estar no mesmo diretório dos <code>.vm</code> gerados.</p>
 <h2 id="o-que-vem-a-seguir">O que vem a seguir<a class="headerlink" href="#o-que-vem-a-seguir" title="Permanent link">&para;</a></h2>
 <p>O compilador está pronto, mas ele só produz código VM — que ainda não roda em hardware nenhum. A Unidade 3 fecha essa lacuna: o capítulo 11 (ainda nesta unidade) começa o VM Translator, traduzindo aritmética e acesso à memória para Assembly Hack; o capítulo 12 completa o protocolo de função (<code>call</code>/<code>return</code>, <em>stack frames</em>); e os capítulos 13–15 tratam da geração de código alvo final e do Assembler.</p>
 

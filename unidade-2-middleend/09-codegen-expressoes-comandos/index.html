@@ -15,7 +15,7 @@
         <link rel="canonical" href="https://lambdageo.github.io/nand2tetris-compilador/unidade-2-middleend/09-codegen-expressoes-comandos/">
       
       
-        <link rel="prev" href="../08-a-vm-hack/">
+        <link rel="prev" href="../08-tabela-de-simbolos/">
       
       
         <link rel="next" href="../10-codegen-subrotinas-objetos/">
@@ -600,14 +600,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../06-tabela-de-simbolos/" class="md-nav__link">
+      <a href="../06-representacoes-intermediarias/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    6. Tabela de símbolos
+    6. Representações intermediárias
   
 
     
@@ -628,14 +628,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../07-representacoes-intermediarias/" class="md-nav__link">
+      <a href="../07-a-vm-hack/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    7. Representações intermediárias
+    7. A VM Hack (especificação)
   
 
     
@@ -656,14 +656,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../08-a-vm-hack/" class="md-nav__link">
+      <a href="../08-tabela-de-simbolos/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    8. A VM Hack (especificação)
+    8. Tabela de símbolos
   
 
     
@@ -1461,7 +1461,7 @@
 <a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">output</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">output</span><span class="p">.</span><span class="na">toString</span><span class="p">();</span><span class="w"> </span><span class="p">}</span>
 <a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a><span class="p">}</span>
 </code></pre></div>
-<p>O <code>Parser</code> ganha uma instância de <code>VMWriter</code> (além do <code>SymbolTable</code> do capítulo 6), e um método <code>VMOutput()</code> espelhando o <code>XMLOutput()</code> que já existia. A partir daqui, cada seção da gramática de expressões e comandos ganha, além do reconhecimento sintático, a emissão de código correspondente — construída e testada incrementalmente, como sempre.</p>
+<p>O <code>Parser</code> ganha uma instância de <code>VMWriter</code> (além do <code>SymbolTable</code> do capítulo 8), e um método <code>VMOutput()</code> espelhando o <code>XMLOutput()</code> que já existia. A partir daqui, cada seção da gramática de expressões e comandos ganha, além do reconhecimento sintático, a emissão de código correspondente — construída e testada incrementalmente, como sempre.</p>
 <h2 id="literais">Literais<a class="headerlink" href="#literais" title="Permanent link">&para;</a></h2>
 <p>Comecemos pelo caso mais simples: um <code>term</code> que é uma constante inteira já reconhecida vira, imediatamente, um <code>push constant</code>:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">case</span><span class="w"> </span><span class="n">NUMBER</span><span class="p">:</span>
@@ -1499,12 +1499,12 @@
 <tr>
 <td><code>true</code></td>
 <td><code>push constant 0</code> seguido de <code>not</code></td>
-<td>não existe literal <code>-1</code>; <code>not 0</code> produz <code>-1</code> (todos os bits em 1)</td>
+<td>não existe literal <code>-1</code>; <code>not 0</code> produz <code>-1</code> (todos os bits em 1) — a especificação sugere <code>push constant 1</code> seguido de <code>neg</code>, que dá o mesmo resultado</td>
 </tr>
 <tr>
 <td><code>this</code></td>
 <td><code>push pointer 0</code></td>
-<td><code>this</code> é sempre o conteúdo do registrador <code>pointer 0</code> (capítulo 8)</td>
+<td><code>this</code> é sempre o conteúdo do registrador <code>pointer 0</code> (capítulo 7)</td>
 </tr>
 </tbody>
 </table>
@@ -1557,97 +1557,105 @@
 <a id="__codelineno-5-22" name="__codelineno-5-22" href="#__codelineno-5-22"></a><span class="w">    </span><span class="p">}</span>
 <a id="__codelineno-5-23" name="__codelineno-5-23" href="#__codelineno-5-23"></a><span class="p">}</span>
 </code></pre></div>
-<p><code>*</code> e <code>/</code> são o único caso especial: como a VM não tem comandos nativos para eles (capítulo 8), viram chamadas a <code>Math.multiply</code>/<code>Math.divide</code> — o compilador "esconde" essa diferença do programador Jack, que escreve <code>a * b</code> sem saber que isso é, por baixo, uma chamada de função.</p>
+<p>Esse laço emite cada operador assim que o termo à sua direita foi compilado — ou seja, avalia da esquerda para a direita, sem precedência. É a convenção do compilador de referência do Nand2Tetris (capítulo 3): <code>a + b * c</code> gera</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>push a
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>push b
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>add
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>push c
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>call Math.multiply 2
+</code></pre></div>
+<p>isto é, <code>(a + b) * c</code>. A figura 11.4 do livro <em>The Elements of Computing Systems</em> ilustra a geração de código para <code>x + g(2,y,-z) * 5</code> com a multiplicação feita antes da soma, mas aquele exemplo é sobre o algoritmo de travessia pós-ordem de uma árvore já construída; ele não é a regra de Jack. Para obter <code>a + (b * c)</code>, o programador precisa escrever os parênteses — e aí a recursão em <code>parseTerm</code> (que trata <code>'(' expression ')'</code>) compila <code>b * c</code> antes do <code>add</code>.</p>
+<p><code>*</code> e <code>/</code> são o único caso especial: como a VM não tem comandos nativos para eles (capítulo 7), viram chamadas a <code>Math.multiply</code>/<code>Math.divide</code> — o compilador "esconde" essa diferença do programador Jack, que escreve <code>a * b</code> sem saber que isso é, por baixo, uma chamada de função.</p>
 <p>Operadores <strong>unários</strong> (<code>-x</code>, <code>~x</code>) seguem o padrão inverso de um binário: compilam o operando primeiro, emitem a operação depois — mas com apenas um operando na pilha:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">case</span><span class="w"> </span><span class="n">MINUS</span><span class="p">:</span><span class="w"> </span><span class="k">case</span><span class="w"> </span><span class="n">NOT</span><span class="p">:</span>
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">    </span><span class="n">TokenType</span><span class="w"> </span><span class="n">unop</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">currentToken</span><span class="p">.</span><span class="na">type</span><span class="p">;</span><span class="w"> </span><span class="c1">// já consumido via expectPeek antes de chamar parseTerm</span>
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">    </span><span class="n">parseTerm</span><span class="p">();</span>
-<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">    </span><span class="n">vmWriter</span><span class="p">.</span><span class="na">writeArithmetic</span><span class="p">(</span><span class="n">unop</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">MINUS</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="n">Command</span><span class="p">.</span><span class="na">NEG</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">Command</span><span class="p">.</span><span class="na">NOT</span><span class="p">);</span>
-<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">    </span><span class="k">break</span><span class="p">;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">case</span><span class="w"> </span><span class="n">MINUS</span><span class="p">:</span><span class="w"> </span><span class="k">case</span><span class="w"> </span><span class="n">NOT</span><span class="p">:</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">    </span><span class="n">TokenType</span><span class="w"> </span><span class="n">unop</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">currentToken</span><span class="p">.</span><span class="na">type</span><span class="p">;</span><span class="w"> </span><span class="c1">// já consumido via expectPeek antes de chamar parseTerm</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">    </span><span class="n">parseTerm</span><span class="p">();</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">    </span><span class="n">vmWriter</span><span class="p">.</span><span class="na">writeArithmetic</span><span class="p">(</span><span class="n">unop</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">MINUS</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="n">Command</span><span class="p">.</span><span class="na">NEG</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">Command</span><span class="p">.</span><span class="na">NOT</span><span class="p">);</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">    </span><span class="k">break</span><span class="p">;</span>
 </code></pre></div>
 <h2 id="o-comando-return">O comando <code>return</code><a class="headerlink" href="#o-comando-return" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="kt">void</span><span class="w"> </span><span class="nf">parseReturn</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">    </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">RETURN</span><span class="p">);</span>
-<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">peekTokenIs</span><span class="p">(</span><span class="n">SEMICOLON</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">        </span><span class="n">parseExpression</span><span class="p">();</span>
-<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">        </span><span class="n">vmWriter</span><span class="p">.</span><span class="na">writePush</span><span class="p">(</span><span class="n">Segment</span><span class="p">.</span><span class="na">CONST</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span><span class="w">  </span><span class="c1">// void: empilha um valor "nulo" por convenção</span>
-<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">    </span><span class="p">}</span>
-<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="w">    </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">SEMICOLON</span><span class="p">);</span>
-<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="w">    </span><span class="n">vmWriter</span><span class="p">.</span><span class="na">writeReturn</span><span class="p">();</span>
-<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="p">}</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="kt">void</span><span class="w"> </span><span class="nf">parseReturn</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">    </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">RETURN</span><span class="p">);</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">peekTokenIs</span><span class="p">(</span><span class="n">SEMICOLON</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">        </span><span class="n">parseExpression</span><span class="p">();</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">        </span><span class="n">vmWriter</span><span class="p">.</span><span class="na">writePush</span><span class="p">(</span><span class="n">Segment</span><span class="p">.</span><span class="na">CONST</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span><span class="w">  </span><span class="c1">// void: empilha um valor "nulo" por convenção</span>
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="w">    </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">SEMICOLON</span><span class="p">);</span>
+<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="w">    </span><span class="n">vmWriter</span><span class="p">.</span><span class="na">writeReturn</span><span class="p">();</span>
+<a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="p">}</span>
 </code></pre></div>
-<p>Isso implementa diretamente a convenção do capítulo 8: toda subroutine, <code>void</code> ou não, precisa deixar exatamente um valor na pilha antes do <code>return</code>.</p>
+<p>Isso implementa diretamente a convenção do capítulo 7: toda subroutine, <code>void</code> ou não, precisa deixar exatamente um valor na pilha antes do <code>return</code>.</p>
 <h2 id="controle-de-fluxo-if-e-while">Controle de fluxo: <code>if</code> e <code>while</code><a class="headerlink" href="#controle-de-fluxo-if-e-while" title="Permanent link">&para;</a></h2>
-<p>Linguagens de alto nível têm estruturas de controle ricas; a VM só tem <code>goto</code> e <code>if-goto</code> (capítulo 8). Cabe ao compilador fazer esse mapeamento — e o ponto delicado é garantir que os <strong>rótulos sejam únicos</strong> dentro de cada subroutine (dois <code>if</code>s na mesma função não podem gerar o mesmo <code>IF_TRUE0</code>). A solução é um contador de instância, zerado a cada <code>parseSubroutineDec</code>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="kd">private</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">ifLabelNum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="kd">private</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">whileLabelNum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<p>Linguagens de alto nível têm estruturas de controle ricas; a VM só tem <code>goto</code> e <code>if-goto</code> (capítulo 7). Cabe ao compilador fazer esse mapeamento — e o ponto delicado é garantir que os <strong>rótulos sejam únicos</strong> dentro de cada subroutine (dois <code>if</code>s na mesma função não podem gerar o mesmo <code>IF_TRUE0</code>). A solução é um contador de instância, zerado a cada <code>parseSubroutineDec</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kd">private</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">ifLabelNum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="kd">private</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">whileLabelNum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
 </code></pre></div>
 <p><strong><code>if</code>/<code>else</code></strong> mapeia para o seguinte esqueleto (o algoritmo aqui é o mesmo usado pelo compilador de referência do Nand2Tetris — não o único possível, mas o que facilita comparar sua saída com a oficial):</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>código VM da condição
-<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>if-goto IF_TRUE0
-<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>goto IF_FALSE0
-<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>label IF_TRUE0
-<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>    código VM do bloco then
-<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>    goto IF_END0        // só existe se houver else
-<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a>label IF_FALSE0
-<a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a>    código VM do bloco else       // só existe se houver else
-<a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a>label IF_END0                     // só existe se houver else
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>código VM da condição
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>if-goto IF_TRUE0
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>goto IF_FALSE0
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>label IF_TRUE0
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>    código VM do bloco then
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>    goto IF_END0        // só existe se houver else
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>label IF_FALSE0
+<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a>    código VM do bloco else       // só existe se houver else
+<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a>label IF_END0                     // só existe se houver else
 </code></pre></div>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="kt">void</span><span class="w"> </span><span class="nf">parseIf</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">labelTrue</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"IF_TRUE"</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">ifLabelNum</span><span class="p">;</span>
-<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">labelFalse</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"IF_FALSE"</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">ifLabelNum</span><span class="p">;</span>
-<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">labelEnd</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"IF_END"</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">ifLabelNum</span><span class="p">;</span>
-<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="w">    </span><span class="n">ifLabelNum</span><span class="o">++</span><span class="p">;</span>
-<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>
-<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="w">    </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">IF</span><span class="p">);</span><span class="w"> </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">LPAREN</span><span class="p">);</span>
-<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="w">    </span><span class="n">parseExpression</span><span class="p">();</span>
-<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a><span class="w">    </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">RPAREN</span><span class="p">);</span>
-<a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a>
-<a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a><span class="w">    </span><span class="n">vmWriter</span><span class="p">.</span><span class="na">writeIf</span><span class="p">(</span><span class="n">labelTrue</span><span class="p">);</span>
-<a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a><span class="w">    </span><span class="n">vmWriter</span><span class="p">.</span><span class="na">writeGoto</span><span class="p">(</span><span class="n">labelFalse</span><span class="p">);</span>
-<a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a><span class="w">    </span><span class="n">vmWriter</span><span class="p">.</span><span class="na">writeLabel</span><span class="p">(</span><span class="n">labelTrue</span><span class="p">);</span>
-<a id="__codelineno-10-14" name="__codelineno-10-14" href="#__codelineno-10-14"></a>
-<a id="__codelineno-10-15" name="__codelineno-10-15" href="#__codelineno-10-15"></a><span class="w">    </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">LBRACE</span><span class="p">);</span><span class="w"> </span><span class="n">parseStatements</span><span class="p">();</span><span class="w"> </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">RBRACE</span><span class="p">);</span>
-<a id="__codelineno-10-16" name="__codelineno-10-16" href="#__codelineno-10-16"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">peekTokenIs</span><span class="p">(</span><span class="n">ELSE</span><span class="p">))</span><span class="w"> </span><span class="n">vmWriter</span><span class="p">.</span><span class="na">writeGoto</span><span class="p">(</span><span class="n">labelEnd</span><span class="p">);</span>
-<a id="__codelineno-10-17" name="__codelineno-10-17" href="#__codelineno-10-17"></a>
-<a id="__codelineno-10-18" name="__codelineno-10-18" href="#__codelineno-10-18"></a><span class="w">    </span><span class="n">vmWriter</span><span class="p">.</span><span class="na">writeLabel</span><span class="p">(</span><span class="n">labelFalse</span><span class="p">);</span>
-<a id="__codelineno-10-19" name="__codelineno-10-19" href="#__codelineno-10-19"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">peekTokenIs</span><span class="p">(</span><span class="n">ELSE</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-10-20" name="__codelineno-10-20" href="#__codelineno-10-20"></a><span class="w">        </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">ELSE</span><span class="p">);</span>
-<a id="__codelineno-10-21" name="__codelineno-10-21" href="#__codelineno-10-21"></a><span class="w">        </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">LBRACE</span><span class="p">);</span><span class="w"> </span><span class="n">parseStatements</span><span class="p">();</span><span class="w"> </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">RBRACE</span><span class="p">);</span>
-<a id="__codelineno-10-22" name="__codelineno-10-22" href="#__codelineno-10-22"></a><span class="w">        </span><span class="n">vmWriter</span><span class="p">.</span><span class="na">writeLabel</span><span class="p">(</span><span class="n">labelEnd</span><span class="p">);</span>
-<a id="__codelineno-10-23" name="__codelineno-10-23" href="#__codelineno-10-23"></a><span class="w">    </span><span class="p">}</span>
-<a id="__codelineno-10-24" name="__codelineno-10-24" href="#__codelineno-10-24"></a><span class="p">}</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="kt">void</span><span class="w"> </span><span class="nf">parseIf</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">labelTrue</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"IF_TRUE"</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">ifLabelNum</span><span class="p">;</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">labelFalse</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"IF_FALSE"</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">ifLabelNum</span><span class="p">;</span>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">labelEnd</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"IF_END"</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">ifLabelNum</span><span class="p">;</span>
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="w">    </span><span class="n">ifLabelNum</span><span class="o">++</span><span class="p">;</span>
+<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>
+<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="w">    </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">IF</span><span class="p">);</span><span class="w"> </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">LPAREN</span><span class="p">);</span>
+<a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a><span class="w">    </span><span class="n">parseExpression</span><span class="p">();</span>
+<a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a><span class="w">    </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">RPAREN</span><span class="p">);</span>
+<a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a>
+<a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a><span class="w">    </span><span class="n">vmWriter</span><span class="p">.</span><span class="na">writeIf</span><span class="p">(</span><span class="n">labelTrue</span><span class="p">);</span>
+<a id="__codelineno-11-12" name="__codelineno-11-12" href="#__codelineno-11-12"></a><span class="w">    </span><span class="n">vmWriter</span><span class="p">.</span><span class="na">writeGoto</span><span class="p">(</span><span class="n">labelFalse</span><span class="p">);</span>
+<a id="__codelineno-11-13" name="__codelineno-11-13" href="#__codelineno-11-13"></a><span class="w">    </span><span class="n">vmWriter</span><span class="p">.</span><span class="na">writeLabel</span><span class="p">(</span><span class="n">labelTrue</span><span class="p">);</span>
+<a id="__codelineno-11-14" name="__codelineno-11-14" href="#__codelineno-11-14"></a>
+<a id="__codelineno-11-15" name="__codelineno-11-15" href="#__codelineno-11-15"></a><span class="w">    </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">LBRACE</span><span class="p">);</span><span class="w"> </span><span class="n">parseStatements</span><span class="p">();</span><span class="w"> </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">RBRACE</span><span class="p">);</span>
+<a id="__codelineno-11-16" name="__codelineno-11-16" href="#__codelineno-11-16"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">peekTokenIs</span><span class="p">(</span><span class="n">ELSE</span><span class="p">))</span><span class="w"> </span><span class="n">vmWriter</span><span class="p">.</span><span class="na">writeGoto</span><span class="p">(</span><span class="n">labelEnd</span><span class="p">);</span>
+<a id="__codelineno-11-17" name="__codelineno-11-17" href="#__codelineno-11-17"></a>
+<a id="__codelineno-11-18" name="__codelineno-11-18" href="#__codelineno-11-18"></a><span class="w">    </span><span class="n">vmWriter</span><span class="p">.</span><span class="na">writeLabel</span><span class="p">(</span><span class="n">labelFalse</span><span class="p">);</span>
+<a id="__codelineno-11-19" name="__codelineno-11-19" href="#__codelineno-11-19"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">peekTokenIs</span><span class="p">(</span><span class="n">ELSE</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-11-20" name="__codelineno-11-20" href="#__codelineno-11-20"></a><span class="w">        </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">ELSE</span><span class="p">);</span>
+<a id="__codelineno-11-21" name="__codelineno-11-21" href="#__codelineno-11-21"></a><span class="w">        </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">LBRACE</span><span class="p">);</span><span class="w"> </span><span class="n">parseStatements</span><span class="p">();</span><span class="w"> </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">RBRACE</span><span class="p">);</span>
+<a id="__codelineno-11-22" name="__codelineno-11-22" href="#__codelineno-11-22"></a><span class="w">        </span><span class="n">vmWriter</span><span class="p">.</span><span class="na">writeLabel</span><span class="p">(</span><span class="n">labelEnd</span><span class="p">);</span>
+<a id="__codelineno-11-23" name="__codelineno-11-23" href="#__codelineno-11-23"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-11-24" name="__codelineno-11-24" href="#__codelineno-11-24"></a><span class="p">}</span>
 </code></pre></div>
 <p><strong><code>while</code></strong> é mais simples, porque não há ramificação — só um teste no início do laço:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>label WHILE_EXP0
-<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>    código VM da condição
-<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>    not
-<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>    if-goto WHILE_END0
-<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>    código VM do corpo
-<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>    goto WHILE_EXP0
-<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a>label WHILE_END0
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>label WHILE_EXP0
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>    código VM da condição
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>    not
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>    if-goto WHILE_END0
+<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>    código VM do corpo
+<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>    goto WHILE_EXP0
+<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a>label WHILE_END0
 </code></pre></div>
 <p>O <code>not</code> antes do <code>if-goto</code> é o detalhe que vale internalizar: a VM só tem "salte se verdadeiro" — para "saia do laço quando a condição for <strong>falsa</strong>", invertemos a condição antes de testar.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="kt">void</span><span class="w"> </span><span class="nf">parseWhile</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">labelExp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"WHILE_EXP"</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">whileLabelNum</span><span class="p">;</span>
-<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">labelEnd</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"WHILE_END"</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">whileLabelNum</span><span class="p">;</span>
-<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="w">    </span><span class="n">whileLabelNum</span><span class="o">++</span><span class="p">;</span>
-<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>
-<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="w">    </span><span class="n">vmWriter</span><span class="p">.</span><span class="na">writeLabel</span><span class="p">(</span><span class="n">labelExp</span><span class="p">);</span>
-<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="w">    </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">WHILE</span><span class="p">);</span><span class="w"> </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">LPAREN</span><span class="p">);</span>
-<a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a><span class="w">    </span><span class="n">parseExpression</span><span class="p">();</span>
-<a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a><span class="w">    </span><span class="n">vmWriter</span><span class="p">.</span><span class="na">writeArithmetic</span><span class="p">(</span><span class="n">Command</span><span class="p">.</span><span class="na">NOT</span><span class="p">);</span>
-<a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a><span class="w">    </span><span class="n">vmWriter</span><span class="p">.</span><span class="na">writeIf</span><span class="p">(</span><span class="n">labelEnd</span><span class="p">);</span>
-<a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a><span class="w">    </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">RPAREN</span><span class="p">);</span>
-<a id="__codelineno-12-12" name="__codelineno-12-12" href="#__codelineno-12-12"></a>
-<a id="__codelineno-12-13" name="__codelineno-12-13" href="#__codelineno-12-13"></a><span class="w">    </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">LBRACE</span><span class="p">);</span><span class="w"> </span><span class="n">parseStatements</span><span class="p">();</span><span class="w"> </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">RBRACE</span><span class="p">);</span>
-<a id="__codelineno-12-14" name="__codelineno-12-14" href="#__codelineno-12-14"></a><span class="w">    </span><span class="n">vmWriter</span><span class="p">.</span><span class="na">writeGoto</span><span class="p">(</span><span class="n">labelExp</span><span class="p">);</span>
-<a id="__codelineno-12-15" name="__codelineno-12-15" href="#__codelineno-12-15"></a><span class="w">    </span><span class="n">vmWriter</span><span class="p">.</span><span class="na">writeLabel</span><span class="p">(</span><span class="n">labelEnd</span><span class="p">);</span>
-<a id="__codelineno-12-16" name="__codelineno-12-16" href="#__codelineno-12-16"></a><span class="p">}</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="kt">void</span><span class="w"> </span><span class="nf">parseWhile</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">labelExp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"WHILE_EXP"</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">whileLabelNum</span><span class="p">;</span>
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">labelEnd</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"WHILE_END"</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">whileLabelNum</span><span class="p">;</span>
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="w">    </span><span class="n">whileLabelNum</span><span class="o">++</span><span class="p">;</span>
+<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>
+<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a><span class="w">    </span><span class="n">vmWriter</span><span class="p">.</span><span class="na">writeLabel</span><span class="p">(</span><span class="n">labelExp</span><span class="p">);</span>
+<a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a><span class="w">    </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">WHILE</span><span class="p">);</span><span class="w"> </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">LPAREN</span><span class="p">);</span>
+<a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a><span class="w">    </span><span class="n">parseExpression</span><span class="p">();</span>
+<a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a><span class="w">    </span><span class="n">vmWriter</span><span class="p">.</span><span class="na">writeArithmetic</span><span class="p">(</span><span class="n">Command</span><span class="p">.</span><span class="na">NOT</span><span class="p">);</span>
+<a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a><span class="w">    </span><span class="n">vmWriter</span><span class="p">.</span><span class="na">writeIf</span><span class="p">(</span><span class="n">labelEnd</span><span class="p">);</span>
+<a id="__codelineno-13-11" name="__codelineno-13-11" href="#__codelineno-13-11"></a><span class="w">    </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">RPAREN</span><span class="p">);</span>
+<a id="__codelineno-13-12" name="__codelineno-13-12" href="#__codelineno-13-12"></a>
+<a id="__codelineno-13-13" name="__codelineno-13-13" href="#__codelineno-13-13"></a><span class="w">    </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">LBRACE</span><span class="p">);</span><span class="w"> </span><span class="n">parseStatements</span><span class="p">();</span><span class="w"> </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">RBRACE</span><span class="p">);</span>
+<a id="__codelineno-13-14" name="__codelineno-13-14" href="#__codelineno-13-14"></a><span class="w">    </span><span class="n">vmWriter</span><span class="p">.</span><span class="na">writeGoto</span><span class="p">(</span><span class="n">labelExp</span><span class="p">);</span>
+<a id="__codelineno-13-15" name="__codelineno-13-15" href="#__codelineno-13-15"></a><span class="w">    </span><span class="n">vmWriter</span><span class="p">.</span><span class="na">writeLabel</span><span class="p">(</span><span class="n">labelEnd</span><span class="p">);</span>
+<a id="__codelineno-13-16" name="__codelineno-13-16" href="#__codelineno-13-16"></a><span class="p">}</span>
 </code></pre></div>
 <h2 id="o-que-levamos-daqui">O que levamos daqui<a class="headerlink" href="#o-que-levamos-daqui" title="Permanent link">&para;</a></h2>
-<p>Neste capítulo, expressões e a maior parte dos comandos de Jack já geram código VM real — sempre seguindo o mesmo princípio: reconhecer a estrutura (o parser da Unidade 1 já faz isso) e, no ponto certo da produção, emitir o comando VM correspondente, sem nunca materializar uma árvore sintática intermediária. O que falta — variáveis (usando a tabela de símbolos do capítulo 6 para resolver <code>push</code>/<code>pop</code> corretos), subroutines completas (com prólogo de função e alocação de objetos) e arrays — é o assunto do capítulo 10, que fecha o Project 11 por completo.</p>
+<p>Neste capítulo, expressões e a maior parte dos comandos de Jack já geram código VM real — sempre seguindo o mesmo princípio: reconhecer a estrutura (o parser da Unidade 1 já faz isso) e, no ponto certo da produção, emitir o comando VM correspondente, sem nunca materializar uma árvore sintática intermediária. O que falta — variáveis (usando a tabela de símbolos do capítulo 8 para resolver <code>push</code>/<code>pop</code> corretos), subroutines completas (com prólogo de função e alocação de objetos) e arrays — é o assunto do capítulo 10, que fecha o Project 11 por completo.</p>
 
 
 

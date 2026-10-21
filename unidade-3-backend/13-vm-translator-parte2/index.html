@@ -600,14 +600,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../unidade-2-middleend/06-tabela-de-simbolos/" class="md-nav__link">
+      <a href="../../unidade-2-middleend/06-representacoes-intermediarias/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    6. Tabela de símbolos
+    6. Representações intermediárias
   
 
     
@@ -628,14 +628,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../unidade-2-middleend/07-representacoes-intermediarias/" class="md-nav__link">
+      <a href="../../unidade-2-middleend/07-a-vm-hack/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    7. Representações intermediárias
+    7. A VM Hack (especificação)
   
 
     
@@ -656,14 +656,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../unidade-2-middleend/08-a-vm-hack/" class="md-nav__link">
+      <a href="../../unidade-2-middleend/08-tabela-de-simbolos/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    8. A VM Hack (especificação)
+    8. Tabela de símbolos
   
 
     
@@ -1497,7 +1497,7 @@
 <h1 id="13-vm-translator-parte-2-controle-de-fluxo-e-funcoes">13. VM Translator — Parte 2: controle de fluxo e funções<a class="headerlink" href="#13-vm-translator-parte-2-controle-de-fluxo-e-funcoes" title="Permanent link">&para;</a></h1>
 <p>A Parte 1 (capítulo 11) traduziu aritmética e acesso à memória — comandos que não atravessam fronteiras de função. Este capítulo fecha o VM Translator (Project 8) com a parte mais sofisticada do tradutor: <strong>rótulos com escopo de função</strong> e o protocolo completo de <strong>chamada de função</strong> (<code>call</code>/<code>function</code>/<code>return</code>), que é o que torna possível compilar recursão corretamente. Ao final, teremos uma cadeia de tradução completa: Jack → VM → Assembly Hack.</p>
 <h2 id="rotulos-com-escopo-de-funcao">Rótulos com escopo de função<a class="headerlink" href="#rotulos-com-escopo-de-funcao" title="Permanent link">&para;</a></h2>
-<p>Um <code>label LOOP</code> dentro de uma função não pode colidir com um <code>label LOOP</code> de outra — mas a VM (capítulo 8) não exige nomes globalmente únicos, só únicos <strong>dentro da função</strong>. A solução do VM Translator é qualificar cada rótulo com o nome da função corrente antes de traduzi-lo para Assembly:</p>
+<p>Um <code>label LOOP</code> dentro de uma função não pode colidir com um <code>label LOOP</code> de outra — mas a VM (capítulo 7) não exige nomes globalmente únicos, só únicos <strong>dentro da função</strong>. A solução do VM Translator é qualificar cada rótulo com o nome da função corrente antes de traduzi-lo para Assembly:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>label LOOP     (dentro de Main.fibonacci)   →   (Main.fibonacci$LOOP)
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>goto LOOP                                    →   @Main.fibonacci$LOOP
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>                                                  0;JMP

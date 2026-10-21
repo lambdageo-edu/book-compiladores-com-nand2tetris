@@ -12,13 +12,13 @@
         <meta name="author" content="Prof. Sergio Costa">
       
       
-        <link rel="canonical" href="https://lambdageo.github.io/nand2tetris-compilador/unidade-2-middleend/06-tabela-de-simbolos/">
+        <link rel="canonical" href="https://lambdageo.github.io/nand2tetris-compilador/unidade-2-middleend/08-tabela-de-simbolos/">
       
       
-        <link rel="prev" href="../../unidade-1-frontend/05-analisador-sintatico/">
+        <link rel="prev" href="../07-a-vm-hack/">
       
       
-        <link rel="next" href="../07-representacoes-intermediarias/">
+        <link rel="next" href="../09-codegen-expressoes-comandos/">
       
       
         
@@ -29,7 +29,7 @@
     
     
       
-        <title>6. Tabela de símbolos - Compiladores — do zero ao Hack</title>
+        <title>8. Tabela de símbolos - Compiladores — do zero ao Hack</title>
       
     
     
@@ -76,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#6-tabela-de-simbolos" class="md-skip">
+        <a href="#8-tabela-de-simbolos" class="md-skip">
           Ir para o conteúdo
         </a>
       
@@ -112,7 +112,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              6. Tabela de símbolos
+              8. Tabela de símbolos
             
           </span>
         </div>
@@ -597,6 +597,62 @@
                 
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-representacoes-intermediarias/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    6. Representações intermediárias
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../07-a-vm-hack/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    7. A VM Hack (especificação)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
     
   
   
@@ -616,7 +672,7 @@
   <span class="md-ellipsis">
     
   
-    6. Tabela de símbolos
+    8. Tabela de símbolos
   
 
     
@@ -634,7 +690,7 @@
   <span class="md-ellipsis">
     
   
-    6. Tabela de símbolos
+    8. Tabela de símbolos
   
 
     
@@ -729,62 +785,6 @@
   
 </nav>
       
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../07-representacoes-intermediarias/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    7. Representações intermediárias
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../08-a-vm-hack/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    8. A VM Hack (especificação)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
     </li>
   
 
@@ -1428,12 +1428,12 @@
   
 
 
-<h1 id="6-tabela-de-simbolos">6. Tabela de símbolos<a class="headerlink" href="#6-tabela-de-simbolos" title="Permanent link">&para;</a></h1>
-<p>Antes de gerar qualquer código, o compilador precisa responder a uma pergunta simples toda vez que encontra um identificador: <em>o que é isso?</em> Uma variável local? Um campo do objeto? Um parâmetro? De que tipo? Em que posição, dentro do seu segmento, ela vive? Este capítulo constrói a estrutura de dados que responde a essas perguntas — a <strong>tabela de símbolos</strong> — e a integra ao <code>CompilationEngine</code> da Unidade 1, fechando a lacuna de análise semântica que faltava para começar a gerar código de verdade nos capítulos 9 e 10.</p>
+<h1 id="8-tabela-de-simbolos">8. Tabela de símbolos<a class="headerlink" href="#8-tabela-de-simbolos" title="Permanent link">&para;</a></h1>
+<p>O capítulo 7 definiu o alvo: cada variável de Jack mora em um segmento da VM (<code>local</code>, <code>argument</code>, <code>static</code> ou <code>this</code>), em uma posição dada por um índice. Para gerar um único <code>push</code> ou <code>pop</code>, portanto, o compilador precisa responder a uma pergunta toda vez que encontra um identificador: <em>o que é isso?</em> Uma variável local? Um campo do objeto? Um parâmetro? De que tipo? Em que posição, dentro do seu segmento, ela vive? Este capítulo constrói a estrutura de dados que responde a essas perguntas — a <strong>tabela de símbolos</strong> — e a integra ao <code>CompilationEngine</code> da Unidade 1, fechando a lacuna de análise semântica que faltava para começar a gerar código de verdade nos capítulos 9 e 10.</p>
 <h2 id="por-que-uma-tabela-de-simbolos">Por que uma tabela de símbolos<a class="headerlink" href="#por-que-uma-tabela-de-simbolos" title="Permanent link">&para;</a></h2>
 <p>Um programa de alto nível introduz e manipula muitos identificadores. Toda vez que o compilador encontra um identificador <code>xxx</code>, ele precisa saber: é um nome de variável, de classe, de função? Se é variável, é campo de um objeto ou argumento de uma subroutine? Qual seu tipo — <code>int</code>, <code>boolean</code>, <code>char</code>, ou uma classe? Essas perguntas precisam ser respondidas <strong>toda vez</strong> que <code>xxx</code> aparece no código-fonte — não apenas na primeira. A tabela de símbolos existe exatamente para isso: sempre que um identificador é declarado, o compilador registra sua descrição; sempre que ele é referenciado, o compilador consulta a tabela e obtém tudo que precisa para gerar o código correspondente.</p>
 <h2 id="as-quatro-categorias-de-variavel-em-jack">As quatro categorias de variável em Jack<a class="headerlink" href="#as-quatro-categorias-de-variavel-em-jack" title="Permanent link">&para;</a></h2>
-<p>Jack tem exatamente quatro categorias (<code>kind</code>) de variável, cada uma com um tempo de vida e um segmento de memória VM associado (o capítulo 8 detalha a VM Hack; por ora, note apenas a categoria):</p>
+<p>Jack tem exatamente quatro categorias (<code>kind</code>) de variável, cada uma com um tempo de vida e — pelo mapeamento padrão do capítulo 7 — um segmento de memória VM associado:</p>
 <table>
 <thead>
 <tr>
@@ -1499,7 +1499,67 @@
 </tr>
 </tbody>
 </table>
-<p>O índice devolvido por <code>resolve</code> (e atribuído automaticamente por <code>define</code>) é sempre relativo à sua própria categoria: a primeira <code>field</code> é índice 0, a segunda <code>field</code> é índice 1, mesmo que entre elas haja uma <code>static</code> (que tem sua própria contagem independente). É exatamente esse índice — categoria + posição — que vira o segmento e o deslocamento de um comando <code>push</code>/<code>pop</code> da VM.</p>
+<p>O índice devolvido por <code>resolve</code> (e atribuído automaticamente por <code>define</code>) é sempre relativo à sua própria categoria: a primeira <code>field</code> é índice 0, a segunda <code>field</code> é índice 1, mesmo que entre elas haja uma <code>static</code> (que tem sua própria contagem independente). É exatamente esse índice — categoria + posição — que vira o segmento e o deslocamento de um comando <code>push</code>/<code>pop</code> da VM. Por exemplo, na classe <code>Point</code> com <code>field int x, y;</code> e um método <code>distance(Point other)</code> com <code>var int dx, dy;</code>, a tabela fica:</p>
+<table>
+<thead>
+<tr>
+<th>Nome</th>
+<th>Tipo</th>
+<th>Categoria</th>
+<th>Índice</th>
+<th>Acesso na VM</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>x</code></td>
+<td><code>int</code></td>
+<td><code>field</code></td>
+<td>0</td>
+<td><code>this 0</code></td>
+</tr>
+<tr>
+<td><code>y</code></td>
+<td><code>int</code></td>
+<td><code>field</code></td>
+<td>1</td>
+<td><code>this 1</code></td>
+</tr>
+<tr>
+<td><code>this</code></td>
+<td><code>Point</code></td>
+<td><code>arg</code></td>
+<td>0</td>
+<td><code>argument 0</code></td>
+</tr>
+<tr>
+<td><code>other</code></td>
+<td><code>Point</code></td>
+<td><code>arg</code></td>
+<td>1</td>
+<td><code>argument 1</code></td>
+</tr>
+<tr>
+<td><code>dx</code></td>
+<td><code>int</code></td>
+<td><code>var</code></td>
+<td>0</td>
+<td><code>local 0</code></td>
+</tr>
+<tr>
+<td><code>dy</code></td>
+<td><code>int</code></td>
+<td><code>var</code></td>
+<td>1</td>
+<td><code>local 1</code></td>
+</tr>
+</tbody>
+</table>
+<p>e <code>let dx = x - other.getx();</code> só pode ser traduzido porque a tabela informa que <code>x</code> é <code>this 0</code>, <code>other</code> é <code>argument 1</code> e <code>dx</code> é <code>local 0</code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Comparação com a API do Nand2Tetris</p>
+<p>O livro do Nand2Tetris propõe uma API com três consultas separadas — <code>kindOf(name)</code>, <code>typeOf(name)</code> e <code>indexOf(name)</code>. Aqui elas foram reunidas em <code>resolve(name)</code>, que devolve as três informações de uma vez em um <code>Symbol</code> (ou <code>null</code>, o equivalente ao <code>NONE</code> de <code>kindOf</code>). <code>startSubroutine</code>, <code>define</code> e <code>varCount</code> têm o mesmo papel nas duas versões.</p>
+</div>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">SymbolTable</span><span class="w"> </span><span class="p">{</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">enum</span><span class="w"> </span><span class="n">Kind</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">STATIC</span><span class="p">,</span><span class="w"> </span><span class="n">FIELD</span><span class="p">,</span><span class="w"> </span><span class="n">ARG</span><span class="p">,</span><span class="w"> </span><span class="n">VAR</span><span class="w"> </span><span class="p">}</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
@@ -1592,11 +1652,11 @@
 <a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="w">    </span><span class="c1">// ...</span>
 <a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="p">}</span>
 </code></pre></div>
-<p>O truque de <code>if (subroutineType == METHOD) symbolTable.define("this", className, Kind.ARG)</code> merece destaque: em Jack, um método é sempre chamado com o objeto receptor como <strong>primeiro argumento implícito</strong> (o compilador insere isso na chamada, como veremos no capítulo 10) — logo, registrá-lo como <code>arg</code> de índice 0 <em>antes</em> de processar a lista de parâmetros declarados garante que o primeiro parâmetro <em>de fato</em> declarado pelo programador já saia com índice 1, exatamente onde ele estará em tempo de execução.</p>
+<p>O truque de <code>if (subroutineType == METHOD) symbolTable.define("this", className, Kind.ARG)</code> merece destaque: pelo mapeamento padrão (capítulo 7), um método é sempre chamado com o objeto receptor como <strong>primeiro argumento implícito</strong> (o compilador insere isso na chamada, como veremos no capítulo 10) — logo, registrá-lo como <code>arg</code> de índice 0 <em>antes</em> de processar a lista de parâmetros declarados garante que o primeiro parâmetro <em>de fato</em> declarado pelo programador já saia com índice 1, exatamente onde ele estará em tempo de execução.</p>
 <h2 id="o-que-a-tabela-ainda-nao-faz">O que a tabela ainda não faz<a class="headerlink" href="#o-que-a-tabela-ainda-nao-faz" title="Permanent link">&para;</a></h2>
 <p>Esta tabela responde "que categoria, que tipo, que índice" — o suficiente para gerar <code>push</code>/<code>pop</code> corretos nos capítulos 9 e 10. Ela <strong>não</strong> faz verificação de tipos (não impede que você some um <code>int</code> com um <code>boolean</code>), nem detecta redeclaração além do básico, nem resolve sobrecarga (que nem existe em Jack). Esse é o escopo deliberadamente mínimo de análise semântica deste curso — o suficiente para gerar código correto, sem se tornar um verificador de tipos completo.</p>
 <h2 id="o-que-vem-a-seguir">O que vem a seguir<a class="headerlink" href="#o-que-vem-a-seguir" title="Permanent link">&para;</a></h2>
-<p>Com a tabela de símbolos pronta, o próximo capítulo dá um passo atrás para revisar, em teoria geral, o papel de uma representação intermediária — preparando o terreno para a especificação da VM Hack (capítulo 8) e, finalmente, para a geração de código de verdade (capítulos 9 e 10), agora que sabemos exatamente onde cada identificador vive.</p>
+<p>Com a tabela de símbolos pronta, temos as três peças: a estrutura do programa (o parser da Unidade 1), o alvo (a VM Hack do capítulo 7) e a ponte entre os nomes de Jack e os segmentos da VM. Os capítulos 9 e 10 juntam as três e começam a gerar código de verdade, agora que sabemos exatamente onde cada identificador vive.</p>
 
 
 

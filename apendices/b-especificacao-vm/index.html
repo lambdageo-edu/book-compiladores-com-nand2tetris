@@ -600,14 +600,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../unidade-2-middleend/06-tabela-de-simbolos/" class="md-nav__link">
+      <a href="../../unidade-2-middleend/06-representacoes-intermediarias/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    6. Tabela de símbolos
+    6. Representações intermediárias
   
 
     
@@ -628,14 +628,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../unidade-2-middleend/07-representacoes-intermediarias/" class="md-nav__link">
+      <a href="../../unidade-2-middleend/07-a-vm-hack/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    7. Representações intermediárias
+    7. A VM Hack (especificação)
   
 
     
@@ -656,14 +656,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../unidade-2-middleend/08-a-vm-hack/" class="md-nav__link">
+      <a href="../../unidade-2-middleend/08-tabela-de-simbolos/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    8. A VM Hack (especificação)
+    8. Tabela de símbolos
   
 
     
@@ -1205,6 +1205,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#mapeamento-padrao-de-jack-resumo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mapeamento padrão de Jack (resumo)
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1386,6 +1397,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#mapeamento-padrao-de-jack-resumo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mapeamento padrão de Jack (resumo)
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1407,7 +1429,7 @@
 
 
 <h1 id="apendice-b-especificacao-da-vm-hack">Apêndice B — Especificação da VM Hack<a class="headerlink" href="#apendice-b-especificacao-da-vm-hack" title="Permanent link">&para;</a></h1>
-<p>Referência compacta, extraída do capítulo 8, para consulta rápida durante os capítulos 9–12.</p>
+<p>Referência compacta, extraída do capítulo 7, para consulta rápida durante os capítulos 9–12.</p>
 <h2 id="segmentos">Segmentos<a class="headerlink" href="#segmentos" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -1435,7 +1457,7 @@
 </tr>
 <tr>
 <td><code>that</code></td>
-<td>Segundo "objeto atual" — usado por arrays e por métodos de outros objetos</td>
+<td>Elemento de array corrente (endereço-base em <code>pointer 1</code>)</td>
 </tr>
 <tr>
 <td><code>constant</code></td>
@@ -1522,7 +1544,51 @@
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>call nome nArgs
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>return
 </code></pre></div>
-<p>Convenção: toda subroutine — <code>void</code> ou não — deixa exatamente um valor na pilha antes do <code>return</code> (por convenção, <code>push constant 0</code> para as que não têm valor útil).</p>
+<p>Convenção: toda subroutine — <code>void</code> ou não — deixa exatamente um valor na pilha antes do <code>return</code> (por convenção, <code>push constant 0</code> para as que não têm valor útil). Do lado de quem chama, o valor devolvido por uma chamada feita apenas pelo efeito (o comando <code>do</code> de Jack) é descartado com <code>pop temp 0</code>.</p>
+<h2 id="mapeamento-padrao-de-jack-resumo">Mapeamento padrão de Jack (resumo)<a class="headerlink" href="#mapeamento-padrao-de-jack-resumo" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Jack</th>
+<th>VM</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>subroutine <code>yyy</code> da classe <code>Xxx</code></td>
+<td>função <code>Xxx.yyy</code></td>
+</tr>
+<tr>
+<td><code>method</code> com <em>k</em> parâmetros</td>
+<td>função com <em>k</em> + 1 argumentos (<code>argument 0</code> = objeto)</td>
+</tr>
+<tr>
+<td><code>var</code> / parâmetro / <code>static</code> / <code>field</code></td>
+<td><code>local</code> / <code>argument</code> / <code>static</code> / <code>this</code></td>
+</tr>
+<tr>
+<td><code>arr[i]</code></td>
+<td><code>pointer 1</code> ← <code>arr + i</code>; acesso via <code>that 0</code></td>
+</tr>
+<tr>
+<td><code>null</code>, <code>false</code> / <code>true</code></td>
+<td><code>0</code> / <code>-1</code> (<code>push constant 1</code>, <code>neg</code>)</td>
+</tr>
+<tr>
+<td><code>*</code>, <code>/</code></td>
+<td><code>call Math.multiply 2</code>, <code>call Math.divide 2</code></td>
+</tr>
+<tr>
+<td>constante string</td>
+<td><code>String.new</code> + <code>String.appendChar</code></td>
+</tr>
+<tr>
+<td>construtor</td>
+<td><code>Memory.alloc(nCampos)</code>, <code>pop pointer 0</code></td>
+</tr>
+</tbody>
+</table>
+<p>Detalhes no capítulo 7.</p>
 
 
 

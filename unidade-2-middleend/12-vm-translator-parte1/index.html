@@ -600,14 +600,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../06-tabela-de-simbolos/" class="md-nav__link">
+      <a href="../06-representacoes-intermediarias/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    6. Tabela de símbolos
+    6. Representações intermediárias
   
 
     
@@ -628,14 +628,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../07-representacoes-intermediarias/" class="md-nav__link">
+      <a href="../07-a-vm-hack/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    7. Representações intermediárias
+    7. A VM Hack (especificação)
   
 
     
@@ -656,14 +656,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../08-a-vm-hack/" class="md-nav__link">
+      <a href="../08-tabela-de-simbolos/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    8. A VM Hack (especificação)
+    8. Tabela de símbolos
   
 
     
@@ -1451,7 +1451,7 @@
 
 
 <h1 id="12-vm-translator-parte-1-aritmetica-e-memoria">12. VM Translator — Parte 1: aritmética e memória<a class="headerlink" href="#12-vm-translator-parte-1-aritmetica-e-memoria" title="Permanent link">&para;</a></h1>
-<p>Com o compilador Jack → VM completo (capítulos 9 e 10), fechamos a metade "de cima" da nossa cadeia de tradução. Este capítulo começa a outra metade: o <strong>VM Translator</strong>, que traduz código VM (a IR especificada no capítulo 8) para Assembly Hack — a linguagem que o capítulo 14 vai detalhar e que o Assembler (capítulo 15) finalmente converte em código de máquina.</p>
+<p>Com o compilador Jack → VM completo (capítulos 9 e 10), fechamos a metade "de cima" da nossa cadeia de tradução. Este capítulo começa a outra metade: o <strong>VM Translator</strong>, que traduz código VM (a IR especificada no capítulo 7) para Assembly Hack — a linguagem que o capítulo 14 vai detalhar e que o Assembler (capítulo 15) finalmente converte em código de máquina.</p>
 <p>A partir deste capítulo, o livro muda de estilo: em vez de código construído junto com você, capítulo a capítulo (como fizemos com o <code>JackTokenizer</code> e o <code>CompilationEngine</code>), o VM Translator e o Assembler são apresentados como <strong>teoria + especificação + exercício guiado</strong> — você implementa como atividade prática, comparando sua saída com os testes oficiais do Nand2Tetris. A razão é de escopo: VM Translator e Assembler não são "o compilador Jack" propriamente — são a infraestrutura de back-end que o sustenta.</p>
 <h2 id="por-que-o-vm-translator-e-um-tradutor-nao-um-compilador">Por que o VM Translator é um tradutor, não um compilador<a class="headerlink" href="#por-que-o-vm-translator-e-um-tradutor-nao-um-compilador" title="Permanent link">&para;</a></h2>
 <p>Note a diferença de natureza: o <code>CompilationEngine</code> compila uma linguagem de alto nível (Jack) para uma representação de mais baixo nível (VM) — uma tradução "para baixo" na hierarquia de abstração. O VM Translator, por sua vez, traduz uma linguagem-fonte (código VM) para <strong>outra</strong> linguagem de baixo nível (Assembly Hack) — ambas já próximas da máquina. É uma arquitetura em três estágios:</p>

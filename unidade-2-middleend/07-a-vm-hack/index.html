@@ -12,13 +12,13 @@
         <meta name="author" content="Prof. Sergio Costa">
       
       
-        <link rel="canonical" href="https://lambdageo.github.io/nand2tetris-compilador/unidade-2-middleend/08-a-vm-hack/">
+        <link rel="canonical" href="https://lambdageo.github.io/nand2tetris-compilador/unidade-2-middleend/07-a-vm-hack/">
       
       
-        <link rel="prev" href="../07-representacoes-intermediarias/">
+        <link rel="prev" href="../06-representacoes-intermediarias/">
       
       
-        <link rel="next" href="../09-codegen-expressoes-comandos/">
+        <link rel="next" href="../08-tabela-de-simbolos/">
       
       
         
@@ -29,7 +29,7 @@
     
     
       
-        <title>8. A VM Hack (especificação) - Compiladores — do zero ao Hack</title>
+        <title>7. A VM Hack (especificação) - Compiladores — do zero ao Hack</title>
       
     
     
@@ -76,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#8-a-vm-hack-especificacao" class="md-skip">
+        <a href="#7-a-vm-hack-especificacao" class="md-skip">
           Ir para o conteúdo
         </a>
       
@@ -112,7 +112,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              8. A VM Hack (especificação)
+              7. A VM Hack (especificação)
             
           </span>
         </div>
@@ -600,42 +600,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../06-tabela-de-simbolos/" class="md-nav__link">
+      <a href="../06-representacoes-intermediarias/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    6. Tabela de símbolos
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../07-representacoes-intermediarias/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    7. Representações intermediárias
+    6. Representações intermediárias
   
 
     
@@ -672,7 +644,7 @@
   <span class="md-ellipsis">
     
   
-    8. A VM Hack (especificação)
+    7. A VM Hack (especificação)
   
 
     
@@ -690,7 +662,7 @@
   <span class="md-ellipsis">
     
   
-    8. A VM Hack (especificação)
+    7. A VM Hack (especificação)
   
 
     
@@ -782,6 +754,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#o-mapeamento-padrao-de-jack-sobre-a-vm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        O mapeamento padrão de Jack sobre a VM
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#o-que-vem-a-seguir" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -796,6 +779,34 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../08-tabela-de-simbolos/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    8. Tabela de símbolos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -1420,6 +1431,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#o-mapeamento-padrao-de-jack-sobre-a-vm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        O mapeamento padrão de Jack sobre a VM
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#o-que-vem-a-seguir" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1450,7 +1472,7 @@
   
 
 
-<h1 id="8-a-vm-hack-especificacao">8. A VM Hack (especificação)<a class="headerlink" href="#8-a-vm-hack-especificacao" title="Permanent link">&para;</a></h1>
+<h1 id="7-a-vm-hack-especificacao">7. A VM Hack (especificação)<a class="headerlink" href="#7-a-vm-hack-especificacao" title="Permanent link">&para;</a></h1>
 <p>Este capítulo é a especificação de referência da VM Hack — a representação intermediária baseada em pilha para a qual o compilador Jack (capítulos 9 e 10) vai gerar código, e que o VM Translator (capítulos 11 e 12) vai traduzir para Assembly Hack. Não há código de compilador aqui; é a "planta" que orienta os próximos quatro capítulos.</p>
 <h2 id="modelo-de-memoria">Modelo de memória<a class="headerlink" href="#modelo-de-memoria" title="Permanent link">&para;</a></h2>
 <p>Cada célula de memória da máquina Hack armazena 16 bits, usados para representar de forma uniforme três coisas: um inteiro em complemento de dois (-32768 a 32767), um booleano (<code>0</code> para falso, <code>-1</code> — todos os bits em 1 — para verdadeiro), ou um endereço de memória.</p>
@@ -1460,62 +1482,69 @@
 <tr>
 <th>Segmento</th>
 <th>Propósito</th>
-<th>Mapeado de</th>
+<th>Usado pelo compilador Jack para</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><code>local</code></td>
 <td>Variáveis locais da subroutine em execução</td>
-<td><code>var</code> (tabela de símbolos, capítulo 6)</td>
+<td>variáveis declaradas com <code>var</code></td>
 </tr>
 <tr>
 <td><code>argument</code></td>
 <td>Argumentos recebidos pela subroutine</td>
-<td><code>arg</code></td>
+<td>parâmetros da subroutine</td>
 </tr>
 <tr>
 <td><code>static</code></td>
 <td>Variáveis de classe (compartilhadas por todas as instâncias)</td>
-<td><code>static</code></td>
+<td>variáveis declaradas com <code>static</code></td>
 </tr>
 <tr>
 <td><code>this</code></td>
 <td>Campos do objeto atual</td>
-<td><code>field</code> (via <code>this</code>)</td>
+<td>variáveis declaradas com <code>field</code></td>
 </tr>
 <tr>
 <td><code>that</code></td>
-<td>Um segundo "objeto atual" — usado para arrays e para o objeto de um método invocado sobre outra instância</td>
-<td>(uso interno)</td>
+<td>Elemento de array corrente</td>
+<td>acesso <code>arr[i]</code></td>
 </tr>
 <tr>
 <td><code>constant</code></td>
 <td>Pseudo-segmento somente leitura para constantes literais</td>
-<td>literais na expressão</td>
+<td>literais inteiros</td>
 </tr>
 <tr>
 <td><code>pointer</code></td>
-<td>Dois registradores (0 e 1) que apontam para <code>this</code> e <code>that</code>, respectivamente</td>
-<td>uso interno do compilador</td>
+<td>Duas células: <code>pointer 0</code> guarda o endereço-base de <code>this</code>, <code>pointer 1</code> o de <code>that</code></td>
+<td>ancorar <code>this</code> no objeto e <code>that</code> no elemento de array</td>
 </tr>
 <tr>
 <td><code>temp</code></td>
 <td>Oito células de uso livre, compartilhadas por toda a VM</td>
-<td>uso interno do compilador</td>
+<td>valores descartados e auxiliares</td>
 </tr>
 </tbody>
 </table>
+<p><code>this</code> e <code>that</code> são segmentos "móveis": não têm endereço fixo, e sim o endereço que estiver gravado em <code>pointer 0</code> e <code>pointer 1</code>. Gravar um endereço <code>a</code> em <code>pointer 0</code> faz <code>this i</code> passar a significar <code>RAM[a + i]</code>; o mesmo vale para <code>pointer 1</code> e <code>that i</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>push constant 8000
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>pop pointer 0        // this passa a começar em RAM[8000]
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>push constant 17
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>pop this 1           // RAM[8001] = 17
+</code></pre></div>
+<p>É esse mecanismo de endereçamento indireto que o compilador vai usar para acessar campos de objetos (via <code>this</code>) e elementos de arrays (via <code>that</code>).</p>
 <p>Além dos segmentos, duas áreas adicionais completam o modelo: a <strong>pilha</strong> (<em>stack</em>), usada para armazenar valores temporários durante a avaliação de expressões e para implementar o protocolo de chamada de função (capítulo 12); e o <strong>heap</strong>, a região de RAM dedicada ao armazenamento de objetos e arrays, gerenciada dinamicamente pelas funções <code>Memory.alloc</code>/<code>Memory.deAlloc</code> do sistema operacional Jack.</p>
 <h2 id="comandos-de-acesso-a-memoria">Comandos de acesso à memória<a class="headerlink" href="#comandos-de-acesso-a-memoria" title="Permanent link">&para;</a></h2>
 <p>Apenas dois comandos movem dados entre a pilha e os segmentos:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>push segmento índice   // empilha o valor de segmento[índice]
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>pop segmento índice    // desempilha o topo e armazena em segmento[índice]
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>push segmento índice   // empilha o valor de segmento[índice]
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>pop segmento índice    // desempilha o topo e armazena em segmento[índice]
 </code></pre></div>
 <p><code>segmento</code> é um dos oito acima (exceto que não existe <code>pop constant</code>, já que constantes não são graváveis); <code>índice</code> é um inteiro não negativo.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>push local 2       // empilha local[2]
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>push constant 10   // empilha o literal 10
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>pop argument 0      // desempilha o topo para argument[0]
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>push local 2       // empilha local[2]
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>push constant 10   // empilha o literal 10
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>pop argument 0      // desempilha o topo para argument[0]
 </code></pre></div>
 <h2 id="comandos-aritmeticos-e-logicos">Comandos aritméticos e lógicos<a class="headerlink" href="#comandos-aritmeticos-e-logicos" title="Permanent link">&para;</a></h2>
 <p>Nove comandos operam sobre a pilha — sete binários (consomem dois valores do topo, empilham um resultado) e dois unários (consomem um, empilham um):</p>
@@ -1578,68 +1607,135 @@
 <p>Não existem comandos de multiplicação ou divisão na VM — como veremos no capítulo 9, o compilador Jack traduz os operadores <code>*</code> e <code>/</code> em chamadas às funções <code>Math.multiply</code>/<code>Math.divide</code> da biblioteca padrão, não em comandos VM nativos.</p>
 <h2 id="controle-de-fluxo">Controle de fluxo<a class="headerlink" href="#controle-de-fluxo" title="Permanent link">&para;</a></h2>
 <p>Linguagens de alto nível têm <code>if</code>, <code>while</code>, <code>for</code> — a VM reduz tudo isso a três primitivas:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>label rótulo       // declara uma posição nomeada no código
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>goto rótulo        // salto incondicional
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>if-goto rótulo     // desempilha o topo; se for verdadeiro (≠ 0), salta
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>label rótulo       // declara uma posição nomeada no código
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>goto rótulo        // salto incondicional
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>if-goto rótulo     // desempilha o topo; se for verdadeiro (≠ 0), salta
 </code></pre></div>
 <p>Rótulos têm escopo de função — dois <code>label LOOP</code> em funções diferentes não colidem (o capítulo 12 detalha a qualificação <code>funcao$rótulo</code> usada pelo VM Translator para garantir isso na tradução final para Assembly). É com apenas essas três primitivas que o capítulo 9 vai mapear <code>if</code>/<code>else</code> e <code>while</code> de Jack.</p>
 <h2 id="funcoes">Funções<a class="headerlink" href="#funcoes" title="Permanent link">&para;</a></h2>
 <p>Três comandos governam todo o protocolo de chamada:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>function nome nLocais   // declara uma função, com N variáveis locais (inicializadas em 0)
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>call nome nArgs         // chama uma função, passando os N argumentos já empilhados
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>return                  // desempilha um valor e devolve o controle ao chamador
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>function nome nLocais   // declara uma função, com N variáveis locais (inicializadas em 0)
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>call nome nArgs         // chama uma função, passando os N argumentos já empilhados
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>return                  // desempilha um valor e devolve o controle ao chamador
 </code></pre></div>
 <p>Uma peça importante do design: <strong>mesmo subroutines que não retornam valor útil precisam empilhar algo antes do <code>return</code></strong> — por convenção, <code>push constant 0</code>. É simetria pura: todo <code>call</code> espera encontrar um valor no topo da pilha ao retornar, então toda função — <code>void</code> ou não — precisa deixar exatamente um valor lá.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>function Main.dobro 0
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>    push constant 2
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    push argument 0
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>    call Math.multiply 2
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>    return
-<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>
-<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>function Main.main 1
-<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>    push constant 5
-<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>    call Main.dobro 1
-<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>    pop local 0
-<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>    push constant 0
-<a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a>    return
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>function Main.dobro 0
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>    push constant 2
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>    push argument 0
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>    call Math.multiply 2
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>    return
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>function Main.main 1
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>    push constant 5
+<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>    call Main.dobro 1
+<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>    pop local 0
+<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>    push constant 0
+<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>    return
 </code></pre></div>
 <p>O nome de uma função é sempre <code>Classe.nomeDaSubroutine</code> — é assim que construtores, métodos e funções (na terminologia Jack) se tornam, todos igualmente, "funções" no nível da VM. O mecanismo completo de <code>call</code>/<code>return</code> (salvar e restaurar o estado do chamador, o <em>stack frame</em>) é o assunto do capítulo 12; por ora, basta saber a interface: argumentos entram empilhados, o resultado sai empilhado.</p>
 <h2 id="um-programa-completo">Um programa completo<a class="headerlink" href="#um-programa-completo" title="Permanent link">&para;</a></h2>
 <p>Todo programa VM começa executando <code>Main.main</code>. Um exemplo simples — somar de 1 a <code>n</code> e imprimir o resultado — ilustra push/pop, aritmética, controle de fluxo e chamada de função juntos:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>function Soma.soma 2        // variáveis locais: sum (0), i (1)
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>    push constant 0
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>    pop local 0              // sum = 0
-<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>    push constant 1
-<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>    pop local 1              // i = 1
-<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>label LOOP
-<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>    push local 1
-<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>    push argument 0
-<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>    gt                        // i &gt; n ?
-<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>    if-goto FIM
-<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>    push local 0
-<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>    push local 1
-<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a>    add
-<a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a>    pop local 0               // sum = sum + i
-<a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a>    push local 1
-<a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a>    push constant 1
-<a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a>    add
-<a id="__codelineno-5-18" name="__codelineno-5-18" href="#__codelineno-5-18"></a>    pop local 1               // i = i + 1
-<a id="__codelineno-5-19" name="__codelineno-5-19" href="#__codelineno-5-19"></a>    goto LOOP
-<a id="__codelineno-5-20" name="__codelineno-5-20" href="#__codelineno-5-20"></a>label FIM
-<a id="__codelineno-5-21" name="__codelineno-5-21" href="#__codelineno-5-21"></a>    push local 0
-<a id="__codelineno-5-22" name="__codelineno-5-22" href="#__codelineno-5-22"></a>    return
-<a id="__codelineno-5-23" name="__codelineno-5-23" href="#__codelineno-5-23"></a>
-<a id="__codelineno-5-24" name="__codelineno-5-24" href="#__codelineno-5-24"></a>function Main.main 1
-<a id="__codelineno-5-25" name="__codelineno-5-25" href="#__codelineno-5-25"></a>    push constant 10
-<a id="__codelineno-5-26" name="__codelineno-5-26" href="#__codelineno-5-26"></a>    pop local 0               // n = 10
-<a id="__codelineno-5-27" name="__codelineno-5-27" href="#__codelineno-5-27"></a>    push local 0
-<a id="__codelineno-5-28" name="__codelineno-5-28" href="#__codelineno-5-28"></a>    call Soma.soma 1
-<a id="__codelineno-5-29" name="__codelineno-5-29" href="#__codelineno-5-29"></a>    call Output.printInt 1
-<a id="__codelineno-5-30" name="__codelineno-5-30" href="#__codelineno-5-30"></a>    push constant 0
-<a id="__codelineno-5-31" name="__codelineno-5-31" href="#__codelineno-5-31"></a>    return
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>function Soma.soma 2        // variáveis locais: sum (0), i (1)
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>    push constant 0
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>    pop local 0              // sum = 0
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>    push constant 1
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>    pop local 1              // i = 1
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>label LOOP
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>    push local 1
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>    push argument 0
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>    gt                        // i &gt; n ?
+<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a>    if-goto FIM
+<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a>    push local 0
+<a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a>    push local 1
+<a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a>    add
+<a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a>    pop local 0               // sum = sum + i
+<a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a>    push local 1
+<a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a>    push constant 1
+<a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a>    add
+<a id="__codelineno-6-18" name="__codelineno-6-18" href="#__codelineno-6-18"></a>    pop local 1               // i = i + 1
+<a id="__codelineno-6-19" name="__codelineno-6-19" href="#__codelineno-6-19"></a>    goto LOOP
+<a id="__codelineno-6-20" name="__codelineno-6-20" href="#__codelineno-6-20"></a>label FIM
+<a id="__codelineno-6-21" name="__codelineno-6-21" href="#__codelineno-6-21"></a>    push local 0
+<a id="__codelineno-6-22" name="__codelineno-6-22" href="#__codelineno-6-22"></a>    return
+<a id="__codelineno-6-23" name="__codelineno-6-23" href="#__codelineno-6-23"></a>
+<a id="__codelineno-6-24" name="__codelineno-6-24" href="#__codelineno-6-24"></a>function Main.main 1
+<a id="__codelineno-6-25" name="__codelineno-6-25" href="#__codelineno-6-25"></a>    push constant 10
+<a id="__codelineno-6-26" name="__codelineno-6-26" href="#__codelineno-6-26"></a>    pop local 0               // n = 10
+<a id="__codelineno-6-27" name="__codelineno-6-27" href="#__codelineno-6-27"></a>    push local 0
+<a id="__codelineno-6-28" name="__codelineno-6-28" href="#__codelineno-6-28"></a>    call Soma.soma 1
+<a id="__codelineno-6-29" name="__codelineno-6-29" href="#__codelineno-6-29"></a>    call Output.printInt 1
+<a id="__codelineno-6-30" name="__codelineno-6-30" href="#__codelineno-6-30"></a>    pop temp 0                // descarta o valor devolvido por Output.printInt
+<a id="__codelineno-6-31" name="__codelineno-6-31" href="#__codelineno-6-31"></a>    push constant 0
+<a id="__codelineno-6-32" name="__codelineno-6-32" href="#__codelineno-6-32"></a>    return
 </code></pre></div>
+<p>O <code>pop temp 0</code> logo depois de <code>call Output.printInt 1</code> é o outro lado da convenção vista acima. Como toda função devolve um valor — inclusive as <code>void</code>, que devolvem 0 —, quem chama uma função apenas pelo efeito colateral precisa descartar esse valor, para que a pilha não acumule lixo.</p>
+<h2 id="o-mapeamento-padrao-de-jack-sobre-a-vm">O mapeamento padrão de Jack sobre a VM<a class="headerlink" href="#o-mapeamento-padrao-de-jack-sobre-a-vm" title="Permanent link">&para;</a></h2>
+<p>A VM não sabe nada de classes, objetos ou métodos. Para que programas Jack compilados separadamente (e o sistema operacional Jack, que é ele próprio um conjunto de arquivos <code>.vm</code>) funcionem juntos, todo compilador Jack → VM segue as mesmas convenções — o <strong>mapeamento padrão</strong>. Ele é parte da especificação, não da implementação: os capítulos 8 a 10 apenas o colocam em prática.</p>
+<p><strong>Arquivos e subroutines.</strong> Cada <code>Xxx.jack</code> é compilado para um <code>Xxx.vm</code> separado. Cada subroutine <code>yyy</code> da classe <code>Xxx</code> — seja <code>function</code>, <code>method</code> ou <code>constructor</code> — vira uma função VM chamada <code>Xxx.yyy</code>. Uma <code>function</code> ou um <code>constructor</code> com <em>k</em> parâmetros vira uma função VM de <em>k</em> argumentos; um <code>method</code> com <em>k</em> parâmetros vira uma função VM de <em>k</em> + 1 argumentos, porque <code>argument 0</code> é sempre uma referência ao objeto sobre o qual o método opera.</p>
+<p><strong>Variáveis.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Variável Jack</th>
+<th>Segmento VM</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>var</code> (local da subroutine)</td>
+<td><code>local</code></td>
+</tr>
+<tr>
+<td>parâmetro da subroutine</td>
+<td><code>argument</code></td>
+</tr>
+<tr>
+<td><code>static</code></td>
+<td><code>static</code> do <code>.vm</code> da classe</td>
+</tr>
+<tr>
+<td><code>field</code> do objeto corrente</td>
+<td><code>this</code>, depois de apontar <code>pointer 0</code> para o objeto</td>
+</tr>
+<tr>
+<td>elemento <code>arr[i]</code></td>
+<td><code>that 0</code>, depois de apontar <code>pointer 1</code> para <code>arr + i</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Subroutines.</strong></p>
+<ul>
+<li>Um <strong>método</strong> começa ancorando <code>this</code> no objeto recebido: <code>push argument 0</code>, <code>pop pointer 0</code>.</li>
+<li>Um <strong>construtor</strong> começa alocando o objeto no heap com <code>Memory.alloc(n)</code>, em que <em>n</em> é o número de campos da classe, ancora <code>this</code> no endereço devolvido (<code>pop pointer 0</code>) e termina devolvendo esse endereço (<code>push pointer 0</code>, <code>return</code>).</li>
+<li>Funções e métodos <code>void</code> devolvem <code>constant 0</code>.</li>
+</ul>
+<p><strong>Chamadas.</strong> Quem chama empilha os argumentos e executa <code>call</code>. Se o alvo é um método, o primeiro valor empilhado é a referência ao objeto. Depois de um <code>do</code>, o valor devolvido é descartado com <code>pop temp 0</code>.</p>
+<p><strong>Constantes.</strong> <code>null</code> e <code>false</code> são <code>0</code>; <code>true</code> é <code>-1</code>, obtido com <code>push constant 1</code> seguido de <code>neg</code> (ou, equivalentemente, <code>push constant 0</code> seguido de <code>not</code>).</p>
+<p><strong>Serviços do sistema operacional.</strong> O sistema operacional Jack é formado por oito classes já compiladas — <code>Math.vm</code>, <code>Memory.vm</code>, <code>Screen.vm</code>, <code>Output.vm</code>, <code>Keyboard.vm</code>, <code>String.vm</code>, <code>Array.vm</code> e <code>Sys.vm</code> —, que precisam estar no mesmo diretório dos <code>.vm</code> gerados pelo compilador (o VM Emulator do Nand2Tetris já traz uma implementação embutida delas, então nesse caso não é preciso copiá-las). O compilador recorre a elas implicitamente:</p>
+<table>
+<thead>
+<tr>
+<th>Construção Jack</th>
+<th>Serviço usado</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>x * y</code>, <code>x / y</code></td>
+<td><code>Math.multiply</code>, <code>Math.divide</code></td>
+</tr>
+<tr>
+<td>constante <code>"abc"</code></td>
+<td><code>String.new(3)</code> seguido de <code>String.appendChar</code> para cada caractere</td>
+</tr>
+<tr>
+<td><code>Classe.new(...)</code> (dentro do construtor)</td>
+<td><code>Memory.alloc(n)</code></td>
+</tr>
+</tbody>
+</table>
 <h2 id="o-que-vem-a-seguir">O que vem a seguir<a class="headerlink" href="#o-que-vem-a-seguir" title="Permanent link">&para;</a></h2>
-<p>Com a especificação da VM Hack em mãos, os próximos dois capítulos (9 e 10) evoluem o <code>CompilationEngine</code> da Unidade 1 para efetivamente gerar este código, expressão por expressão, comando por comando — fechando o compilador Jack → VM (Project 11) por completo. Os capítulos 11 e 12, na Unidade 3, tratam do outro lado: como traduzir esse código VM para Assembly Hack.</p>
+<p>Com a especificação da VM Hack e o mapeamento padrão em mãos, sabemos exatamente <em>onde</em> cada variável Jack precisa morar. O próximo capítulo constrói a estrutura que guarda essa informação durante a compilação — a <strong>tabela de símbolos</strong> —, e os capítulos 9 e 10 evoluem o <code>CompilationEngine</code> da Unidade 1 para efetivamente gerar este código, expressão por expressão, comando por comando — fechando o compilador Jack → VM (Project 11) por completo. Os capítulos 11 e 12, na Unidade 3, tratam do outro lado: como traduzir esse código VM para Assembly Hack.</p>
 <p>Uma versão tabular desta especificação, para consulta rápida durante esses capítulos, está no <a href="../../apendices/b-especificacao-vm/">Apêndice B</a>.</p>
 
 
