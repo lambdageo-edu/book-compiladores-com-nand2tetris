@@ -18,7 +18,7 @@
         <link rel="prev" href="../../unidade-2-middleend/10-codegen-subrotinas-objetos/">
       
       
-        <link rel="next" href="../../unidade-2-middleend/12-vm-translator-parte1/">
+        <link rel="next" href="../12-vm-translator-parte1/">
       
       
         
@@ -1053,7 +1053,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../unidade-2-middleend/12-vm-translator-parte1/" class="md-nav__link">
+      <a href="../12-vm-translator-parte1/" class="md-nav__link">
         
   
   
@@ -1651,7 +1651,7 @@
 
 
 <h1 id="11-assembly-hack-especificacao">11. Assembly Hack (especificação)<a class="headerlink" href="#11-assembly-hack-especificacao" title="Permanent link">&para;</a></h1>
-<p>Este capítulo especifica, por completo, a linguagem Assembly Hack — a linguagem simbólica para a qual o VM Translator (capítulos 11-12) traduz, e que o Assembler (capítulo 15) vai finalmente converter em código de máquina binário. É referência de consulta, não um capítulo incremental — mas vale lê-lo por inteiro pelo menos uma vez antes de atacar o Assembler, porque cada peça (registradores, instruções, símbolos) é usada o tempo todo no capítulo seguinte.</p>
+<p>Com o compilador Jack → VM pronto (Parte 2), falta levar o código VM até a máquina. O primeiro passo é conhecer a linguagem de chegada. Este capítulo especifica, por completo, a linguagem Assembly Hack — a linguagem simbólica para a qual o VM Translator (capítulos 12 e 13) traduz, e que o Assembler (capítulo 15) vai finalmente converter em código de máquina binário. É referência de consulta, não um capítulo incremental — mas vale lê-lo por inteiro pelo menos uma vez antes de atacar o VM Translator, porque cada peça (registradores, instruções, símbolos) é usada o tempo todo nos capítulos 12 e 13 — e, depois, no Assembler (capítulo 15).</p>
 <h2 id="por-que-uma-linguagem-simbolica">Por que uma linguagem simbólica<a class="headerlink" href="#por-que-uma-linguagem-simbolica" title="Permanent link">&para;</a></h2>
 <p>Projetistas de processadores definem uma linguagem assembly — sequências de instruções mnemônicas que representam diretamente as operações do processador, mais símbolos que facilitam a escrita de programas (rótulos, comentários, constantes nomeadas). Tudo isso é, no fim, mapeado para código de máquina — números binários — por um montador. A vantagem é pura ergonomia: <code>@LOOP</code> é imensamente mais legível que o endereço numérico que ele representa, mas os dois significam exatamente a mesma coisa para a CPU.</p>
 <h2 id="a-arquitetura-hack">A arquitetura Hack<a class="headerlink" href="#a-arquitetura-hack" title="Permanent link">&para;</a></h2>
@@ -1822,7 +1822,7 @@
 <h3 id="simbolos-pre-definidos">Símbolos pré-definidos<a class="headerlink" href="#simbolos-pre-definidos" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>Registradores virtuais</strong> <code>R0</code>–<code>R15</code>: referem-se diretamente a <code>RAM[0]</code>–<code>RAM[15]</code>.</li>
-<li><strong>Ponteiros de segmento</strong> <code>SP</code>, <code>LCL</code>, <code>ARG</code>, <code>THIS</code>, <code>THAT</code>: referem-se a <code>RAM[0]</code>–<code>RAM[4]</code> — os mesmos endereços de <code>R0</code>–<code>R4</code>, apenas com nomes mnemônicos para o papel que cumprem na VM (capítulos 7, 11 e 12).</li>
+<li><strong>Ponteiros de segmento</strong> <code>SP</code>, <code>LCL</code>, <code>ARG</code>, <code>THIS</code>, <code>THAT</code>: referem-se a <code>RAM[0]</code>–<code>RAM[4]</code> — os mesmos endereços de <code>R0</code>–<code>R4</code>, apenas com nomes mnemônicos para o papel que cumprem na VM (capítulos 7, 12 e 13).</li>
 <li><strong>Mapas de E/S</strong> <code>SCREEN</code> (RAM 16384) e <code>KBD</code> (RAM 24576): endereço-base do mapa de memória da tela e o registrador de teclado, respectivamente.</li>
 </ul>
 <h3 id="rotulos">Rótulos<a class="headerlink" href="#rotulos" title="Permanent link">&para;</a></h3>
@@ -1935,7 +1935,7 @@
 <a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>M=1     // 0000000000000001 — acende o pixel mais à esquerda da primeira linha
 </code></pre></div>
 <h2 id="o-que-vem-a-seguir">O que vem a seguir<a class="headerlink" href="#o-que-vem-a-seguir" title="Permanent link">&para;</a></h2>
-<p>Com a especificação completa da linguagem em mãos, o capítulo 15 constrói o Assembler: o programa que lê um arquivo <code>.asm</code> como este e produz o binário <code>.hack</code> correspondente — resolvendo, no processo, exatamente os símbolos que acabamos de especificar.</p>
+<p>Com a especificação completa da linguagem em mãos, os capítulos 12 e 13 constroem o VM Translator, que gera programas <code>.asm</code> como estes a partir do código VM. Depois, o capítulo 15 constrói o Assembler: o programa que lê um arquivo <code>.asm</code> e produz o binário <code>.hack</code> correspondente — resolvendo, no processo, exatamente os símbolos que acabamos de especificar.</p>
 <p>As tabelas de codificação (<code>comp</code>/<code>dest</code>/<code>jump</code>) e os símbolos pré-definidos estão consolidados, para consulta rápida, no <a href="../../apendices/c-especificacao-assembly-hack/">Apêndice C</a>.</p>
 
 

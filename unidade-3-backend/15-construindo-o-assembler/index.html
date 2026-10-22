@@ -829,7 +829,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../unidade-2-middleend/12-vm-translator-parte1/" class="md-nav__link">
+      <a href="../12-vm-translator-parte1/" class="md-nav__link">
         
   
   
@@ -1429,7 +1429,7 @@
 
 
 <h1 id="15-construindo-o-assembler">15. Construindo o Assembler<a class="headerlink" href="#15-construindo-o-assembler" title="Permanent link">&para;</a></h1>
-<p>Chegamos à última peça da cadeia de tradução: o <strong>Assembler</strong> (Project 6), que converte um arquivo <code>.asm</code> escrito na linguagem do capítulo 14 em um arquivo <code>.hack</code> — a sequência de instruções binárias de 16 bits que a CPU Hack executa diretamente. Como o VM Translator (capítulos 11-12), este capítulo é teoria + especificação + arquitetura — a implementação completa é sua atividade prática, comparando a saída com os testes oficiais do Nand2Tetris.</p>
+<p>Chegamos à última peça da cadeia de tradução: o <strong>Assembler</strong> (Project 6), que converte um arquivo <code>.asm</code> escrito na linguagem do capítulo 11 em um arquivo <code>.hack</code> — a sequência de instruções binárias de 16 bits que a CPU Hack executa diretamente. Como o VM Translator (capítulos 12-13), este capítulo é teoria + especificação + arquitetura — a implementação completa é sua atividade prática, comparando a saída com os testes oficiais do Nand2Tetris.</p>
 <h2 id="o-problema-central-referencia-futura">O problema central: referência futura<a class="headerlink" href="#o-problema-central-referencia-futura" title="Permanent link">&para;</a></h2>
 <p>Se o Assembler traduzisse o arquivo <code>.asm</code> em uma única leitura, de cima para baixo, ele bateria de frente com um problema irresolúvel:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>@END        // Qual é o endereço de END? Ainda não sabemos!
@@ -1448,7 +1448,7 @@
 <a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    senão (é A-instruction ou C-instruction):
 <a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>        romAddr = romAddr + 1
 </code></pre></div>
-<p><strong>Segunda passagem — gerar o binário.</strong> Percorra o arquivo de novo, agora traduzindo cada instrução real. Rótulos são ignorados (já cumpriram seu papel na primeira passagem — não geram código). Uma A-instruction com um número literal (<code>@10</code>) converte-se diretamente; uma A-instruction com um símbolo consulta a tabela — se já estiver lá (um rótulo, ou uma variável já vista antes), usa o endereço registrado; caso contrário, é a <strong>primeira</strong> aparição de uma variável, e o montador aloca para ela o próximo endereço de RAM disponível, começando em 16. Uma C-instruction é decomposta em <code>comp</code>/<code>dest</code>/<code>jump</code> e cada parte é traduzida pelas tabelas do capítulo 14.</p>
+<p><strong>Segunda passagem — gerar o binário.</strong> Percorra o arquivo de novo, agora traduzindo cada instrução real. Rótulos são ignorados (já cumpriram seu papel na primeira passagem — não geram código). Uma A-instruction com um número literal (<code>@10</code>) converte-se diretamente; uma A-instruction com um símbolo consulta a tabela — se já estiver lá (um rótulo, ou uma variável já vista antes), usa o endereço registrado; caso contrário, é a <strong>primeira</strong> aparição de uma variável, e o montador aloca para ela o próximo endereço de RAM disponível, começando em 16. Uma C-instruction é decomposta em <code>comp</code>/<code>dest</code>/<code>jump</code> e cada parte é traduzida pelas tabelas do capítulo 11.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>ramAddr = 16     // variáveis começam em RAM[16]
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>para cada linha do arquivo:
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    se é rótulo: ignora (não gera código)
@@ -1464,7 +1464,7 @@
 <a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>        emite 16 bits: 111 + comp(7 bits) + dest(3 bits) + jump(3 bits)
 </code></pre></div>
 <h2 id="um-exemplo-completo-passo-a-passo">Um exemplo completo, passo a passo<a class="headerlink" href="#um-exemplo-completo-passo-a-passo" title="Permanent link">&para;</a></h2>
-<p>Considere de novo o programa de somatória do capítulo 14:</p>
+<p>Considere o programa abaixo, uma variação da somatória do capítulo 11: aqui, <code>i</code> começa em <code>RAM[0]</code> e é decrementado até zero, e o resultado vai para <code>RAM[1]</code>:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>@R0
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>D=M
 <a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>@i
@@ -1493,89 +1493,18 @@
 <a id="__codelineno-3-26" name="__codelineno-3-26" href="#__codelineno-3-26"></a>M=D
 </code></pre></div>
 <p><strong>Primeira passagem</strong> — só rótulos importam:</p>
-<table>
-<thead>
-<tr>
-<th>Linha</th>
-<th>Comando</th>
-<th>Tipo</th>
-<th><code>romAddr</code> antes</th>
-<th>Ação</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>@R0</code></td>
-<td>A</td>
-<td>0</td>
-<td>→ 1</td>
-<td></td>
-</tr>
-<tr>
-<td><code>D=M</code></td>
-<td>C</td>
-<td>1</td>
-<td>→ 2</td>
-<td></td>
-</tr>
-<tr>
-<td><code>@i</code></td>
-<td>A</td>
-<td>2</td>
-<td>→ 3</td>
-<td></td>
-</tr>
-<tr>
-<td><code>M=D</code></td>
-<td>C</td>
-<td>3</td>
-<td>→ 4</td>
-<td></td>
-</tr>
-<tr>
-<td><code>@sum</code></td>
-<td>A</td>
-<td>4</td>
-<td>→ 5</td>
-<td></td>
-</tr>
-<tr>
-<td><code>M=0</code></td>
-<td>C</td>
-<td>5</td>
-<td>→ 6</td>
-<td></td>
-</tr>
-<tr>
-<td><code>(LOOP)</code></td>
-<td>L</td>
-<td><strong>6</strong></td>
-<td>registra <code>LOOP → 6</code>, não incrementa</td>
-<td></td>
-</tr>
-<tr>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-<td>... segue incrementando</td>
-<td></td>
-</tr>
-<tr>
-<td><code>(END)</code></td>
-<td>L</td>
-<td><strong>20</strong></td>
-<td>registra <code>END → 20</code>, não incrementa</td>
-<td></td>
-</tr>
-<tr>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-<td></td>
-</tr>
-</tbody>
-</table>
+<p>| Comando | Tipo | <code>romAddr</code> antes | Ação |
+|---|---|---|---|---|
+| <code>@R0</code> | A | 0 | → 1 |
+| <code>D=M</code> | C | 1 | → 2 |
+| <code>@i</code> | A | 2 | → 3 |
+| <code>M=D</code> | C | 3 | → 4 |
+| <code>@sum</code> | A | 4 | → 5 |
+| <code>M=0</code> | C | 5 | → 6 |
+| <code>(LOOP)</code> | L | <strong>6</strong> | registra <code>LOOP → 6</code>, não incrementa |
+| ... | ... | ... | ... segue incrementando |
+| <code>(END)</code> | L | <strong>20</strong> | registra <code>END → 20</code>, não incrementa |
+| ... | ... | ... | ... |</p>
 <p>Tabela ao final da primeira passagem: <code>{ LOOP: 6, END: 20 }</code> (mais os pré-definidos: <code>SP: 0, LCL: 1, ..., R0: 0, ..., R15: 15, SCREEN: 16384, KBD: 24576</code>).</p>
 <p><strong>Segunda passagem</strong> — agora sim, traduzindo:</p>
 <table>
@@ -1636,7 +1565,7 @@
 </table>
 <p>Repare no ponto crucial: <code>@END</code>, quando alcançado na segunda passagem, já resolve imediatamente para <code>20</code> — porque a <strong>primeira</strong> passagem já tinha visitado <code>(END)</code> antes de a segunda passagem sequer começar. É essa separação de responsabilidades — uma passagem só para mapear rótulos, sem gerar nada; outra só para gerar código, sem se preocupar com posições futuras — que resolve o problema da referência futura sem qualquer <em>backtracking</em> ou reprocessamento.</p>
 <h2 id="arquitetura-modular">Arquitetura modular<a class="headerlink" href="#arquitetura-modular" title="Permanent link">&para;</a></h2>
-<p>A implementação se organiza naturalmente em quatro módulos com responsabilidades bem separadas — a mesma disciplina de "uma classe, uma responsabilidade" que seguimos desde o <code>Scanner</code>/<code>Parser</code> da Unidade 1:</p>
+<p>A implementação se organiza naturalmente em quatro módulos com responsabilidades bem separadas — a mesma disciplina de "uma classe, uma responsabilidade" que seguimos desde o <code>Scanner</code>/<code>Parser</code> da Parte 1:</p>
 <table>
 <thead>
 <tr>
@@ -1651,11 +1580,11 @@
 </tr>
 <tr>
 <td><strong>SymbolTable</strong></td>
-<td>Um mapa símbolo → endereço, pré-carregado com os símbolos pré-definidos do capítulo 14 (<code>addEntry</code>, <code>contains</code>, <code>getAddress</code>)</td>
+<td>Um mapa símbolo → endereço, pré-carregado com os símbolos pré-definidos do capítulo 11 (<code>addEntry</code>, <code>contains</code>, <code>getAddress</code>)</td>
 </tr>
 <tr>
 <td><strong>Code</strong></td>
-<td>Traduz cada mnemônico (<code>dest</code>, <code>comp</code>, <code>jump</code>) para sua codificação binária, segundo as tabelas do capítulo 14</td>
+<td>Traduz cada mnemônico (<code>dest</code>, <code>comp</code>, <code>jump</code>) para sua codificação binária, segundo as tabelas do capítulo 11</td>
 </tr>
 <tr>
 <td><strong>Main</strong></td>
@@ -1663,7 +1592,7 @@
 </tr>
 </tbody>
 </table>
-<p>O <code>Parser</code> é deliberadamente burro — ele não sabe nada sobre símbolos ou endereços, só sintaxe. O <code>SymbolTable</code> é só um dicionário. O <code>Code</code> é uma coleção de tabelas de tradução (praticamente uma cópia executável das tabelas do capítulo 14). Toda a "inteligência" das duas passagens — quando registrar um rótulo, quando alocar uma variável — vive no <code>Main</code>, que é o único módulo que orquestra os outros três.</p>
+<p>O <code>Parser</code> é deliberadamente burro — ele não sabe nada sobre símbolos ou endereços, só sintaxe. O <code>SymbolTable</code> é só um dicionário. O <code>Code</code> é uma coleção de tabelas de tradução (praticamente uma cópia executável das tabelas do capítulo 11). Toda a "inteligência" das duas passagens — quando registrar um rótulo, quando alocar uma variável — vive no <code>Main</code>, que é o único módulo que orquestra os outros três.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1">// esboço do módulo Main — primeira passagem</span>
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="kt">int</span><span class="w"> </span><span class="n">romAddr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
 <a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">parser</span><span class="p">.</span><span class="na">hasMoreCommands</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
@@ -1705,13 +1634,13 @@
 <a id="__codelineno-4-39" name="__codelineno-4-39" href="#__codelineno-4-39"></a><span class="p">}</span>
 </code></pre></div>
 <h2 id="validacao">Validação<a class="headerlink" href="#validacao" title="Permanent link">&para;</a></h2>
-<p>O Nand2Tetris fornece, para cada programa <code>.asm</code> de teste (<code>Add.asm</code>, <code>Max.asm</code>, <code>Rect.asm</code>, <code>Pong.asm</code>), o <code>.hack</code> esperado — comparação exata de texto, de novo, é o critério de correção. Vale testar em ordem crescente de complexidade: primeiro programas sem símbolo nenhum, depois com rótulos, depois com variáveis, depois combinando os dois — exatamente a mesma disciplina incremental que usamos desde o capítulo 2.</p>
+<p>O Nand2Tetris fornece os programas <code>.asm</code> de teste (<code>Add.asm</code>, <code>Max.asm</code>, <code>Rect.asm</code>, <code>Pong.asm</code>) e o Assembler de referência (pasta <code>tools/</code>), que gera o <code>.hack</code> esperado — comparação exata de texto, de novo, é o critério de correção. Vale testar em ordem crescente de complexidade: primeiro os programas sem símbolo nenhum (<code>Add.asm</code> e as versões <code>MaxL.asm</code>, <code>RectL.asm</code> e <code>PongL.asm</code>, que já vêm com os símbolos trocados por números), depois com rótulos, depois com variáveis, depois combinando os dois — exatamente a mesma disciplina incremental que usamos desde o capítulo 2.</p>
 <h2 id="fechando-o-livro">Fechando o livro<a class="headerlink" href="#fechando-o-livro" title="Permanent link">&para;</a></h2>
 <p>Com o Assembler completo, a cadeia de tradução está fechada de ponta a ponta:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>Jack (Unidade 1: léxico + sintático)
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>    ↓ Compilador Jack → VM (Unidade 2)
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>Jack (Parte 1: léxico + sintático)
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>    ↓ Compilador Jack → VM (Parte 2)
 <a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>Código VM
-<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>    ↓ VM Translator (capítulos 11-12)
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>    ↓ VM Translator (capítulos 12-13)
 <a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>Assembly Hack
 <a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>    ↓ Assembler (este capítulo)
 <a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>Código de máquina Hack

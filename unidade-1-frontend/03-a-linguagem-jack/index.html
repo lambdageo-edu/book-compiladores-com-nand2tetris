@@ -1014,7 +1014,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../unidade-2-middleend/12-vm-translator-parte1/" class="md-nav__link">
+      <a href="../../unidade-3-backend/12-vm-translator-parte1/" class="md-nav__link">
         
   
   
@@ -1687,7 +1687,7 @@
 <a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">    </span><span class="kd">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">pointCount</span><span class="p">;</span><span class="w"> </span><span class="c1">// variável de classe: única, compartilhada por todas as instâncias</span>
 <a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="p">}</span>
 </code></pre></div>
-<p><code>field</code> (variável de instância) é sempre privado — o acesso de fora da classe exige métodos getter/setter explícitos. <code>static</code> (variável de classe) é acessada via <code>NomeDaClasse.variavel</code> e é compartilhada por todas as instâncias.</p>
+<p><code>field</code> (variável de instância) é sempre privado — o acesso de fora da classe exige métodos getter/setter explícitos — e só é visível nos métodos e no construtor, nunca nas <code>function</code>s, que não operam sobre um objeto. <code>static</code> (variável de classe) é única e compartilhada por todas as instâncias. Assim como <code>field</code>, só é visível dentro da classe — mas, ao contrário de <code>field</code>, pode ser usada também nas <code>function</code>s. Para expô-la a outras classes, é preciso uma subroutine de acesso, como uma <code>function int getPointCount()</code> chamada com <code>Point.getPointCount()</code>: a gramática de Jack não tem uma forma <code>Classe.variavel</code>.</p>
 <h3 id="escopo-de-subroutine-parametros-e-var">Escopo de subroutine: parâmetros e <code>var</code><a class="headerlink" href="#escopo-de-subroutine-parametros-e-var" title="Permanent link">&para;</a></h3>
 <p>Parâmetros são declarados como em Java/C: <code>method void setX(int x)</code>. Variáveis locais usam a palavra reservada <code>var</code>, com duas restrições importantes que <strong>não</strong> existem em linguagens mais modernas:</p>
 <ol>
@@ -1865,7 +1865,7 @@
 </tr>
 <tr>
 <td><code>integerConstant</code></td>
-<td>Um número decimal</td>
+<td>Um número decimal entre 0 e 32767 (o <code>-</code> de um número negativo é o operador unário)</td>
 </tr>
 <tr>
 <td><code>stringConstant</code></td>
@@ -1887,7 +1887,7 @@
 </thead>
 <tbody>
 <tr>
-<td><code>classdef</code></td>
+<td><code>class</code></td>
 <td><code>'class'</code> className <code>'{'</code> classVarDec* subroutineDec* <code>'}'</code></td>
 </tr>
 <tr>

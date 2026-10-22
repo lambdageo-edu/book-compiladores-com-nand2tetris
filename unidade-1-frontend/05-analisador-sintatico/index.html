@@ -648,6 +648,28 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#o-identificador-vem-primeiro" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        O identificador vem primeiro
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quais-nao-terminais-viram-tags" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quais não-terminais viram tags
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#fechando-o-restante-da-gramatica" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -986,7 +1008,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../unidade-2-middleend/12-vm-translator-parte1/" class="md-nav__link">
+      <a href="../../unidade-3-backend/12-vm-translator-parte1/" class="md-nav__link">
         
   
   
@@ -1464,6 +1486,28 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#o-identificador-vem-primeiro" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        O identificador vem primeiro
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quais-nao-terminais-viram-tags" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quais não-terminais viram tags
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#fechando-o-restante-da-gramatica" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1517,7 +1561,7 @@
 
 
 <h1 id="5-analisador-sintatico">5. Analisador sintático<a class="headerlink" href="#5-analisador-sintatico" title="Permanent link">&para;</a></h1>
-<p>Com o <code>JackTokenizer</code> completo, chegamos à etapa central do front-end: o analisador sintático, ou <code>CompilationEngine</code>. Ele consome a sequência de tokens do capítulo anterior e reconhece a estrutura da gramática de Jack (capítulo 3) — por enquanto, apenas <em>reconhecendo</em>, sem gerar nenhum código ainda (isso fica para os capítulos 9 e 10, na Unidade 2). A saída deste capítulo é uma árvore sintática em XML, que — assim como fizemos com os tokens — vamos validar por comparação byte a byte com arquivos de referência do próprio Nand2Tetris.</p>
+<p>Com o <code>JackTokenizer</code> completo, chegamos à etapa central do front-end: o analisador sintático, ou <code>CompilationEngine</code>. Ele consome a sequência de tokens do capítulo anterior e reconhece a estrutura da gramática de Jack (capítulo 3) — por enquanto, apenas <em>reconhecendo</em>, sem gerar nenhum código ainda (isso fica para os capítulos 9 e 10, na Parte 2). A saída deste capítulo é uma árvore sintática em XML, que — assim como fizemos com os tokens — vamos validar por comparação byte a byte com arquivos de referência do próprio Nand2Tetris.</p>
 <h2 id="bottom-up-ou-top-down">Bottom-up ou top-down?<a class="headerlink" href="#bottom-up-ou-top-down" title="Permanent link">&para;</a></h2>
 <p>Existem duas famílias opostas de algoritmo para construir uma árvore sintática a partir de uma cadeia de tokens:</p>
 <ul>
@@ -1528,7 +1572,7 @@
 <p>A gramática de Jack do capítulo 3 é <strong>quase</strong> LL(1): não tem recursão à esquerda, e em quase todo não-terminal o primeiro token basta para escolher a produção (um comando que começa com <code>while</code> só pode ser um <code>whileStatement</code>, por exemplo). A única exceção está em <code>term</code> (e, pelo mesmo motivo, em <code>subroutineCall</code>): as alternativas <code>varName</code>, <code>varName '[' expression ']'</code> e as duas formas de <code>subroutineCall</code> começam todas com um <code>identifier</code>, e só o token <strong>seguinte</strong> — <code>[</code>, <code>(</code>, <code>.</code> ou nenhum deles — diz qual delas se aplica. Nesse ponto, e apenas nele, a gramática como está escrita é LL(2).</p>
 <p>Não precisamos reescrever a gramática para lidar com isso. Basta aplicar, no código, a fatoração à esquerda do capítulo 1: o parser consome o <code>identifier</code> comum a todas as alternativas e só então decide, olhando o próximo token. Com essa fatoração implícita, cada decisão do parser é tomada com um único token de antecipação. A técnica de tradução é a mesma do capítulo 2: <strong>um método por não-terminal</strong>, mapeando cada produção diretamente em código.</p>
 <h2 id="tratamento-de-erros-sintaticos">Tratamento de erros sintáticos<a class="headerlink" href="#tratamento-de-erros-sintaticos" title="Permanent link">&para;</a></h2>
-<p>Diferente de erros léxicos (tipicamente erros de digitação — um símbolo que não existe na linguagem), erros sintáticos dizem respeito à <em>estrutura</em>: um <code>;</code> esquecido, um <code>let</code> sem <code>=</code>. Nossa estratégia de tratamento é deliberadamente simples: no primeiro erro encontrado, o parser para e emite uma mensagem no formato <code>Linha N: Esperado 'X' encontrado 'Y'</code>. Não faremos recuperação de erros nem tentaremos continuar a análise após o primeiro problema — isso é suficiente para os objetivos didáticos deste curso. (Também não implementaremos análise semântica neste analisador: erros de tipo, por exemplo, não serão detectados aqui — ficam para o capítulo 8.)</p>
+<p>Diferente de erros léxicos (tipicamente erros de digitação — um símbolo que não existe na linguagem), erros sintáticos dizem respeito à <em>estrutura</em>: um <code>;</code> esquecido, um <code>let</code> sem <code>=</code>. Nossa estratégia de tratamento é deliberadamente simples: no primeiro erro encontrado, o parser para e emite uma mensagem no formato <code>Linha N: Esperado 'X' encontrado 'Y'</code>. Não faremos recuperação de erros nem tentaremos continuar a análise após o primeiro problema — isso é suficiente para os objetivos didáticos deste curso. (Também não implementaremos análise semântica neste analisador. A análise semântica deste livro se resume à tabela de símbolos do capítulo 8, que descobre o que cada identificador é, mas não verifica tipos: somar um <code>int</code> com um <code>boolean</code> não é detectado em nenhum ponto do compilador.)</p>
 <h2 id="estrutura-basica-um-token-de-antecipacao">Estrutura básica: um token de antecipação<a class="headerlink" href="#estrutura-basica-um-token-de-antecipacao" title="Permanent link">&para;</a></h2>
 <p>Boa parte da gramática de Jack pode ser decidida olhando apenas o token atual. Mas uma parte — notavelmente, distinguir uma variável simples de um acesso a array ou de uma chamada de subroutine dentro de <code>term</code> — exige olhar <strong>um token à frente</strong>. Por isso, de forma simétrica ao <code>peekNext()</code> do tokenizador, o parser mantém dois tokens em memória: o token atual (<code>currentToken</code>) e o próximo (<code>peekToken</code>):</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Parser</span><span class="w"> </span><span class="p">{</span>
@@ -1575,125 +1619,210 @@
 <a id="__codelineno-1-21" name="__codelineno-1-21" href="#__codelineno-1-21"></a><span class="w">    </span><span class="k">throw</span><span class="w"> </span><span class="n">error</span><span class="p">(</span><span class="n">peekToken</span><span class="p">,</span><span class="w"> </span><span class="s">"Esperado um dos tipos: "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">Arrays</span><span class="p">.</span><span class="na">toString</span><span class="p">(</span><span class="n">types</span><span class="p">));</span>
 <a id="__codelineno-1-22" name="__codelineno-1-22" href="#__codelineno-1-22"></a><span class="p">}</span>
 </code></pre></div>
-<p><code>expectPeek</code> é o equivalente, neste parser, do <code>match()</code> do capítulo 2 — mas com uma diferença de nome que reflete a diferença de estrutura: como mantemos <code>peekToken</code>, "casar" com um símbolo terminal significa verificar que o <strong>próximo</strong> token é do tipo esperado, avançar, e (novidade) registrar esse token na saída XML. Um método auxiliar <code>printNonTerminal(nome)</code> grava as tags de abertura/fechamento de cada não-terminal (<code>&lt;term&gt;</code>, <code>&lt;/term&gt;</code>, etc.) — é o que torna a árvore sintática visível na saída.</p>
-<h2 id="term-comecando-pelo-caso-simples">Term — começando pelo caso simples<a class="headerlink" href="#term-comecando-pelo-caso-simples" title="Permanent link">&para;</a></h2>
-<p>A gramática de <code>term</code> (capítulo 3, <a href="../../apendices/a-gramatica-jack/">Apêndice A</a>) tem sete alternativas. Vamos começar por apenas quatro, as mais diretas:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>term -&gt; integerConstant | stringConstant | keywordConstant | varName
+<p><code>expectPeek</code> é o equivalente, neste parser, do <code>match()</code> do capítulo 2 — mas com uma diferença de nome que reflete a diferença de estrutura: como mantemos <code>peekToken</code>, "casar" com um símbolo terminal significa verificar que o <strong>próximo</strong> token é do tipo esperado, avançar, e (novidade) registrar esse token na saída XML. Um método auxiliar <code>printNonTerminal(nome)</code> grava as tags de abertura/fechamento de cada não-terminal (<code>&lt;term&gt;</code>, <code>&lt;/term&gt;</code>, etc.) — é o que torna a árvore sintática visível na saída. Completam o esqueleto o tratamento de erro, o ponto de entrada e o acesso à saída:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kd">private</span><span class="w"> </span><span class="n">ParseError</span><span class="w"> </span><span class="nf">error</span><span class="p">(</span><span class="n">Token</span><span class="w"> </span><span class="n">token</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">message</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">    </span><span class="n">String</span><span class="w"> </span><span class="n">encontrado</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">token</span><span class="p">.</span><span class="na">type</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">TokenType</span><span class="p">.</span><span class="na">EOF</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="s">"fim do arquivo"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">token</span><span class="p">.</span><span class="na">lexeme</span><span class="p">;</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="n">System</span><span class="p">.</span><span class="na">err</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">"Linha "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">token</span><span class="p">.</span><span class="na">line</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">": "</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">message</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">" encontrado '"</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">encontrado</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">"'"</span><span class="p">);</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ParseError</span><span class="p">();</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="p">}</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="kd">private</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">printNonTerminal</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">nterminal</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">    </span><span class="n">xmlOutput</span><span class="p">.</span><span class="na">append</span><span class="p">(</span><span class="s">"&lt;"</span><span class="p">).</span><span class="na">append</span><span class="p">(</span><span class="n">nterminal</span><span class="p">).</span><span class="na">append</span><span class="p">(</span><span class="s">"&gt;\r\n"</span><span class="p">);</span><span class="w">   </span><span class="c1">// "/term" gera &lt;/term&gt;</span>
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="p">}</span>
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">parse</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="w">    </span><span class="n">parseClass</span><span class="p">();</span><span class="w">       </span><span class="c1">// o símbolo inicial da gramática</span>
+<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="p">}</span>
+<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>
+<a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="kd">public</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">XMLOutput</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">xmlOutput</span><span class="p">.</span><span class="na">toString</span><span class="p">();</span>
+<a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a><span class="p">}</span>
 </code></pre></div>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kt">void</span><span class="w"> </span><span class="nf">parseTerm</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">    </span><span class="n">printNonTerminal</span><span class="p">(</span><span class="s">"term"</span><span class="p">);</span>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">    </span><span class="k">switch</span><span class="w"> </span><span class="p">(</span><span class="n">peekToken</span><span class="p">.</span><span class="na">type</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="n">NUMBER</span><span class="p">:</span>
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">            </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">TokenType</span><span class="p">.</span><span class="na">NUMBER</span><span class="p">);</span>
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">            </span><span class="k">break</span><span class="p">;</span>
-<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="n">STRING</span><span class="p">:</span>
-<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="w">            </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">TokenType</span><span class="p">.</span><span class="na">STRING</span><span class="p">);</span>
-<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="w">            </span><span class="k">break</span><span class="p">;</span>
-<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="n">FALSE</span><span class="p">:</span><span class="w"> </span><span class="k">case</span><span class="w"> </span><span class="n">NULL</span><span class="p">:</span><span class="w"> </span><span class="k">case</span><span class="w"> </span><span class="n">TRUE</span><span class="p">:</span>
-<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="w">            </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">TokenType</span><span class="p">.</span><span class="na">FALSE</span><span class="p">,</span><span class="w"> </span><span class="n">TokenType</span><span class="p">.</span><span class="na">NULL</span><span class="p">,</span><span class="w"> </span><span class="n">TokenType</span><span class="p">.</span><span class="na">TRUE</span><span class="p">);</span>
-<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="w">            </span><span class="k">break</span><span class="p">;</span>
-<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="n">THIS</span><span class="p">:</span>
-<a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a><span class="w">            </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">TokenType</span><span class="p">.</span><span class="na">THIS</span><span class="p">);</span>
-<a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a><span class="w">            </span><span class="k">break</span><span class="p">;</span>
-<a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a><span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="n">IDENT</span><span class="p">:</span>
-<a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a><span class="w">            </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">TokenType</span><span class="p">.</span><span class="na">IDENT</span><span class="p">);</span>
-<a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a><span class="w">            </span><span class="k">break</span><span class="p">;</span>
-<a id="__codelineno-3-19" name="__codelineno-3-19" href="#__codelineno-3-19"></a><span class="w">        </span><span class="k">default</span><span class="p">:</span>
-<a id="__codelineno-3-20" name="__codelineno-3-20" href="#__codelineno-3-20"></a><span class="w">            </span><span class="k">throw</span><span class="w"> </span><span class="n">error</span><span class="p">(</span><span class="n">peekToken</span><span class="p">,</span><span class="w"> </span><span class="s">"term esperado"</span><span class="p">);</span>
-<a id="__codelineno-3-21" name="__codelineno-3-21" href="#__codelineno-3-21"></a><span class="w">    </span><span class="p">}</span>
-<a id="__codelineno-3-22" name="__codelineno-3-22" href="#__codelineno-3-22"></a><span class="w">    </span><span class="n">printNonTerminal</span><span class="p">(</span><span class="s">"/term"</span><span class="p">);</span>
-<a id="__codelineno-3-23" name="__codelineno-3-23" href="#__codelineno-3-23"></a><span class="p">}</span>
+<p><code>error</code> usa o número de linha que o tokenizador do capítulo 4 guarda em cada <code>Token</code>, produzindo mensagens como <code>Linha 12: Esperado SEMICOLON encontrado 'let'</code>. Ela <em>devolve</em> a exceção em vez de lançá-la, para que quem chama escreva <code>throw error(...)</code> — assim o compilador Java sabe que aquele ponto do código não continua.</p>
+<h2 id="term-comecando-pelo-caso-simples">Term — começando pelo caso simples<a class="headerlink" href="#term-comecando-pelo-caso-simples" title="Permanent link">&para;</a></h2>
+<p>A gramática de <code>term</code> (capítulo 3, <a href="../../apendices/a-gramatica-jack/">Apêndice A</a>) tem oito alternativas. Vamos começar por apenas quatro, as mais diretas:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>term -&gt; integerConstant | stringConstant | keywordConstant | varName
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kt">void</span><span class="w"> </span><span class="nf">parseTerm</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">    </span><span class="n">printNonTerminal</span><span class="p">(</span><span class="s">"term"</span><span class="p">);</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">    </span><span class="k">switch</span><span class="w"> </span><span class="p">(</span><span class="n">peekToken</span><span class="p">.</span><span class="na">type</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="n">NUMBER</span><span class="p">:</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">            </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">TokenType</span><span class="p">.</span><span class="na">NUMBER</span><span class="p">);</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">            </span><span class="k">break</span><span class="p">;</span>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="n">STRING</span><span class="p">:</span>
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="w">            </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">TokenType</span><span class="p">.</span><span class="na">STRING</span><span class="p">);</span>
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">            </span><span class="k">break</span><span class="p">;</span>
+<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="n">FALSE</span><span class="p">:</span><span class="w"> </span><span class="k">case</span><span class="w"> </span><span class="n">NULL</span><span class="p">:</span><span class="w"> </span><span class="k">case</span><span class="w"> </span><span class="n">TRUE</span><span class="p">:</span>
+<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="w">            </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">TokenType</span><span class="p">.</span><span class="na">FALSE</span><span class="p">,</span><span class="w"> </span><span class="n">TokenType</span><span class="p">.</span><span class="na">NULL</span><span class="p">,</span><span class="w"> </span><span class="n">TokenType</span><span class="p">.</span><span class="na">TRUE</span><span class="p">);</span>
+<a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="w">            </span><span class="k">break</span><span class="p">;</span>
+<a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="n">THIS</span><span class="p">:</span>
+<a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a><span class="w">            </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">TokenType</span><span class="p">.</span><span class="na">THIS</span><span class="p">);</span>
+<a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a><span class="w">            </span><span class="k">break</span><span class="p">;</span>
+<a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a><span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="n">IDENT</span><span class="p">:</span>
+<a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a><span class="w">            </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">TokenType</span><span class="p">.</span><span class="na">IDENT</span><span class="p">);</span>
+<a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a><span class="w">            </span><span class="k">break</span><span class="p">;</span>
+<a id="__codelineno-4-19" name="__codelineno-4-19" href="#__codelineno-4-19"></a><span class="w">        </span><span class="k">default</span><span class="p">:</span>
+<a id="__codelineno-4-20" name="__codelineno-4-20" href="#__codelineno-4-20"></a><span class="w">            </span><span class="k">throw</span><span class="w"> </span><span class="n">error</span><span class="p">(</span><span class="n">peekToken</span><span class="p">,</span><span class="w"> </span><span class="s">"term esperado"</span><span class="p">);</span>
+<a id="__codelineno-4-21" name="__codelineno-4-21" href="#__codelineno-4-21"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-4-22" name="__codelineno-4-22" href="#__codelineno-4-22"></a><span class="w">    </span><span class="n">printNonTerminal</span><span class="p">(</span><span class="s">"/term"</span><span class="p">);</span>
+<a id="__codelineno-4-23" name="__codelineno-4-23" href="#__codelineno-4-23"></a><span class="p">}</span>
 </code></pre></div>
 <p>Testando isoladamente com a entrada <code>"10;"</code>, chamando <code>parser.parseTerm()</code> diretamente (sem passar por <code>parse()</code>), a saída XML deve ser:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nt">&lt;term&gt;</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="nt">&lt;integerConstant&gt;</span><span class="w"> </span>10<span class="w"> </span><span class="nt">&lt;/integerConstant&gt;</span>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="nt">&lt;/term&gt;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nt">&lt;term&gt;</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="nt">&lt;integerConstant&gt;</span><span class="w"> </span>10<span class="w"> </span><span class="nt">&lt;/integerConstant&gt;</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="nt">&lt;/term&gt;</span>
 </code></pre></div>
 <p>Esse hábito — testar cada não-terminal isoladamente, chamando o método de parse diretamente com uma entrada mínima — é o que torna viável construir um parser desse tamanho de forma incremental: cada método pode ser validado no mesmo instante em que é escrito, sem depender do resto da gramática já estar pronto.</p>
 <h2 id="expressao-term-seguido-de-zero-ou-mais-op-term">Expressão: term seguido de zero ou mais (op term)<a class="headerlink" href="#expressao-term-seguido-de-zero-ou-mais-op-term" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>expression -&gt; term (op term)*
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>expression -&gt; term (op term)*
 </code></pre></div>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kd">static</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="nf">isOperator</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">op</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="o">!</span><span class="n">op</span><span class="p">.</span><span class="na">isEmpty</span><span class="p">()</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="s">"+-*/&lt;&gt;=&amp;|"</span><span class="p">.</span><span class="na">contains</span><span class="p">(</span><span class="n">op</span><span class="p">);</span>
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="p">}</span>
-<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>
-<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="kt">void</span><span class="w"> </span><span class="nf">parseExpression</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">    </span><span class="n">printNonTerminal</span><span class="p">(</span><span class="s">"expression"</span><span class="p">);</span>
-<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="w">    </span><span class="n">parseTerm</span><span class="p">();</span>
-<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="w">    </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">isOperator</span><span class="p">(</span><span class="n">peekToken</span><span class="p">.</span><span class="na">lexeme</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="w">        </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">peekToken</span><span class="p">.</span><span class="na">type</span><span class="p">);</span>
-<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="w">        </span><span class="n">parseTerm</span><span class="p">();</span>
-<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="w">    </span><span class="p">}</span>
-<a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a><span class="w">    </span><span class="n">printNonTerminal</span><span class="p">(</span><span class="s">"/expression"</span><span class="p">);</span>
-<a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="p">}</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="kd">static</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="nf">isOperator</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">op</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="o">!</span><span class="n">op</span><span class="p">.</span><span class="na">isEmpty</span><span class="p">()</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="s">"+-*/&lt;&gt;=&amp;|"</span><span class="p">.</span><span class="na">contains</span><span class="p">(</span><span class="n">op</span><span class="p">);</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="p">}</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="kt">void</span><span class="w"> </span><span class="nf">parseExpression</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">    </span><span class="n">printNonTerminal</span><span class="p">(</span><span class="s">"expression"</span><span class="p">);</span>
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">    </span><span class="n">parseTerm</span><span class="p">();</span>
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="w">    </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">isOperator</span><span class="p">(</span><span class="n">peekToken</span><span class="p">.</span><span class="na">lexeme</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="w">        </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">peekToken</span><span class="p">.</span><span class="na">type</span><span class="p">);</span>
+<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="w">        </span><span class="n">parseTerm</span><span class="p">();</span>
+<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a><span class="w">    </span><span class="n">printNonTerminal</span><span class="p">(</span><span class="s">"/expression"</span><span class="p">);</span>
+<a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a><span class="p">}</span>
 </code></pre></div>
 <p>Repare como a ausência de precedência de operadores em Jack (capítulo 3) se paga exatamente aqui: não precisamos de uma hierarquia <code>expression → term → factor → ...</code> para codificar níveis de precedência — um único laço <code>while</code> já captura toda a gramática de expressões. Testando com <code>"10+20"</code>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nt">&lt;expression&gt;</span>
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="nt">&lt;term&gt;&lt;integerConstant&gt;</span><span class="w"> </span>10<span class="w"> </span><span class="nt">&lt;/integerConstant&gt;&lt;/term&gt;</span>
-<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="nt">&lt;symbol&gt;</span><span class="w"> </span>+<span class="w"> </span><span class="nt">&lt;/symbol&gt;</span>
-<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="nt">&lt;term&gt;&lt;integerConstant&gt;</span><span class="w"> </span>20<span class="w"> </span><span class="nt">&lt;/integerConstant&gt;&lt;/term&gt;</span>
-<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="nt">&lt;/expression&gt;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nt">&lt;expression&gt;</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="nt">&lt;term&gt;&lt;integerConstant&gt;</span><span class="w"> </span>10<span class="w"> </span><span class="nt">&lt;/integerConstant&gt;&lt;/term&gt;</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="nt">&lt;symbol&gt;</span><span class="w"> </span>+<span class="w"> </span><span class="nt">&lt;/symbol&gt;</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="nt">&lt;term&gt;&lt;integerConstant&gt;</span><span class="w"> </span>20<span class="w"> </span><span class="nt">&lt;/integerConstant&gt;&lt;/term&gt;</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="nt">&lt;/expression&gt;</span>
 </code></pre></div>
 <h2 id="o-comando-let">O comando <code>let</code><a class="headerlink" href="#o-comando-let" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>letStatement -&gt; 'let' varName ('[' expression ']')? '=' expression ';'
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>letStatement -&gt; 'let' varName ('[' expression ']')? '=' expression ';'
 </code></pre></div>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kt">void</span><span class="w"> </span><span class="nf">parseLet</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">    </span><span class="n">printNonTerminal</span><span class="p">(</span><span class="s">"letStatement"</span><span class="p">);</span>
-<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">    </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">TokenType</span><span class="p">.</span><span class="na">LET</span><span class="p">);</span>
-<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">    </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">TokenType</span><span class="p">.</span><span class="na">IDENT</span><span class="p">);</span>
-<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>
-<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">peekTokenIs</span><span class="p">(</span><span class="n">TokenType</span><span class="p">.</span><span class="na">LBRACKET</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="w">        </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">TokenType</span><span class="p">.</span><span class="na">LBRACKET</span><span class="p">);</span>
-<a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="w">        </span><span class="n">parseExpression</span><span class="p">();</span>
-<a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="w">        </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">TokenType</span><span class="p">.</span><span class="na">RBRACKET</span><span class="p">);</span>
-<a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a><span class="w">    </span><span class="p">}</span>
-<a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a>
-<a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a><span class="w">    </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">TokenType</span><span class="p">.</span><span class="na">EQ</span><span class="p">);</span>
-<a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a><span class="w">    </span><span class="n">parseExpression</span><span class="p">();</span>
-<a id="__codelineno-9-14" name="__codelineno-9-14" href="#__codelineno-9-14"></a><span class="w">    </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">TokenType</span><span class="p">.</span><span class="na">SEMICOLON</span><span class="p">);</span>
-<a id="__codelineno-9-15" name="__codelineno-9-15" href="#__codelineno-9-15"></a><span class="w">    </span><span class="n">printNonTerminal</span><span class="p">(</span><span class="s">"/letStatement"</span><span class="p">);</span>
-<a id="__codelineno-9-16" name="__codelineno-9-16" href="#__codelineno-9-16"></a><span class="p">}</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="kt">void</span><span class="w"> </span><span class="nf">parseLet</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">    </span><span class="n">printNonTerminal</span><span class="p">(</span><span class="s">"letStatement"</span><span class="p">);</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">    </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">TokenType</span><span class="p">.</span><span class="na">LET</span><span class="p">);</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="w">    </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">TokenType</span><span class="p">.</span><span class="na">IDENT</span><span class="p">);</span>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">peekTokenIs</span><span class="p">(</span><span class="n">TokenType</span><span class="p">.</span><span class="na">LBRACKET</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="w">        </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">TokenType</span><span class="p">.</span><span class="na">LBRACKET</span><span class="p">);</span>
+<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="w">        </span><span class="n">parseExpression</span><span class="p">();</span>
+<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a><span class="w">        </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">TokenType</span><span class="p">.</span><span class="na">RBRACKET</span><span class="p">);</span>
+<a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a>
+<a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a><span class="w">    </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">TokenType</span><span class="p">.</span><span class="na">EQ</span><span class="p">);</span>
+<a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a><span class="w">    </span><span class="n">parseExpression</span><span class="p">();</span>
+<a id="__codelineno-10-14" name="__codelineno-10-14" href="#__codelineno-10-14"></a><span class="w">    </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">TokenType</span><span class="p">.</span><span class="na">SEMICOLON</span><span class="p">);</span>
+<a id="__codelineno-10-15" name="__codelineno-10-15" href="#__codelineno-10-15"></a><span class="w">    </span><span class="n">printNonTerminal</span><span class="p">(</span><span class="s">"/letStatement"</span><span class="p">);</span>
+<a id="__codelineno-10-16" name="__codelineno-10-16" href="#__codelineno-10-16"></a><span class="p">}</span>
 </code></pre></div>
 <p>O <code>if (peekTokenIs(LBRACKET))</code> é a tradução direta do <code>?</code> (zero ou uma vez) da gramática — o mesmo padrão que vamos repetir para toda parte opcional das demais regras (o <code>else</code> de <code>ifStatement</code>, o <code>expression?</code> de <code>returnStatement</code>, etc.).</p>
 <h2 id="chamada-de-subroutine-e-o-comando-do">Chamada de subroutine e o comando <code>do</code><a class="headerlink" href="#chamada-de-subroutine-e-o-comando-do" title="Permanent link">&para;</a></h2>
 <p>Uma chamada de subroutine é o primeiro lugar onde o <em>lookahead</em> de um token realmente importa: ao ver um identificador, ainda não sabemos se é uma chamada direta (<code>hello()</code>) ou qualificada por classe/objeto (<code>Classe.metodo()</code> ou <code>objeto.metodo()</code>) — só o próximo token (<code>(</code> ou <code>.</code>) resolve a ambiguidade. Começamos pelo caso mais simples, deixando a forma qualificada como extensão natural do mesmo método:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>subroutineCall -&gt; subroutineName '(' expressionList ')'
-<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>                 | (className|varName) '.' subroutineName '(' expressionList ')'
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>subroutineCall -&gt; subroutineName '(' expressionList ')'
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>                 | (className|varName) '.' subroutineName '(' expressionList ')'
 </code></pre></div>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="c1">// versão inicial: apenas identifier '(' ')'</span>
-<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="kt">void</span><span class="w"> </span><span class="nf">parseSubroutineCall</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="w">    </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">TokenType</span><span class="p">.</span><span class="na">IDENT</span><span class="p">);</span>
-<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="w">    </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">TokenType</span><span class="p">.</span><span class="na">LPAREN</span><span class="p">);</span>
-<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="w">    </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">TokenType</span><span class="p">.</span><span class="na">RPAREN</span><span class="p">);</span>
-<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="p">}</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="c1">// versão inicial: apenas identifier '(' ')'</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="kt">void</span><span class="w"> </span><span class="nf">parseSubroutineCall</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">    </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">TokenType</span><span class="p">.</span><span class="na">IDENT</span><span class="p">);</span>
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="w">    </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">TokenType</span><span class="p">.</span><span class="na">LPAREN</span><span class="p">);</span>
+<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="w">    </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">TokenType</span><span class="p">.</span><span class="na">RPAREN</span><span class="p">);</span>
+<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="p">}</span>
 </code></pre></div>
 <p>E o comando <code>do</code>, que apenas envolve uma chamada de subroutine com a palavra-chave e o <code>;</code> final:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>doStatement -&gt; 'do' subroutineCall ';'
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>doStatement -&gt; 'do' subroutineCall ';'
 </code></pre></div>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="kt">void</span><span class="w"> </span><span class="nf">parseDo</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="w">    </span><span class="n">printNonTerminal</span><span class="p">(</span><span class="s">"doStatement"</span><span class="p">);</span>
-<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">    </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">TokenType</span><span class="p">.</span><span class="na">DO</span><span class="p">);</span>
-<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="w">    </span><span class="n">parseSubroutineCall</span><span class="p">();</span>
-<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="w">    </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">TokenType</span><span class="p">.</span><span class="na">SEMICOLON</span><span class="p">);</span>
-<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a><span class="w">    </span><span class="n">printNonTerminal</span><span class="p">(</span><span class="s">"/doStatement"</span><span class="p">);</span>
-<a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a><span class="p">}</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="kt">void</span><span class="w"> </span><span class="nf">parseDo</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="w">    </span><span class="n">printNonTerminal</span><span class="p">(</span><span class="s">"doStatement"</span><span class="p">);</span>
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="w">    </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">TokenType</span><span class="p">.</span><span class="na">DO</span><span class="p">);</span>
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="w">    </span><span class="n">parseSubroutineCall</span><span class="p">();</span>
+<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="w">    </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">TokenType</span><span class="p">.</span><span class="na">SEMICOLON</span><span class="p">);</span>
+<a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="w">    </span><span class="n">printNonTerminal</span><span class="p">(</span><span class="s">"/doStatement"</span><span class="p">);</span>
+<a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a><span class="p">}</span>
 </code></pre></div>
 <p>Testando com <code>"do hello();"</code>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="nt">&lt;doStatement&gt;</span>
-<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="nt">&lt;keyword&gt;</span><span class="w"> </span>do<span class="w"> </span><span class="nt">&lt;/keyword&gt;</span>
-<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="nt">&lt;identifier&gt;</span><span class="w"> </span>hello<span class="w"> </span><span class="nt">&lt;/identifier&gt;</span>
-<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="nt">&lt;symbol&gt;</span><span class="w"> </span>(<span class="w"> </span><span class="nt">&lt;/symbol&gt;</span>
-<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="nt">&lt;symbol&gt;</span><span class="w"> </span>)<span class="w"> </span><span class="nt">&lt;/symbol&gt;</span>
-<a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="nt">&lt;symbol&gt;</span><span class="w"> </span>;<span class="w"> </span><span class="nt">&lt;/symbol&gt;</span>
-<a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a><span class="nt">&lt;/doStatement&gt;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="nt">&lt;doStatement&gt;</span>
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="nt">&lt;keyword&gt;</span><span class="w"> </span>do<span class="w"> </span><span class="nt">&lt;/keyword&gt;</span>
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="nt">&lt;identifier&gt;</span><span class="w"> </span>hello<span class="w"> </span><span class="nt">&lt;/identifier&gt;</span>
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="nt">&lt;symbol&gt;</span><span class="w"> </span>(<span class="w"> </span><span class="nt">&lt;/symbol&gt;</span>
+<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="nt">&lt;symbol&gt;</span><span class="w"> </span>)<span class="w"> </span><span class="nt">&lt;/symbol&gt;</span>
+<a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a><span class="nt">&lt;symbol&gt;</span><span class="w"> </span>;<span class="w"> </span><span class="nt">&lt;/symbol&gt;</span>
+<a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a><span class="nt">&lt;/doStatement&gt;</span>
 </code></pre></div>
+<h2 id="o-identificador-vem-primeiro">O identificador vem primeiro<a class="headerlink" href="#o-identificador-vem-primeiro" title="Permanent link">&para;</a></h2>
+<p>A versão inicial de <code>parseSubroutineCall</code> consome o identificador por conta própria. Isso funciona no <code>do</code>, mas não dentro de <code>term</code>. Lá, ao ver um <code>identifier</code>, o parser ainda não sabe se está diante de uma variável (<code>x</code>), de um acesso a array (<code>a[i]</code>) ou de uma chamada (<code>f()</code>, <code>Classe.f()</code>, <code>obj.f()</code>) — e só descobre olhando o token <strong>seguinte</strong> ao identificador. É o trecho LL(2) da gramática, discutido no início do capítulo.</p>
+<p>A solução é a fatoração à esquerda: <code>parseTerm</code> consome o identificador comum a todas as alternativas e só então decide, olhando o <code>peekToken</code>. Para isso, <code>parseSubroutineCall</code> passa a supor que o identificador inicial <strong>já foi consumido</strong> (é o <code>currentToken</code>):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="c1">// pré-condição: o identificador inicial já é o currentToken</span>
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="kt">void</span><span class="w"> </span><span class="nf">parseSubroutineCall</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">peekTokenIs</span><span class="p">(</span><span class="n">TokenType</span><span class="p">.</span><span class="na">LPAREN</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w">           </span><span class="c1">// subroutineName '(' expressionList ')'</span>
+<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="w">        </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">TokenType</span><span class="p">.</span><span class="na">LPAREN</span><span class="p">);</span>
+<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="w">        </span><span class="n">parseExpressionList</span><span class="p">();</span>
+<a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a><span class="w">        </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">TokenType</span><span class="p">.</span><span class="na">RPAREN</span><span class="p">);</span>
+<a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a><span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w">                                       </span><span class="c1">// (className | varName) '.' subroutineName '(' ... ')'</span>
+<a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a><span class="w">        </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">TokenType</span><span class="p">.</span><span class="na">DOT</span><span class="p">);</span>
+<a id="__codelineno-16-9" name="__codelineno-16-9" href="#__codelineno-16-9"></a><span class="w">        </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">TokenType</span><span class="p">.</span><span class="na">IDENT</span><span class="p">);</span>
+<a id="__codelineno-16-10" name="__codelineno-16-10" href="#__codelineno-16-10"></a><span class="w">        </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">TokenType</span><span class="p">.</span><span class="na">LPAREN</span><span class="p">);</span>
+<a id="__codelineno-16-11" name="__codelineno-16-11" href="#__codelineno-16-11"></a><span class="w">        </span><span class="n">parseExpressionList</span><span class="p">();</span>
+<a id="__codelineno-16-12" name="__codelineno-16-12" href="#__codelineno-16-12"></a><span class="w">        </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">TokenType</span><span class="p">.</span><span class="na">RPAREN</span><span class="p">);</span>
+<a id="__codelineno-16-13" name="__codelineno-16-13" href="#__codelineno-16-13"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-16-14" name="__codelineno-16-14" href="#__codelineno-16-14"></a><span class="p">}</span>
+</code></pre></div>
+<p>O caso <code>IDENT</code> de <code>parseTerm</code> fica:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="k">case</span><span class="w"> </span><span class="n">IDENT</span><span class="p">:</span>
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="w">    </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">TokenType</span><span class="p">.</span><span class="na">IDENT</span><span class="p">);</span><span class="w">                  </span><span class="c1">// consome o identificador comum</span>
+<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">peekTokenIs</span><span class="p">(</span><span class="n">TokenType</span><span class="p">.</span><span class="na">LPAREN</span><span class="p">)</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">peekTokenIs</span><span class="p">(</span><span class="n">TokenType</span><span class="p">.</span><span class="na">DOT</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="w">        </span><span class="n">parseSubroutineCall</span><span class="p">();</span><span class="w">                    </span><span class="c1">// chamada</span>
+<a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">peekTokenIs</span><span class="p">(</span><span class="n">TokenType</span><span class="p">.</span><span class="na">LBRACKET</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a><span class="w">        </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">TokenType</span><span class="p">.</span><span class="na">LBRACKET</span><span class="p">);</span><span class="w">           </span><span class="c1">// acesso a array</span>
+<a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a><span class="w">        </span><span class="n">parseExpression</span><span class="p">();</span>
+<a id="__codelineno-17-8" name="__codelineno-17-8" href="#__codelineno-17-8"></a><span class="w">        </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">TokenType</span><span class="p">.</span><span class="na">RBRACKET</span><span class="p">);</span>
+<a id="__codelineno-17-9" name="__codelineno-17-9" href="#__codelineno-17-9"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-17-10" name="__codelineno-17-10" href="#__codelineno-17-10"></a><span class="w">    </span><span class="c1">// nenhum dos dois: varName simples, nada mais a consumir</span>
+<a id="__codelineno-17-11" name="__codelineno-17-11" href="#__codelineno-17-11"></a><span class="w">    </span><span class="k">break</span><span class="p">;</span>
+</code></pre></div>
+<p>e <code>parseDo</code> passa a consumir o identificador antes de chamar <code>parseSubroutineCall</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="kt">void</span><span class="w"> </span><span class="nf">parseDo</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="w">    </span><span class="n">printNonTerminal</span><span class="p">(</span><span class="s">"doStatement"</span><span class="p">);</span>
+<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="w">    </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">TokenType</span><span class="p">.</span><span class="na">DO</span><span class="p">);</span>
+<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="w">    </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">TokenType</span><span class="p">.</span><span class="na">IDENT</span><span class="p">);</span>
+<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="w">    </span><span class="n">parseSubroutineCall</span><span class="p">();</span>
+<a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a><span class="w">    </span><span class="n">expectPeek</span><span class="p">(</span><span class="n">TokenType</span><span class="p">.</span><span class="na">SEMICOLON</span><span class="p">);</span>
+<a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a><span class="w">    </span><span class="n">printNonTerminal</span><span class="p">(</span><span class="s">"/doStatement"</span><span class="p">);</span>
+<a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a><span class="p">}</span>
+</code></pre></div>
+<p>A saída XML de <code>"do hello();"</code> não muda. É essa forma — identificador consumido antes de <code>parseSubroutineCall</code> — que os capítulos 9 e 10 vão estender com a geração de código.</p>
+<h2 id="quais-nao-terminais-viram-tags">Quais não-terminais viram tags<a class="headerlink" href="#quais-nao-terminais-viram-tags" title="Permanent link">&para;</a></h2>
+<p>Para que a saída bata com os arquivos de referência, nem todo não-terminal da gramática gera um par de tags. A especificação do Nand2Tetris define exatamente quais geram:</p>
+<table>
+<thead>
+<tr>
+<th>Geram <code>&lt;tag&gt;</code> ... <code>&lt;/tag&gt;</code></th>
+<th>Não geram tag</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>class</code>, <code>classVarDec</code>, <code>subroutineDec</code>, <code>parameterList</code>, <code>subroutineBody</code>, <code>varDec</code></td>
+<td><code>type</code>, <code>className</code>, <code>subroutineName</code>, <code>varName</code> — aparecem direto como <code>&lt;keyword&gt;</code> ou <code>&lt;identifier&gt;</code></td>
+</tr>
+<tr>
+<td><code>statements</code>, <code>letStatement</code>, <code>ifStatement</code>, <code>whileStatement</code>, <code>doStatement</code>, <code>returnStatement</code></td>
+<td><code>statement</code> — <code>parseStatements</code> chama <code>parseLet</code>, <code>parseIf</code> etc. diretamente; não existe <code>parseStatement</code></td>
+</tr>
+<tr>
+<td><code>expression</code>, <code>term</code>, <code>expressionList</code></td>
+<td><code>subroutineCall</code> — seus tokens aparecem dentro de <code>&lt;doStatement&gt;</code> ou de <code>&lt;term&gt;</code>, por isso <code>parseSubroutineCall</code> não chama <code>printNonTerminal</code></td>
+</tr>
+</tbody>
+</table>
+<p>Dois detalhes costumam quebrar a comparação: <code>&lt;parameterList&gt;</code> e <code>&lt;expressionList&gt;</code> aparecem <strong>mesmo quando a lista está vazia</strong> (um par de tags sem nada dentro), e <code>parseStatements</code> emite <code>&lt;statements&gt;</code> mesmo para um bloco <code>{ }</code> vazio.</p>
 <h2 id="fechando-o-restante-da-gramatica">Fechando o restante da gramática<a class="headerlink" href="#fechando-o-restante-da-gramatica" title="Permanent link">&para;</a></h2>
 <p>A partir daqui, o padrão está estabelecido — cada não-terminal restante segue exatamente a mesma receita (um método, um <code>expectPeek</code> por terminal, uma chamada recursiva por não-terminal, um <code>if</code>/<code>while</code> por <code>?</code>/<code>*</code> da gramática). Fica como exercício guiado completar:</p>
 <ul>
-<li><code>parseSubroutineCall</code> — adicionar a forma qualificada (<code>Classe.metodo(...)</code> / <code>objeto.metodo(...)</code>), usando o <em>lookahead</em> do <code>.</code> versus <code>(</code>.</li>
-<li><code>parseTerm</code> — completar os três casos que faltam: acesso a array (<code>varName '[' expression ']'</code>), chamada de subroutine dentro de uma expressão, expressão entre parênteses, e operador unário (<code>unaryOp term</code>) — todos decididos da mesma forma: consumir o <code>identifier</code> e olhar o token seguinte (<code>[</code>, <code>(</code>, <code>.</code>) para desambiguar frente a um simples <code>varName</code>.</li>
+<li><code>parseTerm</code> — os dois casos que faltam: expressão entre parênteses (<code>'(' expression ')'</code>) e operador unário (<code>unaryOp term</code>). Ambos se decidem pelo primeiro token (<code>(</code>, ou <code>-</code>/<code>~</code>), sem antecipação extra.</li>
 <li><code>parseExpressionList</code>, <code>parseIf</code>, <code>parseWhile</code>, <code>parseReturn</code>, <code>parseStatements</code> — cada um uma tradução direta de sua produção na tabela do capítulo 3.</li>
-<li><code>parseClassVarDec</code>, <code>parseSubroutineDec</code>, <code>parseParameterList</code>, <code>parseVarDec</code>, <code>parseClass</code> — a "casca" da classe, fechando o topo da gramática.</li>
+<li><code>parseClassVarDec</code>, <code>parseSubroutineDec</code>, <code>parseParameterList</code>, <code>parseVarDec</code>, <code>parseSubroutineBody</code>, <code>parseClass</code> — a "casca" da classe, fechando o topo da gramática.</li>
 </ul>
 <p>A API completa esperada do <code>CompilationEngine</code> (ou <code>Parser</code>) é:</p>
 <table>
@@ -1713,8 +1842,12 @@
 <td>Uma declaração <code>static</code> ou <code>field</code></td>
 </tr>
 <tr>
-<td><code>parseSubroutine</code></td>
+<td><code>parseSubroutineDec</code></td>
 <td>Um método, função ou construtor completo</td>
+</tr>
+<tr>
+<td><code>parseSubroutineBody</code></td>
+<td>O corpo de uma subroutine: declarações <code>var</code> e comandos, com as chaves</td>
 </tr>
 <tr>
 <td><code>parseParameterList</code></td>
@@ -1736,20 +1869,24 @@
 <td><code>parseExpression</code> / <code>parseTerm</code> / <code>parseExpressionList</code></td>
 <td>Expressões e suas partes</td>
 </tr>
+<tr>
+<td><code>parseSubroutineCall</code></td>
+<td>Uma chamada de subroutine (auxiliar, sem tag própria; supõe o identificador já consumido)</td>
+</tr>
 </tbody>
 </table>
 <h2 id="validando-contra-a-arvore-sintatica-de-referencia">Validando contra a árvore sintática de referência<a class="headerlink" href="#validando-contra-a-arvore-sintatica-de-referencia" title="Permanent link">&para;</a></h2>
 <p>Assim como no capítulo 4, o Nand2Tetris fornece, para cada programa Jack de exemplo, um arquivo XML de referência — desta vez com a árvore sintática <strong>completa</strong> (não apenas os tokens). Testar o parser é, de novo, uma questão de comparação exata de texto:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="nd">@Test</span>
-<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">testParserWithSquare</span><span class="p">()</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">IOException</span><span class="w"> </span><span class="p">{</span>
-<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="w">    </span><span class="kd">var</span><span class="w"> </span><span class="n">input</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fromFile</span><span class="p">(</span><span class="s">"Square/Square.jack"</span><span class="p">);</span>
-<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="w">    </span><span class="kd">var</span><span class="w"> </span><span class="n">expectedResult</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fromFile</span><span class="p">(</span><span class="s">"Square/Square.xml"</span><span class="p">);</span>
-<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>
-<a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a><span class="w">    </span><span class="kd">var</span><span class="w"> </span><span class="n">parser</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Parser</span><span class="p">(</span><span class="n">input</span><span class="p">.</span><span class="na">getBytes</span><span class="p">(</span><span class="n">StandardCharsets</span><span class="p">.</span><span class="na">UTF_8</span><span class="p">));</span>
-<a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a><span class="w">    </span><span class="n">parser</span><span class="p">.</span><span class="na">parse</span><span class="p">();</span>
-<a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a><span class="w">    </span><span class="kd">var</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">parser</span><span class="p">.</span><span class="na">XMLOutput</span><span class="p">();</span>
-<a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a><span class="w">    </span><span class="n">assertEquals</span><span class="p">(</span><span class="n">expectedResult</span><span class="p">,</span><span class="w"> </span><span class="n">result</span><span class="p">);</span>
-<a id="__codelineno-15-10" name="__codelineno-15-10" href="#__codelineno-15-10"></a><span class="p">}</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="nd">@Test</span>
+<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">testParserWithSquare</span><span class="p">()</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">IOException</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="w">    </span><span class="kd">var</span><span class="w"> </span><span class="n">input</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fromFile</span><span class="p">(</span><span class="s">"Square/Square.jack"</span><span class="p">);</span>
+<a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="w">    </span><span class="kd">var</span><span class="w"> </span><span class="n">expectedResult</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fromFile</span><span class="p">(</span><span class="s">"Square/Square.xml"</span><span class="p">);</span>
+<a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a>
+<a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a><span class="w">    </span><span class="kd">var</span><span class="w"> </span><span class="n">parser</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Parser</span><span class="p">(</span><span class="n">input</span><span class="p">.</span><span class="na">getBytes</span><span class="p">(</span><span class="n">StandardCharsets</span><span class="p">.</span><span class="na">UTF_8</span><span class="p">));</span>
+<a id="__codelineno-19-7" name="__codelineno-19-7" href="#__codelineno-19-7"></a><span class="w">    </span><span class="n">parser</span><span class="p">.</span><span class="na">parse</span><span class="p">();</span>
+<a id="__codelineno-19-8" name="__codelineno-19-8" href="#__codelineno-19-8"></a><span class="w">    </span><span class="kd">var</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">parser</span><span class="p">.</span><span class="na">XMLOutput</span><span class="p">();</span>
+<a id="__codelineno-19-9" name="__codelineno-19-9" href="#__codelineno-19-9"></a><span class="w">    </span><span class="n">assertEquals</span><span class="p">(</span><span class="n">expectedResult</span><span class="p">,</span><span class="w"> </span><span class="n">result</span><span class="p">);</span>
+<a id="__codelineno-19-10" name="__codelineno-19-10" href="#__codelineno-19-10"></a><span class="p">}</span>
 </code></pre></div>
 <p>O pacote de testes do Nand2Tetris inclui uma variante interessante para progressão incremental: os arquivos <code>ExpressionLessSquare/*.jack</code> substituem expressões complexas por espaços reservados simples, permitindo validar a "casca" da gramática (classes, subroutines, comandos) antes de enfrentar a gramática de expressões por completo.</p>
 <div class="admonition note">
@@ -1757,7 +1894,7 @@
 <p>Não tente compilar de uma vez um arquivo <code>.jack</code> inteiro contra a gramática completa. Construa o parser exatamente na ordem que fomos construindo aqui: primeiro <code>term</code> simples, depois <code>expression</code>, depois cada comando isoladamente (com testes próprios, como fizemos com <code>parseLet</code> e <code>parseDo</code>), só então subindo para <code>parseStatements</code>, <code>parseSubroutineDec</code> e finalmente <code>parseClass</code>. É a mesma disciplina de "um passo por vez, com teste a cada passo" que usamos desde o capítulo 2.</p>
 </div>
 <h2 id="o-que-vem-a-seguir">O que vem a seguir<a class="headerlink" href="#o-que-vem-a-seguir" title="Permanent link">&para;</a></h2>
-<p>Com um parser completo (mesmo que ainda apenas reconhecendo a estrutura, sem gerar código), fechamos o front-end da Unidade 1. Antes de gerar código de verdade, porém, a Unidade 2 precisa definir <em>para onde</em> traduzir: o capítulo 6 discute representações intermediárias e o capítulo 7 especifica a VM Hack, nosso alvo. Só então faz sentido a última peça — a tabela de símbolos (capítulo 8), que diz <strong>onde</strong> cada identificador vive (é uma variável local? um campo do objeto? um parâmetro?) e <strong>que tipo</strong> ele tem — e que finalmente nos permite evoluir este reconhecedor em um compilador que produz código VM de verdade.</p>
+<p>Com um parser completo (mesmo que ainda apenas reconhecendo a estrutura, sem gerar código), fechamos o front-end da Parte 1. Antes de gerar código de verdade, porém, a Parte 2 precisa definir <em>para onde</em> traduzir: o capítulo 6 discute representações intermediárias e o capítulo 7 especifica a VM Hack, nosso alvo. Só então faz sentido a última peça — a tabela de símbolos (capítulo 8), que diz <strong>onde</strong> cada identificador vive (é uma variável local? um campo do objeto? um parâmetro?) e <strong>que tipo</strong> ele tem — e que finalmente nos permite evoluir este reconhecedor em um compilador que produz código VM de verdade.</p>
 
 
 

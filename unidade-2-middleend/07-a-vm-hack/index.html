@@ -964,7 +964,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../12-vm-translator-parte1/" class="md-nav__link">
+      <a href="../../unidade-3-backend/12-vm-translator-parte1/" class="md-nav__link">
         
   
   
@@ -1473,7 +1473,7 @@
 
 
 <h1 id="7-a-vm-hack-especificacao">7. A VM Hack (especificação)<a class="headerlink" href="#7-a-vm-hack-especificacao" title="Permanent link">&para;</a></h1>
-<p>Este capítulo é a especificação de referência da VM Hack — a representação intermediária baseada em pilha para a qual o compilador Jack (capítulos 9 e 10) vai gerar código, e que o VM Translator (capítulos 11 e 12) vai traduzir para Assembly Hack. Não há código de compilador aqui; é a "planta" que orienta os próximos quatro capítulos.</p>
+<p>Este capítulo é a especificação de referência da VM Hack — a representação intermediária baseada em pilha para a qual o compilador Jack (capítulos 9 e 10) vai gerar código, e que o VM Translator (capítulos 12 e 13) vai traduzir para Assembly Hack. Não há código de compilador aqui; é a "planta" que orienta o restante da Parte 2 e o VM Translator.</p>
 <h2 id="modelo-de-memoria">Modelo de memória<a class="headerlink" href="#modelo-de-memoria" title="Permanent link">&para;</a></h2>
 <p>Cada célula de memória da máquina Hack armazena 16 bits, usados para representar de forma uniforme três coisas: um inteiro em complemento de dois (-32768 a 32767), um booleano (<code>0</code> para falso, <code>-1</code> — todos os bits em 1 — para verdadeiro), ou um endereço de memória.</p>
 <p>A memória é organizada em <strong>oito segmentos</strong>, cada um endereçado por índice a partir de 0:</p>
@@ -1535,7 +1535,7 @@
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>pop this 1           // RAM[8001] = 17
 </code></pre></div>
 <p>É esse mecanismo de endereçamento indireto que o compilador vai usar para acessar campos de objetos (via <code>this</code>) e elementos de arrays (via <code>that</code>).</p>
-<p>Além dos segmentos, duas áreas adicionais completam o modelo: a <strong>pilha</strong> (<em>stack</em>), usada para armazenar valores temporários durante a avaliação de expressões e para implementar o protocolo de chamada de função (capítulo 12); e o <strong>heap</strong>, a região de RAM dedicada ao armazenamento de objetos e arrays, gerenciada dinamicamente pelas funções <code>Memory.alloc</code>/<code>Memory.deAlloc</code> do sistema operacional Jack.</p>
+<p>Além dos segmentos, duas áreas adicionais completam o modelo: a <strong>pilha</strong> (<em>stack</em>), usada para armazenar valores temporários durante a avaliação de expressões e para implementar o protocolo de chamada de função (capítulo 13); e o <strong>heap</strong>, a região de RAM dedicada ao armazenamento de objetos e arrays, gerenciada dinamicamente pelas funções <code>Memory.alloc</code>/<code>Memory.deAlloc</code> do sistema operacional Jack.</p>
 <h2 id="comandos-de-acesso-a-memoria">Comandos de acesso à memória<a class="headerlink" href="#comandos-de-acesso-a-memoria" title="Permanent link">&para;</a></h2>
 <p>Apenas dois comandos movem dados entre a pilha e os segmentos:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>push segmento índice   // empilha o valor de segmento[índice]
@@ -1611,7 +1611,7 @@
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>goto rótulo        // salto incondicional
 <a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>if-goto rótulo     // desempilha o topo; se for verdadeiro (≠ 0), salta
 </code></pre></div>
-<p>Rótulos têm escopo de função — dois <code>label LOOP</code> em funções diferentes não colidem (o capítulo 12 detalha a qualificação <code>funcao$rótulo</code> usada pelo VM Translator para garantir isso na tradução final para Assembly). É com apenas essas três primitivas que o capítulo 9 vai mapear <code>if</code>/<code>else</code> e <code>while</code> de Jack.</p>
+<p>Rótulos têm escopo de função — dois <code>label LOOP</code> em funções diferentes não colidem (o capítulo 13 detalha a qualificação <code>funcao$rótulo</code> usada pelo VM Translator para garantir isso na tradução final para Assembly). É com apenas essas três primitivas que o capítulo 9 vai mapear <code>if</code>/<code>else</code> e <code>while</code> de Jack.</p>
 <h2 id="funcoes">Funções<a class="headerlink" href="#funcoes" title="Permanent link">&para;</a></h2>
 <p>Três comandos governam todo o protocolo de chamada:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>function nome nLocais   // declara uma função, com N variáveis locais (inicializadas em 0)
@@ -1632,9 +1632,9 @@
 <a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>    push constant 0
 <a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>    return
 </code></pre></div>
-<p>O nome de uma função é sempre <code>Classe.nomeDaSubroutine</code> — é assim que construtores, métodos e funções (na terminologia Jack) se tornam, todos igualmente, "funções" no nível da VM. O mecanismo completo de <code>call</code>/<code>return</code> (salvar e restaurar o estado do chamador, o <em>stack frame</em>) é o assunto do capítulo 12; por ora, basta saber a interface: argumentos entram empilhados, o resultado sai empilhado.</p>
+<p>O nome de uma função é sempre <code>Classe.nomeDaSubroutine</code> — é assim que construtores, métodos e funções (na terminologia Jack) se tornam, todos igualmente, "funções" no nível da VM. O mecanismo completo de <code>call</code>/<code>return</code> (salvar e restaurar o estado do chamador, o <em>stack frame</em>) é o assunto do capítulo 13; por ora, basta saber a interface: argumentos entram empilhados, o resultado sai empilhado.</p>
 <h2 id="um-programa-completo">Um programa completo<a class="headerlink" href="#um-programa-completo" title="Permanent link">&para;</a></h2>
-<p>Todo programa VM começa executando <code>Main.main</code>. Um exemplo simples — somar de 1 a <code>n</code> e imprimir o resultado — ilustra push/pop, aritmética, controle de fluxo e chamada de função juntos:</p>
+<p>Todo programa Jack começa executando <code>Main.main</code> — mais precisamente, a máquina começa por <code>Sys.init</code>, uma função do sistema operacional Jack que inicializa as demais classes do SO e então chama <code>Main.main</code> (o capítulo 13 mostra esse <em>bootstrap</em>). Um exemplo simples — somar de 1 a <code>n</code> e imprimir o resultado — ilustra push/pop, aritmética, controle de fluxo e chamada de função juntos:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>function Soma.soma 2        // variáveis locais: sum (0), i (1)
 <a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>    push constant 0
 <a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>    pop local 0              // sum = 0
@@ -1735,7 +1735,7 @@
 </tbody>
 </table>
 <h2 id="o-que-vem-a-seguir">O que vem a seguir<a class="headerlink" href="#o-que-vem-a-seguir" title="Permanent link">&para;</a></h2>
-<p>Com a especificação da VM Hack e o mapeamento padrão em mãos, sabemos exatamente <em>onde</em> cada variável Jack precisa morar. O próximo capítulo constrói a estrutura que guarda essa informação durante a compilação — a <strong>tabela de símbolos</strong> —, e os capítulos 9 e 10 evoluem o <code>CompilationEngine</code> da Unidade 1 para efetivamente gerar este código, expressão por expressão, comando por comando — fechando o compilador Jack → VM (Project 11) por completo. Os capítulos 11 e 12, na Unidade 3, tratam do outro lado: como traduzir esse código VM para Assembly Hack.</p>
+<p>Com a especificação da VM Hack e o mapeamento padrão em mãos, sabemos exatamente <em>onde</em> cada variável Jack precisa morar. O próximo capítulo constrói a estrutura que guarda essa informação durante a compilação — a <strong>tabela de símbolos</strong> —, e os capítulos 9 e 10 evoluem o <code>CompilationEngine</code> da Parte 1 para efetivamente gerar este código, expressão por expressão, comando por comando — fechando o compilador Jack → VM (Project 11) por completo. Os capítulos 12 e 13, na Parte 3, tratam do outro lado: como traduzir esse código VM para Assembly Hack.</p>
 <p>Uma versão tabular desta especificação, para consulta rápida durante esses capítulos, está no <a href="../../apendices/b-especificacao-vm/">Apêndice B</a>.</p>
 
 

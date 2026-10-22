@@ -829,7 +829,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../unidade-2-middleend/12-vm-translator-parte1/" class="md-nav__link">
+      <a href="../12-vm-translator-parte1/" class="md-nav__link">
         
   
   
@@ -960,6 +960,28 @@
     <span class="md-ellipsis">
       
         Por que uma etapa intermediária extra
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#o-que-cada-etapa-resolve" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        O que cada etapa resolve
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#o-que-vem-a-seguir" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        O que vem a seguir
       
     </span>
   </a>
@@ -1320,6 +1342,28 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#o-que-cada-etapa-resolve" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        O que cada etapa resolve
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#o-que-vem-a-seguir" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        O que vem a seguir
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1341,18 +1385,53 @@
 
 
 <h1 id="14-geracao-de-codigo-alvo-consolidacao-teorica">14. Geração de código alvo (consolidação teórica)<a class="headerlink" href="#14-geracao-de-codigo-alvo-consolidacao-teorica" title="Permanent link">&para;</a></h1>
-<p>Antes de mergulhar na especificação de Assembly Hack (capítulo 14) e construir o Assembler (capítulo 15), vale um momento de retrospectiva: o que exatamente aconteceu nos capítulos 11 e 12, e por que essa arquitetura em particular?</p>
+<p>Antes de construir o Assembler (capítulo 15), vale um momento de retrospectiva: o que exatamente aconteceu nos capítulos 11 a 13, e por que essa arquitetura em particular?</p>
 <h2 id="o-que-ja-construimos">O que já construímos<a class="headerlink" href="#o-que-ja-construimos" title="Permanent link">&para;</a></h2>
 <p>Percorremos, sem perceber explicitamente, uma tradução em <strong>duas etapas</strong> dentro do que costuma ser chamado, em conjunto, de "geração de código alvo":</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Código VM (IR, capítulo 7)
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    ↓ VM Translator (capítulos 11-12)
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>Assembly Hack (simbólico, capítulo 14)
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    ↓ VM Translator (capítulos 12-13)
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>Assembly Hack (simbólico, capítulo 11)
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    ↓ Assembler (capítulo 15)
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>Código de máquina Hack (binário)
 </code></pre></div>
 <p>O VM Translator não é, estritamente, "geração de código alvo" no sentido mais estrito do termo (ele traduz entre duas representações textuais, ambas ainda "legíveis" por um humano treinado) — mas cumpre exatamente o papel que a geração de código alvo cumpre em um compilador tradicional: transformar uma representação independente de máquina em uma representação específica de uma arquitetura real. A diferença sutil é que aqui esse trabalho foi dividido em duas sub-etapas (VM → Assembly, Assembly → binário) em vez de uma só (IR → binário direto) — uma divisão que, como vimos no capítulo 6, tem tudo a ver com simplicidade de implementação.</p>
 <h2 id="por-que-uma-etapa-intermediaria-extra">Por que uma etapa intermediária extra<a class="headerlink" href="#por-que-uma-etapa-intermediaria-extra" title="Permanent link">&para;</a></h2>
-<p>Um compilador "clássico" de livro-texto costuma ir direto de uma IR para código de máquina binário. O Nand2Tetris insere Assembly Hack como uma parada intermediária <strong>legível por humanos</strong> entre a VM e o binário, por uma razão pedagógica e prática ao mesmo tempo: cada etapa da tradução — VM → Assembly (capítulos 11-12) e Assembly → binário (capítulo 15) — se torna pequena e independentemente verificável. Você pode ler o <code>.asm</code> gerado pelo seu VM Translator e confirmar, linha a linha, que ele faz sentido, antes de sequer pensar no Assembler. Compiladores de produção fazem escolhas semelhantes por razões de engenharia: o LLVM, por exemplo, tem uma IR textual (a "LLVM IR") que pode ser inspecionada exatamente por esse motivo — depurar em texto é mais fácil que depurar em binário.</p>
+<p>Um compilador "clássico" de livro-texto costuma ir direto de uma IR para código de máquina binário. O Nand2Tetris insere Assembly Hack como uma parada intermediária <strong>legível por humanos</strong> entre a VM e o binário, por uma razão pedagógica e prática ao mesmo tempo: cada etapa da tradução — VM → Assembly (capítulos 12-13) e Assembly → binário (capítulo 15) — se torna pequena e independentemente verificável. Você pode ler o <code>.asm</code> gerado pelo seu VM Translator e confirmar, linha a linha, que ele faz sentido, antes de sequer pensar no Assembler. Compiladores de produção fazem escolhas semelhantes por razões de engenharia: o LLVM, por exemplo, tem uma IR textual (a "LLVM IR") que pode ser inspecionada exatamente por esse motivo — depurar em texto é mais fácil que depurar em binário.</p>
+<h2 id="o-que-cada-etapa-resolve">O que cada etapa resolve<a class="headerlink" href="#o-que-cada-etapa-resolve" title="Permanent link">&para;</a></h2>
+<p>Cada tradutor da cadeia elimina uma abstração específica — e só ela. Ver a cadeia desse jeito ajuda a localizar um bug: se o problema envolve nomes de variáveis, ele está no compilador; se envolve endereços de RAM, no VM Translator; se envolve bits, no Assembler.</p>
+<table>
+<thead>
+<tr>
+<th>Etapa</th>
+<th>Abstração eliminada</th>
+<th>Como</th>
+<th>Capítulos</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Jack → VM</td>
+<td>Nomes de variáveis, classes, objetos e estruturas de controle</td>
+<td>Tabela de símbolos (nome → segmento + índice), <code>pointer</code>/<code>this</code>/<code>that</code> para objetos e arrays, rótulos para <code>if</code>/<code>while</code></td>
+<td>7–10</td>
+</tr>
+<tr>
+<td>VM → Assembly</td>
+<td>Pilha e segmentos virtuais</td>
+<td>Registradores <code>SP</code>, <code>LCL</code>, <code>ARG</code>, <code>THIS</code>, <code>THAT</code> em <code>RAM[0..4]</code>; cada comando VM vira uma sequência fixa de instruções; <code>call</code>/<code>return</code> montam e desmontam o frame</td>
+<td>11–13</td>
+</tr>
+<tr>
+<td>Assembly → binário</td>
+<td>Símbolos e mnemônicos</td>
+<td>Duas passagens: rótulos → endereços de ROM, variáveis → endereços de RAM a partir de 16; mnemônicos → bits pelas tabelas do capítulo 11</td>
+<td>11, 15</td>
+</tr>
+</tbody>
+</table>
+<p>Repare que nenhuma etapa "olha para trás": o VM Translator não sabe que o código veio de Jack, e o Assembler não sabe que o Assembly veio de uma VM. É essa independência que permite testar cada tradutor sozinho, com os arquivos de teste de cada projeto do Nand2Tetris.</p>
+<h2 id="o-que-vem-a-seguir">O que vem a seguir<a class="headerlink" href="#o-que-vem-a-seguir" title="Permanent link">&para;</a></h2>
+<p>Falta o último elo: o Assembler. O capítulo 15 mostra como converter o Assembly Hack especificado no capítulo 11 em código binário, resolvendo os símbolos em duas passagens.</p>
 
 
 

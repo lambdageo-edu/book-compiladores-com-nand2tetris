@@ -920,7 +920,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../unidade-2-middleend/12-vm-translator-parte1/" class="md-nav__link">
+      <a href="../../unidade-3-backend/12-vm-translator-parte1/" class="md-nav__link">
         
   
   
@@ -1441,7 +1441,7 @@
 <li><strong>Geração de código intermediário</strong>: traduz o programa (já validado) para uma representação intermediária.</li>
 <li><strong>Geração de código alvo</strong>: traduz a representação intermediária para o código final executável.</li>
 </ul>
-<p>Este livro segue esse pipeline clássico de livro-texto — a mesma ordem usada por praticamente todo curso introdutório de compiladores — e não a ordem "bottom-up" (hardware → VM → linguagem) do livro original do Nand2Tetris. Construiremos primeiro o front-end (Unidade 1), depois o middle-end (Unidade 2) e por fim o back-end (Unidade 3), sempre com um artefato funcional ao final de cada etapa.</p>
+<p>Este livro segue esse pipeline clássico de livro-texto — a mesma ordem usada por praticamente todo curso introdutório de compiladores — e não a ordem "bottom-up" (hardware → VM → linguagem) do livro original do Nand2Tetris. Construiremos primeiro o front-end (Parte 1), depois o middle-end — o compilador Jack → VM (Parte 2) — e por fim o back-end, em duas partes: o tradutor de VM (Parte 3) e o montador (Parte 4), sempre com um artefato funcional ao final de cada etapa.</p>
 <h2 id="por-que-o-nand2tetris">Por que o Nand2Tetris<a class="headerlink" href="#por-que-o-nand2tetris" title="Permanent link">&para;</a></h2>
 <p>O projeto <a href="https://www.nand2tetris.org/">Nand2Tetris</a> (Nisan &amp; Schocken) propõe construir um sistema de computação completo a partir de portas NAND, subindo até uma linguagem de programação de alto nível. Vamos usar apenas a metade "de cima" dessa pilha — a parte de compiladores — mas ela já nos dá tudo que precisamos: uma linguagem orientada a objetos completa (<strong>Jack</strong>), uma máquina virtual baseada em pilha bem especificada (a <strong>VM Hack</strong>) e uma arquitetura de máquina real e simples (o <strong>Hack</strong>), com seu montador. É um projeto pequeno o suficiente para caber em um semestre e completo o suficiente para não deixar buracos conceituais — você vai implementar cada elo da corrente entre o texto-fonte e a máquina.</p>
 <p>Nosso compilador será dividido em dois projetos que se comunicam através da VM Hack:</p>
@@ -1460,7 +1460,8 @@
 <table>
 <thead>
 <tr>
-<th>Unidade</th>
+<th>Parte</th>
+<th>Capítulos</th>
 <th>Foco</th>
 <th>Fecha com</th>
 </tr>
@@ -1468,18 +1469,27 @@
 <tbody>
 <tr>
 <td>1 — Front-end</td>
+<td>0–5</td>
 <td>Fundamentos teóricos, a linguagem Jack, análise léxica e sintática</td>
-<td>Um parser completo para Jack</td>
+<td>Um parser completo para Jack (Project 10)</td>
 </tr>
 <tr>
-<td>2 — Middle-end</td>
-<td>Representações intermediárias, especificação da VM Hack, tabela de símbolos, geração de código para a VM</td>
-<td>Compilador Jack → VM completo + VM Translator (parte 1)</td>
+<td>2 — O Compilador</td>
+<td>6–10</td>
+<td>Representações intermediárias, especificação da VM Hack, tabela de símbolos, geração de código VM</td>
+<td>Compilador Jack → VM completo (Project 11)</td>
 </tr>
 <tr>
-<td>3 — Back-end</td>
-<td>VM Translator (parte 2), geração de código alvo, Assembly e montador</td>
-<td>VM Translator completo + Assembler Hack</td>
+<td>3 — O Tradutor VM</td>
+<td>11–14</td>
+<td>Especificação do Assembly Hack, VM Translator (partes 1 e 2), consolidação da geração de código alvo</td>
+<td>VM Translator completo (Projects 7 e 8)</td>
+</tr>
+<tr>
+<td>4 — O Montador</td>
+<td>15</td>
+<td>Montagem em duas passagens</td>
+<td>Assembler Hack (Project 6)</td>
 </tr>
 </tbody>
 </table>

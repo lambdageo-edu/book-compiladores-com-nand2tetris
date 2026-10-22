@@ -964,7 +964,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../unidade-2-middleend/12-vm-translator-parte1/" class="md-nav__link">
+      <a href="../../unidade-3-backend/12-vm-translator-parte1/" class="md-nav__link">
         
   
   
@@ -1502,7 +1502,7 @@
 <a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a><span class="w">    </span><span class="p">}</span>
 <a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a><span class="p">}</span>
 </code></pre></div>
-<p>Reconhecer inteiros e identificadores já está pronto — a lógica não muda para Jack. O que falta é: o conjunto completo de palavras reservadas, o conjunto completo de símbolos, strings entre aspas, comentários (de linha e de bloco) e contagem de linha (para mensagens de erro úteis).</p>
+<p>Reconhecer inteiros e identificadores já está pronto — a lógica não muda para Jack, exceto por um detalhe: uma <code>integerConstant</code> de Jack vai de 0 a 32767 (o maior inteiro positivo de 16 bits; <code>-5</code> é o operador unário aplicado a <code>5</code>), então <code>number()</code> deve rejeitar, com erro léxico, um lexema acima desse valor. O que falta é: o conjunto completo de palavras reservadas, o conjunto completo de símbolos, strings entre aspas, comentários (de linha e de bloco) e contagem de linha (para mensagens de erro úteis).</p>
 <h2 id="palavras-reservadas-completas">Palavras reservadas completas<a class="headerlink" href="#palavras-reservadas-completas" title="Permanent link">&para;</a></h2>
 <p>Jack tem 21 palavras-chave. Adicionamos cada uma ao <code>TokenType</code> e à tabela <code>keywords</code> — mecanicamente, sem lógica nova:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kd">public</span><span class="w"> </span><span class="kd">enum</span><span class="w"> </span><span class="n">TokenType</span><span class="w"> </span><span class="p">{</span>
