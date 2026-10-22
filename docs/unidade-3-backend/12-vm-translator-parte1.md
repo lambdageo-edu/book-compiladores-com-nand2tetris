@@ -207,7 +207,7 @@ Vale a pena registrar, em número de instruções Assembly geradas, o custo rela
 Sua atividade prática nesta parte do curso é implementar um `VMTranslator` que recebe um arquivo `.vm` (ou uma pasta com vários) e produz o `.asm` correspondente, cobrindo:
 
 1. Todos os comandos aritméticos/lógicos (`add`, `sub`, `neg`, `eq`, `gt`, `lt`, `and`, `or`, `not`).
-2. `push`/`pop` para todos os oito segmentos.
+2. `push` para todos os oito segmentos e `pop` para sete deles (não existe `pop constant`: `constant` é um segmento virtual, só de leitura).
 3. Rótulos únicos para cada comparação traduzida (um contador incremental é suficiente).
 
 Os testes oficiais do Nand2Tetris para esta parte (pasta `projects/07`) incluem `SimpleAdd`, `StackTest` (aritmética e lógica combinadas), `BasicTest`, `PointerTest` e `StaticTest` (os quatro segmentos e os dois casos especiais `pointer`/`static`) — rode cada `.asm` gerado no CPU Emulator e compare o estado final da RAM com o script `.tst`/`.cmp` de referência.

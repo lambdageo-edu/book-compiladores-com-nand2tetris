@@ -86,7 +86,19 @@ public class Parser {
 
 Repare que cada não-terminal virou exatamente um método, e cada terminal virou uma chamada a `match`. As chamadas a `System.out.println` intercaladas entre elas são exatamente as ações semânticas do **esquema de tradução dirigido por sintaxe** do capítulo 1 — copiadas para dentro de cada método, na mesma posição em que apareceriam se escritas entre chaves na produção (`digit → dígito { print(dígito) }`, `oper → + digit { print('+') } oper`). É esse acoplamento entre "reconhecer a estrutura" e "emitir a tradução" — sem nenhuma árvore sintática explícita no meio do caminho — que vamos repetir em escala maior nos capítulos 9 e 10.
 
-Rodando com `"8+5-7+9"`, o tradutor imprime `push 8`, `push 5`, `add`, `push 7`, `sub`, `push 9`, `add` — a expressão em notação pós-fixa, um comando por linha. Como exercício, fica a inclusão de `*` e `/`; e você vai notar que `45+89-876` já quebra, porque nosso "dígito" só aceita um caractere — é exatamente o problema que resolvemos no próximo passo.
+Rodando com `"8+5-7+9"`, o tradutor imprime `push 8`, `push 5`, `add`, `push 7`, `sub`, `push 9`, `add` — a expressão em notação pós-fixa, um comando por linha. E você vai notar que `45+89-876` já quebra, porque nosso "dígito" só aceita um caractere — é exatamente o problema que resolvemos no próximo passo.
+
+!!! note "Exercício: multiplicação e divisão"
+    Inclua `*` e `/` no tradutor, **respeitando a precedência**: `8+5*2` deve produzir `push 8`, `push 5`, `push 2`, `mul`, `add` (e não `push 8`, `push 5`, `add`, `push 2`, `mul`, que calcularia `(8+5)*2`). Acrescentar `*` e `/` como novas alternativas de `oper` não basta, porque eles ficariam no mesmo nível de `+` e `-`. O caminho é a gramática de expressões do capítulo 1, com um não-terminal por nível de precedência, já sem recursão à esquerda:
+
+    ```
+    expr -> term plus
+    plus -> + term plus | - term plus | ε
+    term -> digit mult
+    mult -> * digit mult | / digit mult | ε
+    ```
+
+    Cada não-terminal vira um método, como antes. Para conferir, `9-6/3*2` deve dar `push 9`, `push 6`, `push 3`, `div`, `push 2`, `mul`, `sub`. Quando chegar ao Passo 8, acrescente também `mul` e `div` ao interpretador. Mais adiante (Passo 6), o não-terminal `term` passa a ter outro papel; se você fizer este exercício, renomeie o seu para não haver confusão (por exemplo, `factor`).
 
 ## Passo 2 — Por que precisamos de um analisador léxico
 

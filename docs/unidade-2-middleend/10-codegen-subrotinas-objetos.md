@@ -314,6 +314,43 @@ vmWriter.writePush(Segment.THAT, 0);
 
 Como exercício de verificação, vale compilar mentalmente (ou de fato, testando) uma expressão deliberadamente hostil como `let a[a[i]] = a[b[a[b[j]]]]` — se o `temp 0` intermediário estiver no lugar certo, mesmo esse emaranhado de acessos aninhados produz código correto.
 
+??? note "Gabarito (supondo `var Array a, b; var int i, j;`, ou seja, `local 0` a `local 3`)"
+    ```
+    // lado esquerdo: endereço de a[a[i]]
+    push local 0        // a
+    push local 0        // a
+    push local 2        // i
+    add
+    pop pointer 1
+    push that 0         // a[i]
+    add                 // endereço de a[a[i]] fica na pilha
+    // lado direito: a[b[a[b[j]]]], de dentro para fora
+    push local 0        // a
+    push local 1        // b
+    push local 0        // a
+    push local 1        // b
+    push local 3        // j
+    add
+    pop pointer 1
+    push that 0         // b[j]
+    add
+    pop pointer 1
+    push that 0         // a[b[j]]
+    add
+    pop pointer 1
+    push that 0         // b[a[b[j]]]
+    add
+    pop pointer 1
+    push that 0         // a[b[a[b[j]]]]
+    // a atribuição
+    pop temp 0
+    pop pointer 1       // that aponta para a[a[i]]
+    push temp 0
+    pop that 0
+    ```
+
+    Repare que o endereço do lado esquerdo fica **na pilha**, e não em `pointer 1`, durante toda a avaliação do lado direito — por isso as quatro leituras do lado direito podem usar `pointer 1` à vontade. Simulando essa sequência com arrays e índices aleatórios, o resultado bate sempre com a atribuição esperada.
+
 ## Fechando o Project 11
 
 Com variáveis, funções, construtores, métodos, chamadas e arrays todos gerando código VM, o compilador Jack → VM está completo — qualquer arquivo `.jack` válido, de qualquer complexidade, agora compila para um `.vm` executável no VM Emulator do Nand2Tetris. É um bom momento para rodar contra os programas de teste do Project 11, nesta ordem — `Seven` (expressão com constantes, `do` e `return`), `ConvertToBin` (comandos procedurais e funções), `Square` (construtores, métodos e campos), `Average` (arrays e strings), `Pong` (aplicação orientada a objetos completa, com variáveis `static`) e `ComplexArrays` (índices de array aninhados) — e comparar a saída com a do `JackCompiler` de referência (pasta `tools/` do Nand2Tetris; o Project 11 não traz arquivos `.vm` esperados). Quando ela não bate byte a byte, normalmente ainda é possível validar comportamentalmente, executando ambos no VM Emulator e comparando o resultado observável. Para executar, carregue no emulador o diretório inteiro do programa: o VM Emulator já traz uma implementação embutida das oito classes do sistema operacional Jack; em qualquer outro ambiente, os oito arquivos `.vm` do sistema operacional (capítulo 7) precisam estar no mesmo diretório dos `.vm` gerados.
