@@ -166,9 +166,13 @@ Repare como a ausência de precedência de operadores em Jack (capítulo 3) se p
 
 ```xml
 <expression>
-<term><integerConstant> 10 </integerConstant></term>
+<term>
+<integerConstant> 10 </integerConstant>
+</term>
 <symbol> + </symbol>
-<term><integerConstant> 20 </integerConstant></term>
+<term>
+<integerConstant> 20 </integerConstant>
+</term>
 </expression>
 ```
 
@@ -336,9 +340,16 @@ A API completa esperada do `CompilationEngine` (ou `Parser`) é:
 
 ## Validando contra a árvore sintática de referência
 
-Assim como no capítulo 4, o Nand2Tetris fornece, para cada programa Jack de exemplo, um arquivo XML de referência — desta vez com a árvore sintática **completa** (não apenas os tokens). Testar o parser é, de novo, uma questão de comparação exata de texto:
+Assim como no capítulo 4, o Nand2Tetris fornece, para cada programa Jack de exemplo, um arquivo XML de referência — desta vez com a árvore sintática **completa** (não apenas os tokens). Há uma diferença em relação aos arquivos de tokens: os `*T.xml` do capítulo 4 não têm indentação, mas os arquivos de árvore sintática (`Square.xml` etc.) são indentados, dois espaços por nível — e o nosso `printNonTerminal` não indenta. A indentação serve só para leitura (o `TextComparer` do Nand2Tetris a ignora), então o teste compara as duas saídas linha a linha, depois de remover espaços nas pontas e linhas vazias:
 
 ```java
+private static String normalize(String xml) {
+    return xml.lines()
+              .map(String::strip)
+              .filter(l -> !l.isEmpty())
+              .collect(Collectors.joining("\n"));
+}
+
 @Test
 public void testParserWithSquare() throws IOException {
     var input = fromFile("Square/Square.jack");
@@ -347,7 +358,7 @@ public void testParserWithSquare() throws IOException {
     var parser = new Parser(input.getBytes(StandardCharsets.UTF_8));
     parser.parse();
     var result = parser.XMLOutput();
-    assertEquals(expectedResult, result);
+    assertEquals(normalize(expectedResult), normalize(result));
 }
 ```
 

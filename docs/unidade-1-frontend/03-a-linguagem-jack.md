@@ -15,7 +15,7 @@ Jack tem uma sintaxe inspirada em Java, mas com uma lista deliberada de simplifi
 | Tipos primitivos | Apenas `int`, `boolean`, `char` (sem `float`) | Simplifica geração de código e representação de valores (tudo cabe em uma palavra de 16 bits) |
 | Campos de instância | Sempre privados | Não há modificadores de visibilidade para tratar |
 | Métodos | Sempre públicos | Idem |
-| Sobrecarga | Não existe (um construtor por classe, nomes de subroutine únicos) | Simplifica resolução de chamadas |
+| Sobrecarga | Não existe (nomes de subroutine únicos dentro da classe, inclusive construtores) | Simplifica resolução de chamadas |
 
 Cada uma dessas escolhas de projeto tem uma tradução direta em "uma linha a menos para o compilador se preocupar" — é uma lição de projeto de linguagem tanto quanto de compiladores: a complexidade de compilar uma linguagem é, em grande parte, uma escolha de projeto da própria linguagem.
 
@@ -183,7 +183,7 @@ class Point {
 }
 ```
 
-Cada classe tem **no máximo um construtor** (sem sobrecarga). A chamada usa a convenção `NomeDaClasse.new(...)`:
+Um construtor pode ter qualquer nome — por convenção, `new` —, e uma classe pode ter mais de um, desde que com nomes diferentes (não há sobrecarga). O tipo de retorno de um construtor é sempre a própria classe. A chamada usa o nome completo, `NomeDaClasse.new(...)`:
 
 ```java
 var Point pt;
@@ -191,6 +191,24 @@ let pt = Point.new(10, 20);
 ```
 
 Métodos são chamados sobre uma instância (`objeto.metodo(...)`); funções, sobre a classe (`Classe.funcao(...)`). Essa distinção sintática — que não existe em Java, onde tudo é `objeto.metodo` ou `Classe.metodoEstatico` mas o compilador resolve por assinatura — é explícita em Jack através da palavra-chave de declaração, o que facilita bastante a análise semântica no capítulo 8.
+
+Dentro da própria classe vale uma regra a mais: um **método** pode ser chamado sem qualificador — `metodo(...)` significa "chame `metodo` sobre o objeto corrente", o equivalente a `this.metodo(...)` em Java. **Funções e construtores**, ao contrário, são sempre chamados pelo nome completo, mesmo de dentro da classe:
+
+```java
+class Point {
+    // ...
+    method void moveTo(int nx, int ny) {
+        do erase();                                  // método de Point, sobre este objeto
+        let x = nx;
+        let y = ny;
+        do draw();                                   // idem
+        do Output.printInt(Point.getPointCount());   // função: sempre com o nome da classe
+        return;
+    }
+}
+```
+
+O compilador do capítulo 10 depende dessa regra: uma chamada sem qualificador é sempre tratada como chamada de método sobre `this`.
 
 ## Biblioteca padrão (Jack OS)
 

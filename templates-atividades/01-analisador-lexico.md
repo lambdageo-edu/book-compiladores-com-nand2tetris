@@ -26,7 +26,7 @@ capaz de ler arquivos fonte `.jack`, identificar seus tokens e gerar um arquivo 
 | --- | --- |
 | `keyword` | As 21 palavras reservadas de Jack |
 | `symbol` | `{` `}` `(` `)` `[` `]` `.` `,` `;` `+` `-` `*` `/` `&` `\|` `<` `>` `=` `~` (19 símbolos) |
-| `integerConstant` | Números inteiros decimais |
+| `integerConstant` | Números inteiros decimais de 0 a 32767 |
 | `stringConstant` | Cadeias entre aspas duplas (sem escapes) |
 | `identifier` | Letras, dígitos e `_`, não iniciando com dígito |
 

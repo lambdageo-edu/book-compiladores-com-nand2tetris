@@ -193,13 +193,14 @@ Vale a pena registrar, em número de instruções Assembly geradas, o custo rela
 |---|---|
 | `push constant` | 7 |
 | `push`/`pop` segmento dinâmico | 10–12 |
-| `push`/`pop temp`/`static` | 5–6 |
+| `push temp`/`static`/`pointer` | 7 |
+| `pop temp`/`static`/`pointer` | 5 |
 | `add`/`sub`/`and`/`or` | 5 |
 | `neg`/`not` | 3 |
 | `eq`/`lt`/`gt` | ~16 |
 | `label` | 0 (é só um símbolo) |
 | `goto` | 2 |
-| `if-goto` | 4 |
+| `if-goto` | 5 |
 
 ## Exercício guiado
 

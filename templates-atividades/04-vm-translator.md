@@ -136,13 +136,15 @@ saída com o `.cmp`. Sucesso é a mensagem `Comparison ended successfully.`
 
 ### 4️⃣ Bootstrap
 
-Emitido **uma única vez**, no início do `.asm` final: inicializar `SP = 256` e executar
-`call Sys.init 0`.
+Emitido **uma única vez**, no início do `.asm` final, **quando o programa tem uma função
+`Sys.init`** (os testes que trazem `Sys.vm`): inicializar `SP = 256` e executar
+`call Sys.init 0`. Os testes sem `Sys.vm` (`BasicLoop`, `FibonacciSeries`, `SimpleFunction`)
+inicializam a máquina pelo próprio `.tst` e devem ser traduzidos **sem** bootstrap.
 
 ### 5️⃣ Entrada por diretório
 
-Ao receber uma pasta, traduzir **todos** os `.vm` para um **único** `.asm`, com o bootstrap
-no topo.
+Ao receber uma pasta, traduzir **todos** os `.vm` para um **único** `.asm` (com o bootstrap
+no topo, se houver `Sys.init`). O prefixo de `static` muda a cada arquivo traduzido.
 
 ### 🧪 Testes da Parte 2 (Project 08)
 

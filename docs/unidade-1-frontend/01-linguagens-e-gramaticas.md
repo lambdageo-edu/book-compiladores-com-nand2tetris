@@ -31,7 +31,7 @@ Para qualquer autômato finito, podemos descrever a linguagem que ele reconhece 
 
 Por convenção de precedência (da mais alta para a mais baixa): parênteses, fechamento (`*`), concatenação, alternação (`|`). Como abreviação, intervalos de caracteres são escritos entre colchetes com reticências — `[0...9]` significa `(0|1|2|...|9)`.
 
-**Exemplo — identificadores estilo Algol** (uma letra seguida de zero ou mais letras/dígitos):
+**Exemplo — identificadores estilo Algol** (uma letra seguida de zero ou mais letras, dígitos ou `_`):
 
 ```
 ([A...Z] | [a...z]) ([A...Z] | [a...z] | [0...9] | _)*

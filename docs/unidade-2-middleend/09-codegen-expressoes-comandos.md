@@ -137,7 +137,7 @@ push c
 call Math.multiply 2
 ```
 
-isto é, `(a + b) * c`. A figura 11.4 do livro *The Elements of Computing Systems* ilustra a geração de código para `x + g(2,y,-z) * 5` com a multiplicação feita antes da soma, mas aquele exemplo é sobre o algoritmo de travessia pós-ordem de uma árvore já construída; ele não é a regra de Jack. Para obter `a + (b * c)`, o programador precisa escrever os parênteses — e aí a recursão em `parseTerm` (que trata `'(' expression ')'`) compila `b * c` antes do `add`.
+isto é, `(a + b) * c`. A figura 11.4 da 1ª edição de *The Elements of Computing Systems* (seção 11.1.2) ilustra a geração de código para `x + g(2,y,-z) * 5` com a multiplicação feita antes da soma, mas aquele exemplo é sobre o algoritmo de travessia pós-ordem de uma árvore já construída; ele não é a regra de Jack. Para obter `a + (b * c)`, o programador precisa escrever os parênteses — e aí a recursão em `parseTerm` (que trata `'(' expression ')'`) compila `b * c` antes do `add`.
 
 `*` e `/` são o único caso especial: como a VM não tem comandos nativos para eles (capítulo 7), viram chamadas a `Math.multiply`/`Math.divide` — o compilador "esconde" essa diferença do programador Jack, que escreve `a * b` sem saber que isso é, por baixo, uma chamada de função.
 

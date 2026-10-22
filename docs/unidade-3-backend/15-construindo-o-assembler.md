@@ -139,7 +139,8 @@ while (parser.hasMoreCommands()) {
     }
 }
 
-// segunda passagem
+// segunda passagem: recomeça a leitura do início do arquivo
+parser = new Parser(inputFile);
 int nextRam = 16;
 while (parser.hasMoreCommands()) {
     parser.advance();

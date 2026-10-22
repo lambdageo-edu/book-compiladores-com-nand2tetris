@@ -24,18 +24,20 @@ A **árvore de derivação** (*parse tree*), produzida diretamente pelo analisad
 A **árvore sintática abstrata** (AST) retém apenas a estrutura essencial: operadores, operandos, e a hierarquia que expressa precedência e associatividade — mas descarta tudo que é "só sintaxe". Para uma AST não importa se um bloco é demarcado por chaves, por `begin`/`end`, ou por indentação; importa apenas "isto é um comando condicional, com esta condição, este ramo verdadeiro e este ramo falso".
 
 ```
-Parse tree de "2 + 3 * 4"          AST equivalente
+Parse tree de "2 + 3 * 4"                AST equivalente
 
-        expr                              +
-       /    \                            / \
-     expr    term                       2   *
-      |      / | \                         / \
-    term   term * factor                  3   4
-     |      |         |
-   factor factor       4
-     |      |
-     2      3
+            expr                                +
+          /  |   \                              / \
+      expr   +    term                         2   *
+       |        /  |   \                          / \
+     term    term  *  factor                     3   4
+       |       |        |
+    factor  factor      4
+       |       |
+       2       3
 ```
+
+A árvore de derivação acima segue a gramática `expr → expr + term | term`, `term → term * factor | factor`, `factor → número` — repare que ela guarda até o `+` e o `*` como folhas, enquanto a AST os promove a nós internos e descarta os não-terminais intermediários.
 
 Atenção: o exemplo acima segue a precedência usual da matemática (`*` antes de `+`), como em C ou Java. Em Jack não é assim — como vimos no capítulo 3, a linguagem não define precedência entre operadores, e o compilador avalia da esquerda para a direita: em Jack, `2 + 3 * 4` é compilado como `(2 + 3) * 4`.
 
@@ -92,6 +94,8 @@ BINARY_MULTIPLY
 BINARY_SUBTRACT
 RETURN_VALUE
 ```
+
+(Saída de `dis.dis(f)` até o Python 3.10. A partir do 3.11, as duas operações aparecem como `BINARY_OP`, com o operador indicado ao lado — a estrutura de pilha é a mesma.)
 
 Note a semelhança estrutural com o pseudocódigo de pilha acima — `LOAD_FAST`/`LOAD_CONST` são um `push`, e cada operação binária consome dois valores do topo e empilha o resultado. É exatamente esse modelo — pilha de operandos, um opcode por instrução — que a **VM Hack** do Nand2Tetris adota, e que vamos especificar em detalhe no próximo capítulo.
 

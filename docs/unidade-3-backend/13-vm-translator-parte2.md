@@ -74,7 +74,18 @@ M=D
 M=M+1
 ```
 
-**2. Salvar `LCL`, `ARG`, `THIS`, `THAT`** — quatro blocos idênticos ao acima, trocando apenas o registrador de origem.
+**2. Salvar `LCL`, `ARG`, `THIS`, `THAT`** — quatro blocos quase iguais ao anterior, com uma diferença importante: agora o que se empilha é o **conteúdo** do registrador (`D=M`), e não um endereço (`D=A`, como no rótulo de retorno):
+
+```
+@LCL
+D=M          // D = valor de LCL — com D=A, empilharíamos o número 1
+@SP
+A=M
+M=D
+@SP
+M=M+1
+// (o mesmo bloco para ARG, THIS e THAT)
+```
 
 **3. Reposicionar `ARG`** — o novo `ARG` deve apontar para onde os argumentos (já empilhados pelo chamador, antes do `call`) começam: `ARG = SP - 5 - nArgs` (o `5` é o tamanho fixo dos metadados que acabamos de empilhar):
 
@@ -108,7 +119,7 @@ M=D
 
 O rótulo `RETURN_LABEL_42` é declarado logo **depois** do salto — é para lá que o `return` da função chamada vai desviar quando terminar.
 
-Custo total: cerca de 34 instruções — um overhead fixo, independente da complexidade da função chamada.
+Custo total, na versão mostrada: 49 instruções (7 para o endereço de retorno, 4 × 7 para os registradores, 8 para `ARG`, 4 para `LCL` e 2 para o salto) — um overhead fixo, independente da complexidade da função chamada.
 
 ## `function`: inicializando variáveis locais
 
@@ -266,9 +277,9 @@ Vale posicionar esse protocolo ao lado de convenções usadas em processadores r
 |---|---|---|---|
 | Empilhar argumentos | chamador | chamador | chamador |
 | Descartar argumentos após a chamada | chamador | callee (via `RET n`) | callee (implícito, via `ARG`) |
-| Salvar registradores | parcialmente ambos | parcialmente ambos | callee salva; caller nada faz |
+| Salvar registradores | parcialmente ambos | parcialmente ambos | caller salva todos (no código do `call`); callee restaura (no `return`) |
 | Valor de retorno | registrador (`EAX`) | registrador (`EAX`) | pilha (posição `ARG`) |
-| Overhead por chamada | variável (poucos registradores movidos) | variável | fixo (~34 + ~38 instruções) |
+| Overhead por chamada | variável (poucos registradores movidos) | variável | fixo (49 no `call` + 52 no `return`, na versão mostrada) |
 
 A VM Hack sacrifica desempenho (um overhead fixo e relativamente alto por chamada) por simplicidade extrema de implementação — não há alocação de registradores, não há análise de quais registradores precisam ser preservados: **tudo** é sempre salvo e restaurado, do mesmo jeito, sempre. É uma escolha de projeto coerente com o resto deste curso: corretude e clareza antes de desempenho.
 
