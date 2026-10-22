@@ -1643,7 +1643,7 @@
 <li><code>ε</code> é uma RE indicando o conjunto contendo apenas a cadeia vazia.</li>
 </ol>
 <p>Por convenção de precedência (da mais alta para a mais baixa): parênteses, fechamento (<code>*</code>), concatenação, alternação (<code>|</code>). Como abreviação, intervalos de caracteres são escritos entre colchetes com reticências — <code>[0...9]</code> significa <code>(0|1|2|...|9)</code>.</p>
-<p><strong>Exemplo — identificadores estilo Algol</strong> (uma letra seguida de zero ou mais letras/dígitos):</p>
+<p><strong>Exemplo — identificadores estilo Algol</strong> (uma letra seguida de zero ou mais letras, dígitos ou <code>_</code>):</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>([A...Z] | [a...z]) ([A...Z] | [a...z] | [0...9] | _)*
 </code></pre></div>
 <p><strong>Exemplo — inteiro sem sinal</strong> (zero, ou um dígito não-zero seguido de dígitos):</p>

@@ -1595,100 +1595,109 @@
 <a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>@SP
 <a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>M=M+1
 </code></pre></div>
-<p><strong>2. Salvar <code>LCL</code>, <code>ARG</code>, <code>THIS</code>, <code>THAT</code></strong> — quatro blocos idênticos ao acima, trocando apenas o registrador de origem.</p>
+<p><strong>2. Salvar <code>LCL</code>, <code>ARG</code>, <code>THIS</code>, <code>THAT</code></strong> — quatro blocos quase iguais ao anterior, com uma diferença importante: agora o que se empilha é o <strong>conteúdo</strong> do registrador (<code>D=M</code>), e não um endereço (<code>D=A</code>, como no rótulo de retorno):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>@LCL
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>D=M          // D = valor de LCL — com D=A, empilharíamos o número 1
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>@SP
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>A=M
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>M=D
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>@SP
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>M=M+1
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>// (o mesmo bloco para ARG, THIS e THAT)
+</code></pre></div>
 <p><strong>3. Reposicionar <code>ARG</code></strong> — o novo <code>ARG</code> deve apontar para onde os argumentos (já empilhados pelo chamador, antes do <code>call</code>) começam: <code>ARG = SP - 5 - nArgs</code> (o <code>5</code> é o tamanho fixo dos metadados que acabamos de empilhar):</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>@5
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>D=A
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>@nArgs
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>D=D+A
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>@SP
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>D=M-D
-<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>@ARG
-<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>M=D
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>@5
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>D=A
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>@nArgs
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>D=D+A
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>@SP
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>D=M-D
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>@ARG
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>M=D
 </code></pre></div>
 <p><strong>4. Reposicionar <code>LCL</code></strong> — simplesmente <code>LCL = SP</code> (as variáveis locais da nova função começarão exatamente onde a pilha está agora):</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>@SP
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>D=M
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>@LCL
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>M=D
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>@SP
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>D=M
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>@LCL
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>M=D
 </code></pre></div>
 <p><strong>5. Saltar para a função:</strong></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>@functionName
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>0;JMP
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>(RETURN_LABEL_42)
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>@functionName
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>0;JMP
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>(RETURN_LABEL_42)
 </code></pre></div>
 <p>O rótulo <code>RETURN_LABEL_42</code> é declarado logo <strong>depois</strong> do salto — é para lá que o <code>return</code> da função chamada vai desviar quando terminar.</p>
-<p>Custo total: cerca de 34 instruções — um overhead fixo, independente da complexidade da função chamada.</p>
+<p>Custo total, na versão mostrada: 49 instruções (7 para o endereço de retorno, 4 × 7 para os registradores, 8 para <code>ARG</code>, 4 para <code>LCL</code> e 2 para o salto) — um overhead fixo, independente da complexidade da função chamada.</p>
 <h2 id="function-inicializando-variaveis-locais"><code>function</code>: inicializando variáveis locais<a class="headerlink" href="#function-inicializando-variaveis-locais" title="Permanent link">&para;</a></h2>
 <p>O comando <code>function nome nLocais</code> marca o ponto de entrada e tem uma única responsabilidade: garantir que as <code>nLocais</code> variáveis locais comecem zeradas (é a semântica que Jack promete: toda <code>var</code> não explicitamente inicializada vale 0). Isso é um laço simples de "empilhar zero, <code>nLocais</code> vezes":</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>(nome)
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>    @nLocais
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>    D=A
-<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>    @R13
-<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>    M=D                    // R13 = contador
-<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>(nome$LOOP_INIT)
-<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>    @R13
-<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>    D=M
-<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>    @nome$END_INIT
-<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a>    D;JEQ                   // contador == 0 → fim
-<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a>    @0
-<a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a>    D=A
-<a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a>    @SP
-<a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a>    A=M
-<a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a>    M=D                     // push 0
-<a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a>    @SP
-<a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a>    M=M+1
-<a id="__codelineno-6-18" name="__codelineno-6-18" href="#__codelineno-6-18"></a>    @R13
-<a id="__codelineno-6-19" name="__codelineno-6-19" href="#__codelineno-6-19"></a>    M=M-1
-<a id="__codelineno-6-20" name="__codelineno-6-20" href="#__codelineno-6-20"></a>    @nome$LOOP_INIT
-<a id="__codelineno-6-21" name="__codelineno-6-21" href="#__codelineno-6-21"></a>    0;JMP
-<a id="__codelineno-6-22" name="__codelineno-6-22" href="#__codelineno-6-22"></a>(nome$END_INIT)
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>(nome)
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>    @nLocais
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>    D=A
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>    @R13
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>    M=D                    // R13 = contador
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>(nome$LOOP_INIT)
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>    @R13
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>    D=M
+<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>    @nome$END_INIT
+<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a>    D;JEQ                   // contador == 0 → fim
+<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a>    @0
+<a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a>    D=A
+<a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a>    @SP
+<a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a>    A=M
+<a id="__codelineno-7-15" name="__codelineno-7-15" href="#__codelineno-7-15"></a>    M=D                     // push 0
+<a id="__codelineno-7-16" name="__codelineno-7-16" href="#__codelineno-7-16"></a>    @SP
+<a id="__codelineno-7-17" name="__codelineno-7-17" href="#__codelineno-7-17"></a>    M=M+1
+<a id="__codelineno-7-18" name="__codelineno-7-18" href="#__codelineno-7-18"></a>    @R13
+<a id="__codelineno-7-19" name="__codelineno-7-19" href="#__codelineno-7-19"></a>    M=M-1
+<a id="__codelineno-7-20" name="__codelineno-7-20" href="#__codelineno-7-20"></a>    @nome$LOOP_INIT
+<a id="__codelineno-7-21" name="__codelineno-7-21" href="#__codelineno-7-21"></a>    0;JMP
+<a id="__codelineno-7-22" name="__codelineno-7-22" href="#__codelineno-7-22"></a>(nome$END_INIT)
 </code></pre></div>
 <h2 id="return-desmontando-o-frame-em-ordem-reversa"><code>return</code>: desmontando o frame em ordem reversa<a class="headerlink" href="#return-desmontando-o-frame-em-ordem-reversa" title="Permanent link">&para;</a></h2>
 <p><code>return</code> é a operação inversa de <code>call</code>: extrair o valor de retorno, restaurar <code>SP</code>/<code>LCL</code>/<code>ARG</code>/<code>THIS</code>/<code>THAT</code> do chamador, e saltar de volta. A ordem importa — os registradores foram salvos numa sequência (<code>RetAddr</code>, <code>LCL</code>, <code>ARG</code>, <code>THIS</code>, <code>THAT</code>), e por isso precisam ser restaurados na ordem <strong>reversa</strong> (<code>THAT</code>, <code>THIS</code>, <code>ARG</code>, <code>LCL</code>), para que o deslocamento a partir do topo do frame (<code>endFrame</code>) continue válido a cada passo.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>// 1. Guardar o topo do frame atual (LCL será sobrescrito em breve)
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>@LCL
-<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>D=M
-<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>@R14
-<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>M=D              // R14 = endFrame
-<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>
-<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>// 2. Extrair o endereço de retorno: RAM[endFrame - 5]
-<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>@5
-<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>D=A
-<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a>@R14
-<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a>A=M-D
-<a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a>D=M
-<a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a>@R15
-<a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a>M=D              // R15 = retAddr
-<a id="__codelineno-7-15" name="__codelineno-7-15" href="#__codelineno-7-15"></a>
-<a id="__codelineno-7-16" name="__codelineno-7-16" href="#__codelineno-7-16"></a>// 3. Colocar o valor de retorno onde o chamador vai procurá-lo: *ARG
-<a id="__codelineno-7-17" name="__codelineno-7-17" href="#__codelineno-7-17"></a>@SP
-<a id="__codelineno-7-18" name="__codelineno-7-18" href="#__codelineno-7-18"></a>AM=M-1
-<a id="__codelineno-7-19" name="__codelineno-7-19" href="#__codelineno-7-19"></a>D=M
-<a id="__codelineno-7-20" name="__codelineno-7-20" href="#__codelineno-7-20"></a>@ARG
-<a id="__codelineno-7-21" name="__codelineno-7-21" href="#__codelineno-7-21"></a>A=M
-<a id="__codelineno-7-22" name="__codelineno-7-22" href="#__codelineno-7-22"></a>M=D              // *ARG = resultado
-<a id="__codelineno-7-23" name="__codelineno-7-23" href="#__codelineno-7-23"></a>
-<a id="__codelineno-7-24" name="__codelineno-7-24" href="#__codelineno-7-24"></a>// 4. Restaurar SP: logo após o valor de retorno
-<a id="__codelineno-7-25" name="__codelineno-7-25" href="#__codelineno-7-25"></a>@ARG
-<a id="__codelineno-7-26" name="__codelineno-7-26" href="#__codelineno-7-26"></a>D=M+1
-<a id="__codelineno-7-27" name="__codelineno-7-27" href="#__codelineno-7-27"></a>@SP
-<a id="__codelineno-7-28" name="__codelineno-7-28" href="#__codelineno-7-28"></a>M=D
-<a id="__codelineno-7-29" name="__codelineno-7-29" href="#__codelineno-7-29"></a>
-<a id="__codelineno-7-30" name="__codelineno-7-30" href="#__codelineno-7-30"></a>// 5. Restaurar THAT, THIS, ARG, LCL — nessa ordem, todos relativos a R14 (endFrame)
-<a id="__codelineno-7-31" name="__codelineno-7-31" href="#__codelineno-7-31"></a>@1
-<a id="__codelineno-7-32" name="__codelineno-7-32" href="#__codelineno-7-32"></a>D=A
-<a id="__codelineno-7-33" name="__codelineno-7-33" href="#__codelineno-7-33"></a>@R14
-<a id="__codelineno-7-34" name="__codelineno-7-34" href="#__codelineno-7-34"></a>A=M-D
-<a id="__codelineno-7-35" name="__codelineno-7-35" href="#__codelineno-7-35"></a>D=M
-<a id="__codelineno-7-36" name="__codelineno-7-36" href="#__codelineno-7-36"></a>@THAT
-<a id="__codelineno-7-37" name="__codelineno-7-37" href="#__codelineno-7-37"></a>M=D
-<a id="__codelineno-7-38" name="__codelineno-7-38" href="#__codelineno-7-38"></a>// (o mesmo padrão, com deslocamentos 2, 3, 4, para THIS, ARG, LCL)
-<a id="__codelineno-7-39" name="__codelineno-7-39" href="#__codelineno-7-39"></a>
-<a id="__codelineno-7-40" name="__codelineno-7-40" href="#__codelineno-7-40"></a>// 6. Saltar de volta
-<a id="__codelineno-7-41" name="__codelineno-7-41" href="#__codelineno-7-41"></a>@R15
-<a id="__codelineno-7-42" name="__codelineno-7-42" href="#__codelineno-7-42"></a>A=M
-<a id="__codelineno-7-43" name="__codelineno-7-43" href="#__codelineno-7-43"></a>0;JMP
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>// 1. Guardar o topo do frame atual (LCL será sobrescrito em breve)
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>@LCL
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>D=M
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>@R14
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>M=D              // R14 = endFrame
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>// 2. Extrair o endereço de retorno: RAM[endFrame - 5]
+<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>@5
+<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>D=A
+<a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a>@R14
+<a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a>A=M-D
+<a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a>D=M
+<a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a>@R15
+<a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a>M=D              // R15 = retAddr
+<a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a>
+<a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a>// 3. Colocar o valor de retorno onde o chamador vai procurá-lo: *ARG
+<a id="__codelineno-8-17" name="__codelineno-8-17" href="#__codelineno-8-17"></a>@SP
+<a id="__codelineno-8-18" name="__codelineno-8-18" href="#__codelineno-8-18"></a>AM=M-1
+<a id="__codelineno-8-19" name="__codelineno-8-19" href="#__codelineno-8-19"></a>D=M
+<a id="__codelineno-8-20" name="__codelineno-8-20" href="#__codelineno-8-20"></a>@ARG
+<a id="__codelineno-8-21" name="__codelineno-8-21" href="#__codelineno-8-21"></a>A=M
+<a id="__codelineno-8-22" name="__codelineno-8-22" href="#__codelineno-8-22"></a>M=D              // *ARG = resultado
+<a id="__codelineno-8-23" name="__codelineno-8-23" href="#__codelineno-8-23"></a>
+<a id="__codelineno-8-24" name="__codelineno-8-24" href="#__codelineno-8-24"></a>// 4. Restaurar SP: logo após o valor de retorno
+<a id="__codelineno-8-25" name="__codelineno-8-25" href="#__codelineno-8-25"></a>@ARG
+<a id="__codelineno-8-26" name="__codelineno-8-26" href="#__codelineno-8-26"></a>D=M+1
+<a id="__codelineno-8-27" name="__codelineno-8-27" href="#__codelineno-8-27"></a>@SP
+<a id="__codelineno-8-28" name="__codelineno-8-28" href="#__codelineno-8-28"></a>M=D
+<a id="__codelineno-8-29" name="__codelineno-8-29" href="#__codelineno-8-29"></a>
+<a id="__codelineno-8-30" name="__codelineno-8-30" href="#__codelineno-8-30"></a>// 5. Restaurar THAT, THIS, ARG, LCL — nessa ordem, todos relativos a R14 (endFrame)
+<a id="__codelineno-8-31" name="__codelineno-8-31" href="#__codelineno-8-31"></a>@1
+<a id="__codelineno-8-32" name="__codelineno-8-32" href="#__codelineno-8-32"></a>D=A
+<a id="__codelineno-8-33" name="__codelineno-8-33" href="#__codelineno-8-33"></a>@R14
+<a id="__codelineno-8-34" name="__codelineno-8-34" href="#__codelineno-8-34"></a>A=M-D
+<a id="__codelineno-8-35" name="__codelineno-8-35" href="#__codelineno-8-35"></a>D=M
+<a id="__codelineno-8-36" name="__codelineno-8-36" href="#__codelineno-8-36"></a>@THAT
+<a id="__codelineno-8-37" name="__codelineno-8-37" href="#__codelineno-8-37"></a>M=D
+<a id="__codelineno-8-38" name="__codelineno-8-38" href="#__codelineno-8-38"></a>// (o mesmo padrão, com deslocamentos 2, 3, 4, para THIS, ARG, LCL)
+<a id="__codelineno-8-39" name="__codelineno-8-39" href="#__codelineno-8-39"></a>
+<a id="__codelineno-8-40" name="__codelineno-8-40" href="#__codelineno-8-40"></a>// 6. Saltar de volta
+<a id="__codelineno-8-41" name="__codelineno-8-41" href="#__codelineno-8-41"></a>@R15
+<a id="__codelineno-8-42" name="__codelineno-8-42" href="#__codelineno-8-42"></a>A=M
+<a id="__codelineno-8-43" name="__codelineno-8-43" href="#__codelineno-8-43"></a>0;JMP
 </code></pre></div>
 <p>Por que guardar <code>endFrame</code> e <code>retAddr</code> antes de qualquer outra coisa? São dois motivos diferentes:</p>
 <ul>
@@ -1697,32 +1706,32 @@
 </ul>
 <h2 id="recursao-o-teste-definitivo">Recursão: o teste definitivo<a class="headerlink" href="#recursao-o-teste-definitivo" title="Permanent link">&para;</a></h2>
 <p>O protocolo acima, aplicado sem alteração a cada chamada — inclusive quando a função chama a si mesma —, é o que sustenta a recursão:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>function Main.fibonacci 0
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>    push argument 0
-<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>    push constant 2
-<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>    lt
-<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>    if-goto BASE
-<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>    push argument 0
-<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>    push constant 1
-<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>    sub
-<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>    call Main.fibonacci 1
-<a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a>    push argument 0
-<a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a>    push constant 2
-<a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a>    sub
-<a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a>    call Main.fibonacci 1
-<a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a>    add
-<a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a>    return
-<a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a>label BASE
-<a id="__codelineno-8-17" name="__codelineno-8-17" href="#__codelineno-8-17"></a>    push argument 0
-<a id="__codelineno-8-18" name="__codelineno-8-18" href="#__codelineno-8-18"></a>    return
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>function Main.fibonacci 0
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>    push argument 0
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>    push constant 2
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>    lt
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>    if-goto BASE
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>    push argument 0
+<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a>    push constant 1
+<a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a>    sub
+<a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a>    call Main.fibonacci 1
+<a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a>    push argument 0
+<a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a>    push constant 2
+<a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a>    sub
+<a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a>    call Main.fibonacci 1
+<a id="__codelineno-9-14" name="__codelineno-9-14" href="#__codelineno-9-14"></a>    add
+<a id="__codelineno-9-15" name="__codelineno-9-15" href="#__codelineno-9-15"></a>    return
+<a id="__codelineno-9-16" name="__codelineno-9-16" href="#__codelineno-9-16"></a>label BASE
+<a id="__codelineno-9-17" name="__codelineno-9-17" href="#__codelineno-9-17"></a>    push argument 0
+<a id="__codelineno-9-18" name="__codelineno-9-18" href="#__codelineno-9-18"></a>    return
 </code></pre></div>
 <p>Cada chamada recursiva empilha um novo frame completo — <code>fib(3)</code> chamando <code>fib(2)</code> chamando <code>fib(1)</code> — sem que nenhuma delas jamais veja ou corrompa o frame das demais. A pilha cresce a cada <code>call</code> e encolhe a cada <code>return</code>; é essa disciplina de empilhamento estrito que garante a correção, sem qualquer análise especial para o caso recursivo.</p>
 <h2 id="bootstrap-dando-a-partida">Bootstrap: dando a partida<a class="headerlink" href="#bootstrap-dando-a-partida" title="Permanent link">&para;</a></h2>
 <p>Antes de qualquer código VM rodar, a máquina precisa ser inicializada: <code>SP</code> apontando para o início da pilha (RAM 256), e uma chamada inicial a <code>Sys.init</code> (a função que, por convenção, chama <code>Main.main</code>):</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>@256
-<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>D=A
-<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>@SP
-<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>M=D
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>@256
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>D=A
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>@SP
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>M=D
 </code></pre></div>
 <p>seguido de um <code>call Sys.init 0</code> — usando exatamente o mesmo mecanismo de <code>call</code> descrito acima. Esse código de bootstrap é emitido uma única vez, no início do arquivo <code>.asm</code> final, antes da tradução de qualquer arquivo <code>.vm</code>.</p>
 <h2 id="traduzindo-um-programa-inteiro">Traduzindo um programa inteiro<a class="headerlink" href="#traduzindo-um-programa-inteiro" title="Permanent link">&para;</a></h2>
@@ -1805,7 +1814,7 @@
 <td>Salvar registradores</td>
 <td>parcialmente ambos</td>
 <td>parcialmente ambos</td>
-<td>callee salva; caller nada faz</td>
+<td>caller salva todos (no código do <code>call</code>); callee restaura (no <code>return</code>)</td>
 </tr>
 <tr>
 <td>Valor de retorno</td>
@@ -1817,7 +1826,7 @@
 <td>Overhead por chamada</td>
 <td>variável (poucos registradores movidos)</td>
 <td>variável</td>
-<td>fixo (~34 + ~38 instruções)</td>
+<td>fixo (49 no <code>call</code> + 52 no <code>return</code>, na versão mostrada)</td>
 </tr>
 </tbody>
 </table>

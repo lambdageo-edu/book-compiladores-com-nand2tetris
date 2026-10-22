@@ -1622,7 +1622,7 @@
 </tr>
 <tr>
 <td>Sobrecarga</td>
-<td>Não existe (um construtor por classe, nomes de subroutine únicos)</td>
+<td>Não existe (nomes de subroutine únicos dentro da classe, inclusive construtores)</td>
 <td>Simplifica resolução de chamadas</td>
 </tr>
 </tbody>
@@ -1794,11 +1794,25 @@
 <a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a><span class="w">    </span><span class="p">}</span>
 <a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a><span class="p">}</span>
 </code></pre></div>
-<p>Cada classe tem <strong>no máximo um construtor</strong> (sem sobrecarga). A chamada usa a convenção <code>NomeDaClasse.new(...)</code>:</p>
+<p>Um construtor pode ter qualquer nome — por convenção, <code>new</code> —, e uma classe pode ter mais de um, desde que com nomes diferentes (não há sobrecarga). O tipo de retorno de um construtor é sempre a própria classe. A chamada usa o nome completo, <code>NomeDaClasse.new(...)</code>:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kd">var</span><span class="w"> </span><span class="n">Point</span><span class="w"> </span><span class="n">pt</span><span class="p">;</span>
 <a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="n">let</span><span class="w"> </span><span class="n">pt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Point</span><span class="p">.</span><span class="na">new</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="mi">20</span><span class="p">);</span>
 </code></pre></div>
 <p>Métodos são chamados sobre uma instância (<code>objeto.metodo(...)</code>); funções, sobre a classe (<code>Classe.funcao(...)</code>). Essa distinção sintática — que não existe em Java, onde tudo é <code>objeto.metodo</code> ou <code>Classe.metodoEstatico</code> mas o compilador resolve por assinatura — é explícita em Jack através da palavra-chave de declaração, o que facilita bastante a análise semântica no capítulo 8.</p>
+<p>Dentro da própria classe vale uma regra a mais: um <strong>método</strong> pode ser chamado sem qualificador — <code>metodo(...)</code> significa "chame <code>metodo</code> sobre o objeto corrente", o equivalente a <code>this.metodo(...)</code> em Java. <strong>Funções e construtores</strong>, ao contrário, são sempre chamados pelo nome completo, mesmo de dentro da classe:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="kd">class</span> <span class="nc">Point</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">    </span><span class="c1">// ...</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">    </span><span class="n">method</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">moveTo</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">nx</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">ny</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="w">        </span><span class="k">do</span><span class="w"> </span><span class="n">erase</span><span class="p">();</span><span class="w">                                  </span><span class="c1">// método de Point, sobre este objeto</span>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="w">        </span><span class="n">let</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nx</span><span class="p">;</span>
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="w">        </span><span class="n">let</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ny</span><span class="p">;</span>
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="w">        </span><span class="k">do</span><span class="w"> </span><span class="n">draw</span><span class="p">();</span><span class="w">                                   </span><span class="c1">// idem</span>
+<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="w">        </span><span class="k">do</span><span class="w"> </span><span class="n">Output</span><span class="p">.</span><span class="na">printInt</span><span class="p">(</span><span class="n">Point</span><span class="p">.</span><span class="na">getPointCount</span><span class="p">());</span><span class="w">   </span><span class="c1">// função: sempre com o nome da classe</span>
+<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a><span class="w">        </span><span class="k">return</span><span class="p">;</span>
+<a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a><span class="p">}</span>
+</code></pre></div>
+<p>O compilador do capítulo 10 depende dessa regra: uma chamada sem qualificador é sempre tratada como chamada de método sobre <code>this</code>.</p>
 <h2 id="biblioteca-padrao-jack-os">Biblioteca padrão (Jack OS)<a class="headerlink" href="#biblioteca-padrao-jack-os" title="Permanent link">&para;</a></h2>
 <p>Jack não tem tipos ou operações embutidas além dos três primitivos — tudo o mais (strings, arrays, matemática, entrada/saída, gráficos, gerência de memória) é fornecido por oito classes de uma biblioteca padrão, o "sistema operacional Jack":</p>
 <table>
