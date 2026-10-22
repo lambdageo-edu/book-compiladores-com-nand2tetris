@@ -12,11 +12,11 @@ O projeto disponibiliza um pacote de ferramentas gratuito — os emuladores e os
    nand2tetris/
      tools/              — os emuladores (scripts .sh / .bat)
      projects/
-       06/                — Assembler: programas .asm de teste + .hack esperados
-       07/  08/            — VM Translator: programas .vm de teste + .asm de referência
+       06/                — Assembler: programas .asm de teste (o .hack esperado é gerado pelo Assembler de tools/)
+       07/  08/            — VM Translator: programas .vm de teste + scripts .tst e saídas esperadas .cmp
        09/                — exemplos de programas Jack
        10/                — Analisador léxico/sintático: .jack + .xml de referência
-       11/                — Compilador completo: .jack + .vm de referência
+       11/                — Compilador completo: programas .jack de teste (sem .vm esperado; compare com o JackCompiler de tools/)
    ```
 3. As ferramentas relevantes, em `tools/`:
    - **CPU Emulator** (`CPUEmulator.sh`/`.bat`): executa arquivos `.hack` (ou `.asm` diretamente) e permite inspecionar registradores e RAM — use para validar o Assembler (capítulo 15).

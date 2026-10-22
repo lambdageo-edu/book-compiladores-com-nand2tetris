@@ -1,6 +1,6 @@
 # 5. Analisador sintático
 
-Com o `JackTokenizer` completo, chegamos à etapa central do front-end: o analisador sintático, ou `CompilationEngine`. Ele consome a sequência de tokens do capítulo anterior e reconhece a estrutura da gramática de Jack (capítulo 3) — por enquanto, apenas *reconhecendo*, sem gerar nenhum código ainda (isso fica para os capítulos 9 e 10, na Unidade 2). A saída deste capítulo é uma árvore sintática em XML, que — assim como fizemos com os tokens — vamos validar por comparação byte a byte com arquivos de referência do próprio Nand2Tetris.
+Com o `JackTokenizer` completo, chegamos à etapa central do front-end: o analisador sintático, ou `CompilationEngine`. Ele consome a sequência de tokens do capítulo anterior e reconhece a estrutura da gramática de Jack (capítulo 3) — por enquanto, apenas *reconhecendo*, sem gerar nenhum código ainda (isso fica para os capítulos 9 e 10, na Parte 2). A saída deste capítulo é uma árvore sintática em XML, que — assim como fizemos com os tokens — vamos validar por comparação byte a byte com arquivos de referência do próprio Nand2Tetris.
 
 ## Bottom-up ou top-down?
 
@@ -17,7 +17,7 @@ Não precisamos reescrever a gramática para lidar com isso. Basta aplicar, no c
 
 ## Tratamento de erros sintáticos
 
-Diferente de erros léxicos (tipicamente erros de digitação — um símbolo que não existe na linguagem), erros sintáticos dizem respeito à *estrutura*: um `;` esquecido, um `let` sem `=`. Nossa estratégia de tratamento é deliberadamente simples: no primeiro erro encontrado, o parser para e emite uma mensagem no formato `Linha N: Esperado 'X' encontrado 'Y'`. Não faremos recuperação de erros nem tentaremos continuar a análise após o primeiro problema — isso é suficiente para os objetivos didáticos deste curso. (Também não implementaremos análise semântica neste analisador: erros de tipo, por exemplo, não serão detectados aqui — ficam para o capítulo 8.)
+Diferente de erros léxicos (tipicamente erros de digitação — um símbolo que não existe na linguagem), erros sintáticos dizem respeito à *estrutura*: um `;` esquecido, um `let` sem `=`. Nossa estratégia de tratamento é deliberadamente simples: no primeiro erro encontrado, o parser para e emite uma mensagem no formato `Linha N: Esperado 'X' encontrado 'Y'`. Não faremos recuperação de erros nem tentaremos continuar a análise após o primeiro problema — isso é suficiente para os objetivos didáticos deste curso. (Também não implementaremos análise semântica neste analisador. A análise semântica deste livro se resume à tabela de símbolos do capítulo 8, que descobre o que cada identificador é, mas não verifica tipos: somar um `int` com um `boolean` não é detectado em nenhum ponto do compilador.)
 
 ## Estrutura básica: um token de antecipação
 
@@ -72,11 +72,33 @@ private void expectPeek(TokenType... types) {
 }
 ```
 
-`expectPeek` é o equivalente, neste parser, do `match()` do capítulo 2 — mas com uma diferença de nome que reflete a diferença de estrutura: como mantemos `peekToken`, "casar" com um símbolo terminal significa verificar que o **próximo** token é do tipo esperado, avançar, e (novidade) registrar esse token na saída XML. Um método auxiliar `printNonTerminal(nome)` grava as tags de abertura/fechamento de cada não-terminal (`<term>`, `</term>`, etc.) — é o que torna a árvore sintática visível na saída.
+`expectPeek` é o equivalente, neste parser, do `match()` do capítulo 2 — mas com uma diferença de nome que reflete a diferença de estrutura: como mantemos `peekToken`, "casar" com um símbolo terminal significa verificar que o **próximo** token é do tipo esperado, avançar, e (novidade) registrar esse token na saída XML. Um método auxiliar `printNonTerminal(nome)` grava as tags de abertura/fechamento de cada não-terminal (`<term>`, `</term>`, etc.) — é o que torna a árvore sintática visível na saída. Completam o esqueleto o tratamento de erro, o ponto de entrada e o acesso à saída:
+
+```java
+private ParseError error(Token token, String message) {
+    String encontrado = token.type == TokenType.EOF ? "fim do arquivo" : token.lexeme;
+    System.err.println("Linha " + token.line + ": " + message + " encontrado '" + encontrado + "'");
+    return new ParseError();
+}
+
+private void printNonTerminal(String nterminal) {
+    xmlOutput.append("<").append(nterminal).append(">\r\n");   // "/term" gera </term>
+}
+
+public void parse() {
+    parseClass();       // o símbolo inicial da gramática
+}
+
+public String XMLOutput() {
+    return xmlOutput.toString();
+}
+```
+
+`error` usa o número de linha que o tokenizador do capítulo 4 guarda em cada `Token`, produzindo mensagens como `Linha 12: Esperado SEMICOLON encontrado 'let'`. Ela *devolve* a exceção em vez de lançá-la, para que quem chama escreva `throw error(...)` — assim o compilador Java sabe que aquele ponto do código não continua.
 
 ## Term — começando pelo caso simples
 
-A gramática de `term` (capítulo 3, [Apêndice A](../apendices/a-gramatica-jack.md)) tem sete alternativas. Vamos começar por apenas quatro, as mais diretas:
+A gramática de `term` (capítulo 3, [Apêndice A](../apendices/a-gramatica-jack.md)) tem oito alternativas. Vamos começar por apenas quatro, as mais diretas:
 
 ```
 term -> integerConstant | stringConstant | keywordConstant | varName
@@ -223,14 +245,79 @@ Testando com `"do hello();"`:
 </doStatement>
 ```
 
+## O identificador vem primeiro
+
+A versão inicial de `parseSubroutineCall` consome o identificador por conta própria. Isso funciona no `do`, mas não dentro de `term`. Lá, ao ver um `identifier`, o parser ainda não sabe se está diante de uma variável (`x`), de um acesso a array (`a[i]`) ou de uma chamada (`f()`, `Classe.f()`, `obj.f()`) — e só descobre olhando o token **seguinte** ao identificador. É o trecho LL(2) da gramática, discutido no início do capítulo.
+
+A solução é a fatoração à esquerda: `parseTerm` consome o identificador comum a todas as alternativas e só então decide, olhando o `peekToken`. Para isso, `parseSubroutineCall` passa a supor que o identificador inicial **já foi consumido** (é o `currentToken`):
+
+```java
+// pré-condição: o identificador inicial já é o currentToken
+void parseSubroutineCall() {
+    if (peekTokenIs(TokenType.LPAREN)) {           // subroutineName '(' expressionList ')'
+        expectPeek(TokenType.LPAREN);
+        parseExpressionList();
+        expectPeek(TokenType.RPAREN);
+    } else {                                       // (className | varName) '.' subroutineName '(' ... ')'
+        expectPeek(TokenType.DOT);
+        expectPeek(TokenType.IDENT);
+        expectPeek(TokenType.LPAREN);
+        parseExpressionList();
+        expectPeek(TokenType.RPAREN);
+    }
+}
+```
+
+O caso `IDENT` de `parseTerm` fica:
+
+```java
+case IDENT:
+    expectPeek(TokenType.IDENT);                  // consome o identificador comum
+    if (peekTokenIs(TokenType.LPAREN) || peekTokenIs(TokenType.DOT)) {
+        parseSubroutineCall();                    // chamada
+    } else if (peekTokenIs(TokenType.LBRACKET)) {
+        expectPeek(TokenType.LBRACKET);           // acesso a array
+        parseExpression();
+        expectPeek(TokenType.RBRACKET);
+    }
+    // nenhum dos dois: varName simples, nada mais a consumir
+    break;
+```
+
+e `parseDo` passa a consumir o identificador antes de chamar `parseSubroutineCall`:
+
+```java
+void parseDo() {
+    printNonTerminal("doStatement");
+    expectPeek(TokenType.DO);
+    expectPeek(TokenType.IDENT);
+    parseSubroutineCall();
+    expectPeek(TokenType.SEMICOLON);
+    printNonTerminal("/doStatement");
+}
+```
+
+A saída XML de `"do hello();"` não muda. É essa forma — identificador consumido antes de `parseSubroutineCall` — que os capítulos 9 e 10 vão estender com a geração de código.
+
+## Quais não-terminais viram tags
+
+Para que a saída bata com os arquivos de referência, nem todo não-terminal da gramática gera um par de tags. A especificação do Nand2Tetris define exatamente quais geram:
+
+| Geram `<tag>` ... `</tag>` | Não geram tag |
+|---|---|
+| `class`, `classVarDec`, `subroutineDec`, `parameterList`, `subroutineBody`, `varDec` | `type`, `className`, `subroutineName`, `varName` — aparecem direto como `<keyword>` ou `<identifier>` |
+| `statements`, `letStatement`, `ifStatement`, `whileStatement`, `doStatement`, `returnStatement` | `statement` — `parseStatements` chama `parseLet`, `parseIf` etc. diretamente; não existe `parseStatement` |
+| `expression`, `term`, `expressionList` | `subroutineCall` — seus tokens aparecem dentro de `<doStatement>` ou de `<term>`, por isso `parseSubroutineCall` não chama `printNonTerminal` |
+
+Dois detalhes costumam quebrar a comparação: `<parameterList>` e `<expressionList>` aparecem **mesmo quando a lista está vazia** (um par de tags sem nada dentro), e `parseStatements` emite `<statements>` mesmo para um bloco `{ }` vazio.
+
 ## Fechando o restante da gramática
 
 A partir daqui, o padrão está estabelecido — cada não-terminal restante segue exatamente a mesma receita (um método, um `expectPeek` por terminal, uma chamada recursiva por não-terminal, um `if`/`while` por `?`/`*` da gramática). Fica como exercício guiado completar:
 
-- `parseSubroutineCall` — adicionar a forma qualificada (`Classe.metodo(...)` / `objeto.metodo(...)`), usando o *lookahead* do `.` versus `(`.
-- `parseTerm` — completar os três casos que faltam: acesso a array (`varName '[' expression ']'`), chamada de subroutine dentro de uma expressão, expressão entre parênteses, e operador unário (`unaryOp term`) — todos decididos da mesma forma: consumir o `identifier` e olhar o token seguinte (`[`, `(`, `.`) para desambiguar frente a um simples `varName`.
+- `parseTerm` — os dois casos que faltam: expressão entre parênteses (`'(' expression ')'`) e operador unário (`unaryOp term`). Ambos se decidem pelo primeiro token (`(`, ou `-`/`~`), sem antecipação extra.
 - `parseExpressionList`, `parseIf`, `parseWhile`, `parseReturn`, `parseStatements` — cada um uma tradução direta de sua produção na tabela do capítulo 3.
-- `parseClassVarDec`, `parseSubroutineDec`, `parseParameterList`, `parseVarDec`, `parseClass` — a "casca" da classe, fechando o topo da gramática.
+- `parseClassVarDec`, `parseSubroutineDec`, `parseParameterList`, `parseVarDec`, `parseSubroutineBody`, `parseClass` — a "casca" da classe, fechando o topo da gramática.
 
 A API completa esperada do `CompilationEngine` (ou `Parser`) é:
 
@@ -238,12 +325,14 @@ A API completa esperada do `CompilationEngine` (ou `Parser`) é:
 |---|---|
 | `parseClass` | Uma classe completa |
 | `parseClassVarDec` | Uma declaração `static` ou `field` |
-| `parseSubroutine` | Um método, função ou construtor completo |
+| `parseSubroutineDec` | Um método, função ou construtor completo |
+| `parseSubroutineBody` | O corpo de uma subroutine: declarações `var` e comandos, com as chaves |
 | `parseParameterList` | Uma lista de parâmetros (possivelmente vazia), sem os parênteses |
 | `parseVarDec` | Uma declaração `var` |
 | `parseStatements` | Uma sequência de comandos, sem as chaves |
 | `parseDo` / `parseLet` / `parseIf` / `parseWhile` / `parseReturn` | Cada tipo de comando |
 | `parseExpression` / `parseTerm` / `parseExpressionList` | Expressões e suas partes |
+| `parseSubroutineCall` | Uma chamada de subroutine (auxiliar, sem tag própria; supõe o identificador já consumido) |
 
 ## Validando contra a árvore sintática de referência
 
@@ -269,4 +358,4 @@ O pacote de testes do Nand2Tetris inclui uma variante interessante para progress
 
 ## O que vem a seguir
 
-Com um parser completo (mesmo que ainda apenas reconhecendo a estrutura, sem gerar código), fechamos o front-end da Unidade 1. Antes de gerar código de verdade, porém, a Unidade 2 precisa definir *para onde* traduzir: o capítulo 6 discute representações intermediárias e o capítulo 7 especifica a VM Hack, nosso alvo. Só então faz sentido a última peça — a tabela de símbolos (capítulo 8), que diz **onde** cada identificador vive (é uma variável local? um campo do objeto? um parâmetro?) e **que tipo** ele tem — e que finalmente nos permite evoluir este reconhecedor em um compilador que produz código VM de verdade.
+Com um parser completo (mesmo que ainda apenas reconhecendo a estrutura, sem gerar código), fechamos o front-end da Parte 1. Antes de gerar código de verdade, porém, a Parte 2 precisa definir *para onde* traduzir: o capítulo 6 discute representações intermediárias e o capítulo 7 especifica a VM Hack, nosso alvo. Só então faz sentido a última peça — a tabela de símbolos (capítulo 8), que diz **onde** cada identificador vive (é uma variável local? um campo do objeto? um parâmetro?) e **que tipo** ele tem — e que finalmente nos permite evoluir este reconhecedor em um compilador que produz código VM de verdade.

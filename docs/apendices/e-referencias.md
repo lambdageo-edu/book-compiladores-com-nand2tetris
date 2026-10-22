@@ -3,10 +3,10 @@
 ## Livros-texto
 
 - **Aho, A. V.; Lam, M. S.; Sethi, R.; Ullman, J. D.** *Compilers: Principles, Techniques, and Tools* (2ª ed.), Pearson, 2006. O "Dragon Book" — a referência clássica de teoria de compiladores; base para boa parte da terminologia usada neste livro (análise léxica/sintática, representações intermediárias, geração de código).
-- **Cooper, K. D.; Torczon, L.** *Engineering a Compiler* (2ª ed.), Morgan Kaufmann, 2011. Fonte da caracterização de compiladores como "microcosmo da ciência da computação" (capítulo 0) e de boa parte da discussão sobre representações intermediárias lineares (capítulo 6) e ambiente de execução/*stack frames* (capítulo 12).
-- **Nisan, N.; Schocken, S.** *The Elements of Computing Systems* (2ª ed.), MIT Press, 2021. O livro-base do projeto [Nand2Tetris](https://www.nand2tetris.org/) — especificação canônica da linguagem Jack, da VM Hack e da arquitetura Hack, usadas nas três unidades deste livro.
+- **Cooper, K. D.; Torczon, L.** *Engineering a Compiler* (2ª ed.), Morgan Kaufmann, 2011. Fonte da caracterização de compiladores como "microcosmo da ciência da computação" (capítulo 0) e de boa parte da discussão sobre representações intermediárias lineares (capítulo 6) e ambiente de execução/*stack frames* (capítulo 13).
+- **Nisan, N.; Schocken, S.** *The Elements of Computing Systems* (2ª ed.), MIT Press, 2021. O livro-base do projeto [Nand2Tetris](https://www.nand2tetris.org/) — especificação canônica da linguagem Jack, da VM Hack e da arquitetura Hack, usadas nas quatro partes deste livro.
 - **Ricarte, I. L. M.** *Introdução à Compilação*. Referência para a formalização de autômatos finitos, expressões regulares e gramáticas livres de contexto usada no capítulo 1.
-- **Sebesta, R. W.** *Concepts of Programming Languages*. Referência para a discussão de convenções de chamada (cdecl, stdcall) comparadas ao protocolo de função da VM Hack, no capítulo 12.
+- **Sebesta, R. W.** *Concepts of Programming Languages*. Referência para a discussão de convenções de chamada (cdecl, stdcall) comparadas ao protocolo de função da VM Hack, no capítulo 13.
 
 ## Estilo e inspiração pedagógica
 

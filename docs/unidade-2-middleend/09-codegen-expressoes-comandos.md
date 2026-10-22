@@ -1,6 +1,6 @@
 # 9. Geração de código: expressões e comandos
 
-Chegou a hora de evoluir o `CompilationEngine` — que na Unidade 1 apenas *reconhecia* a estrutura de um programa Jack, emitindo uma árvore XML — para efetivamente **gerar código VM**. A boa notícia é que a maior parte do trabalho já está feita: a gramática, o parser recursivo descendente e a tabela de símbolos já existem. Falta "só" substituir `printNonTerminal` por chamadas que emitem comandos VM reais, nos pontos certos — exatamente a técnica de **tradução dirigida por sintaxe** formalizada no capítulo 1.
+Chegou a hora de evoluir o `CompilationEngine` — que na Parte 1 apenas *reconhecia* a estrutura de um programa Jack, emitindo uma árvore XML — para efetivamente **gerar código VM**. A boa notícia é que a maior parte do trabalho já está feita: a gramática, o parser recursivo descendente e a tabela de símbolos já existem. Falta "só" substituir `printNonTerminal` por chamadas que emitem comandos VM reais, nos pontos certos — exatamente a técnica de **tradução dirigida por sintaxe** formalizada no capítulo 1.
 
 ## O VMWriter
 
@@ -141,13 +141,26 @@ isto é, `(a + b) * c`. A figura 11.4 do livro *The Elements of Computing System
 
 `*` e `/` são o único caso especial: como a VM não tem comandos nativos para eles (capítulo 7), viram chamadas a `Math.multiply`/`Math.divide` — o compilador "esconde" essa diferença do programador Jack, que escreve `a * b` sem saber que isso é, por baixo, uma chamada de função.
 
-Operadores **unários** (`-x`, `~x`) seguem o padrão inverso de um binário: compilam o operando primeiro, emitem a operação depois — mas com apenas um operando na pilha:
+Operadores **unários** (`-x`, `~x`) seguem o mesmo princípio pós-fixo de um binário: compilam o operando primeiro e emitem a operação depois — mas com apenas um operando na pilha. Dentro de `parseTerm`, o operador é consumido, guardado, e só emitido depois do termo:
 
 ```java
 case MINUS: case NOT:
-    TokenType unop = currentToken.type; // já consumido via expectPeek antes de chamar parseTerm
-    parseTerm();
+    expectPeek(MINUS, NOT);
+    TokenType unop = currentToken.type;   // guarda o operador
+    parseTerm();                          // compila o operando
     vmWriter.writeArithmetic(unop == MINUS ? Command.NEG : Command.NOT);
+    break;
+```
+
+Repare que o mesmo `-` vira `sub` quando é binário (em `parseExpression`) e `neg` quando é unário (em `parseTerm`): quem decide é a posição na gramática, não o símbolo.
+
+Uma expressão entre parênteses não emite nada de próprio — os parênteses só agrupam. Basta compilar a expressão interna, e o valor dela fica no topo da pilha:
+
+```java
+case LPAREN:
+    expectPeek(LPAREN);
+    parseExpression();
+    expectPeek(RPAREN);
     break;
 ```
 
@@ -170,12 +183,18 @@ Isso implementa diretamente a convenção do capítulo 7: toda subroutine, `void
 
 ## Controle de fluxo: `if` e `while`
 
-Linguagens de alto nível têm estruturas de controle ricas; a VM só tem `goto` e `if-goto` (capítulo 7). Cabe ao compilador fazer esse mapeamento — e o ponto delicado é garantir que os **rótulos sejam únicos** dentro de cada subroutine (dois `if`s na mesma função não podem gerar o mesmo `IF_TRUE0`). A solução é um contador de instância, zerado a cada `parseSubroutineDec`:
+Linguagens de alto nível têm estruturas de controle ricas; a VM só tem `goto` e `if-goto` (capítulo 7). Cabe ao compilador fazer esse mapeamento — e o ponto delicado é garantir que os **rótulos sejam únicos** dentro de cada subroutine (dois `if`s na mesma função não podem gerar o mesmo `IF_TRUE0`). A solução é um contador de instância, zerado a cada `parseSubroutineDec` (a versão completa desse método está no capítulo 10):
 
 ```java
 private int ifLabelNum = 0;
 private int whileLabelNum = 0;
+
+// no início de parseSubroutineDec:
+ifLabelNum = 0;
+whileLabelNum = 0;
 ```
+
+Zerar a cada subroutine é suficiente porque rótulos VM têm escopo de função (capítulo 7): o `IF_TRUE0` de `Main.main` e o de `Main.foo` não colidem.
 
 **`if`/`else`** mapeia para o seguinte esqueleto (o algoritmo aqui é o mesmo usado pelo compilador de referência do Nand2Tetris — não o único possível, mas o que facilita comparar sua saída com a oficial):
 
@@ -253,4 +272,4 @@ void parseWhile() {
 
 ## O que levamos daqui
 
-Neste capítulo, expressões e a maior parte dos comandos de Jack já geram código VM real — sempre seguindo o mesmo princípio: reconhecer a estrutura (o parser da Unidade 1 já faz isso) e, no ponto certo da produção, emitir o comando VM correspondente, sem nunca materializar uma árvore sintática intermediária. O que falta — variáveis (usando a tabela de símbolos do capítulo 8 para resolver `push`/`pop` corretos), subroutines completas (com prólogo de função e alocação de objetos) e arrays — é o assunto do capítulo 10, que fecha o Project 11 por completo.
+Neste capítulo, expressões e a maior parte dos comandos de Jack já geram código VM real — sempre seguindo o mesmo princípio: reconhecer a estrutura (o parser da Parte 1 já faz isso) e, no ponto certo da produção, emitir o comando VM correspondente, sem nunca materializar uma árvore sintática intermediária. O que falta — variáveis (usando a tabela de símbolos do capítulo 8 para resolver `push`/`pop` corretos), subroutines completas (com prólogo de função e alocação de objetos) e arrays — é o assunto do capítulo 10, que fecha o Project 11 por completo.

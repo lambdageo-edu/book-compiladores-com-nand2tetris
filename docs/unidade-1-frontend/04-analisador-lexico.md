@@ -34,7 +34,7 @@ class Scanner {
 }
 ```
 
-Reconhecer inteiros e identificadores já está pronto — a lógica não muda para Jack. O que falta é: o conjunto completo de palavras reservadas, o conjunto completo de símbolos, strings entre aspas, comentários (de linha e de bloco) e contagem de linha (para mensagens de erro úteis).
+Reconhecer inteiros e identificadores já está pronto — a lógica não muda para Jack, exceto por um detalhe: uma `integerConstant` de Jack vai de 0 a 32767 (o maior inteiro positivo de 16 bits; `-5` é o operador unário aplicado a `5`), então `number()` deve rejeitar, com erro léxico, um lexema acima desse valor. O que falta é: o conjunto completo de palavras reservadas, o conjunto completo de símbolos, strings entre aspas, comentários (de linha e de bloco) e contagem de linha (para mensagens de erro úteis).
 
 ## Palavras reservadas completas
 

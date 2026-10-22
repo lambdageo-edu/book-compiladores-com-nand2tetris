@@ -1,6 +1,6 @@
 # 11. Assembly Hack (especificação)
 
-Este capítulo especifica, por completo, a linguagem Assembly Hack — a linguagem simbólica para a qual o VM Translator (capítulos 11-12) traduz, e que o Assembler (capítulo 15) vai finalmente converter em código de máquina binário. É referência de consulta, não um capítulo incremental — mas vale lê-lo por inteiro pelo menos uma vez antes de atacar o Assembler, porque cada peça (registradores, instruções, símbolos) é usada o tempo todo no capítulo seguinte.
+Com o compilador Jack → VM pronto (Parte 2), falta levar o código VM até a máquina. O primeiro passo é conhecer a linguagem de chegada. Este capítulo especifica, por completo, a linguagem Assembly Hack — a linguagem simbólica para a qual o VM Translator (capítulos 12 e 13) traduz, e que o Assembler (capítulo 15) vai finalmente converter em código de máquina binário. É referência de consulta, não um capítulo incremental — mas vale lê-lo por inteiro pelo menos uma vez antes de atacar o VM Translator, porque cada peça (registradores, instruções, símbolos) é usada o tempo todo nos capítulos 12 e 13 — e, depois, no Assembler (capítulo 15).
 
 ## Por que uma linguagem simbólica
 
@@ -102,7 +102,7 @@ Escrever programas inteiros em endereços numéricos seria impraticável — Ass
 ### Símbolos pré-definidos
 
 - **Registradores virtuais** `R0`–`R15`: referem-se diretamente a `RAM[0]`–`RAM[15]`.
-- **Ponteiros de segmento** `SP`, `LCL`, `ARG`, `THIS`, `THAT`: referem-se a `RAM[0]`–`RAM[4]` — os mesmos endereços de `R0`–`R4`, apenas com nomes mnemônicos para o papel que cumprem na VM (capítulos 7, 11 e 12).
+- **Ponteiros de segmento** `SP`, `LCL`, `ARG`, `THIS`, `THAT`: referem-se a `RAM[0]`–`RAM[4]` — os mesmos endereços de `R0`–`R4`, apenas com nomes mnemônicos para o papel que cumprem na VM (capítulos 7, 12 e 13).
 - **Mapas de E/S** `SCREEN` (RAM 16384) e `KBD` (RAM 24576): endereço-base do mapa de memória da tela e o registrador de teclado, respectivamente.
 
 ### Rótulos
@@ -240,6 +240,6 @@ M=1     // 0000000000000001 — acende o pixel mais à esquerda da primeira linh
 
 ## O que vem a seguir
 
-Com a especificação completa da linguagem em mãos, o capítulo 15 constrói o Assembler: o programa que lê um arquivo `.asm` como este e produz o binário `.hack` correspondente — resolvendo, no processo, exatamente os símbolos que acabamos de especificar.
+Com a especificação completa da linguagem em mãos, os capítulos 12 e 13 constroem o VM Translator, que gera programas `.asm` como estes a partir do código VM. Depois, o capítulo 15 constrói o Assembler: o programa que lê um arquivo `.asm` e produz o binário `.hack` correspondente — resolvendo, no processo, exatamente os símbolos que acabamos de especificar.
 
 As tabelas de codificação (`comp`/`dest`/`jump`) e os símbolos pré-definidos estão consolidados, para consulta rápida, no [Apêndice C](../apendices/c-especificacao-assembly-hack.md).

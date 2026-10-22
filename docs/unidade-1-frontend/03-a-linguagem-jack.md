@@ -77,7 +77,7 @@ class Point {
 }
 ```
 
-`field` (variável de instância) é sempre privado — o acesso de fora da classe exige métodos getter/setter explícitos. `static` (variável de classe) é acessada via `NomeDaClasse.variavel` e é compartilhada por todas as instâncias.
+`field` (variável de instância) é sempre privado — o acesso de fora da classe exige métodos getter/setter explícitos — e só é visível nos métodos e no construtor, nunca nas `function`s, que não operam sobre um objeto. `static` (variável de classe) é única e compartilhada por todas as instâncias. Assim como `field`, só é visível dentro da classe — mas, ao contrário de `field`, pode ser usada também nas `function`s. Para expô-la a outras classes, é preciso uma subroutine de acesso, como uma `function int getPointCount()` chamada com `Point.getPointCount()`: a gramática de Jack não tem uma forma `Classe.variavel`.
 
 ### Escopo de subroutine: parâmetros e `var`
 
@@ -219,7 +219,7 @@ O front-end de Jack (léxico + sintático, capítulos 4 e 5) trabalha sobre uma 
 |---|---|
 | `keyword` | `class`, `constructor`, `function`, `method`, `field`, `static`, `var`, `int`, `char`, `boolean`, `void`, `true`, `false`, `null`, `this`, `let`, `do`, `if`, `else`, `while`, `return` |
 | `symbol` | `{ } ( ) [ ] . , ; + - * / & | < > = ~` |
-| `integerConstant` | Um número decimal |
+| `integerConstant` | Um número decimal entre 0 e 32767 (o `-` de um número negativo é o operador unário) |
 | `stringConstant` | Sequência de caracteres Unicode, sem aspas duplas nem quebra de linha |
 | `identifier` | Sequência de letras, dígitos e `_`, não iniciando com dígito |
 
@@ -227,7 +227,7 @@ O front-end de Jack (léxico + sintático, capítulos 4 e 5) trabalha sobre uma 
 
 | Não-terminal | Regra |
 |---|---|
-| `classdef` | `'class'` className `'{'` classVarDec* subroutineDec* `'}'` |
+| `class` | `'class'` className `'{'` classVarDec* subroutineDec* `'}'` |
 | `classVarDec` | (`'static'`\|`'field'`) type varName (`','` varName)* `';'` |
 | `type` | `'int'` \| `'char'` \| `'boolean'` \| className |
 | `subroutineDec` | (`'constructor'`\|`'function'`\|`'method'`) (`'void'`\|type) subroutineName `'('` parameterList `')'` subroutineBody |

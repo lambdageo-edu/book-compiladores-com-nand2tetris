@@ -84,7 +84,7 @@ nav:
       - unidade-2-middleend/10-codegen-subrotinas-objetos.md
   - "Parte 3 — O Tradutor VM (Geração de Código Assembly)":
       - unidade-3-backend/11-assembly-hack.md
-      - unidade-2-middleend/12-vm-translator-parte1.md
+      - unidade-3-backend/12-vm-translator-parte1.md
       - unidade-3-backend/13-vm-translator-parte2.md
       - unidade-3-backend/14-geracao-codigo-alvo.md
   - "Parte 4 — O Montador (Assembly para Código de Máquina)":

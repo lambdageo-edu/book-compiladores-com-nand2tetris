@@ -1,6 +1,6 @@
 # Compiladores — do zero ao Hack
 
-Bem-vindo(a) à disciplina de Compiladores. Este livro constrói, unidade a unidade, um compilador completo para a linguagem **Jack** (Nand2Tetris) e a infraestrutura que o sustenta — máquina virtual, montador e a arquitetura Hack — no espírito de *[Crafting Interpreters](https://craftinginterpreters.com/contents.html)*: você acompanha o código sendo construído, método a método, capítulo a capítulo.
+Bem-vindo(a) à disciplina de Compiladores. Este livro constrói, parte a parte, um compilador completo para a linguagem **Jack** (Nand2Tetris) e a infraestrutura que o sustenta — máquina virtual, montador e a arquitetura Hack — no espírito de *[Crafting Interpreters](https://craftinginterpreters.com/contents.html)*: você acompanha o código sendo construído, método a método, capítulo a capítulo.
 
 ## Como usar este livro
 
@@ -15,8 +15,8 @@ Bem-vindo(a) à disciplina de Compiladores. Este livro constrói, unidade a unid
 |---|---|---|
 | 1 — Front-end (Análise Sintática) | Linguagens, gramáticas, analisador léxico e analisador sintático para a linguagem Jack. | Projeto 10 (Compiler I - Syntax Analysis) |
 | 2 — O Compilador (Geração de Código VM) | Representações intermediárias, especificação da VM Hack, tabela de símbolos e geração de código VM para Jack. | Projeto 11 (Compiler II - Code Generation) |
-| 3 — O Tradutor VM (Geração de Código Assembly) | Tradução de aritmética, memória, controle de fluxo e funções de código VM para Assembly Hack. | Projetos 7 e 8 (VM Translator) |
-| 4 — O Montador (Assembly para Código de Máquina) | Especificação do Assembly Hack e construção do Montador (Assembler) para produzir o binário. | Projeto 6 (Assembler) |
+| 3 — O Tradutor VM (Geração de Código Assembly) | Especificação do Assembly Hack e tradução de aritmética, memória, controle de fluxo e funções de código VM para Assembly Hack. | Projetos 7 e 8 (VM Translator) |
+| 4 — O Montador (Assembly para Código de Máquina) | Construção do Montador (Assembler), que converte o Assembly Hack em binário em duas passagens. | Projeto 6 (Assembler) |
 
 ## Pré-requisitos
 

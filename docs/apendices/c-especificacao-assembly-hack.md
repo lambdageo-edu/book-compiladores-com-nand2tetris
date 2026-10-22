@@ -1,6 +1,6 @@
 # Apêndice C — Especificação do Assembly Hack
 
-Referência compacta, extraída do capítulo 14, para consulta rápida durante os capítulos 15 e a implementação do Assembler.
+Referência compacta, extraída do capítulo 11, para consulta rápida durante o VM Translator (capítulos 12 e 13) e o Assembler (capítulo 15).
 
 ## Formato binário
 

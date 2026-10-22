@@ -46,7 +46,7 @@ Cada uma dessas fases se divide, por sua vez, em etapas menores:
 - **Geração de código intermediário**: traduz o programa (já validado) para uma representação intermediária.
 - **Geração de código alvo**: traduz a representação intermediária para o código final executável.
 
-Este livro segue esse pipeline clássico de livro-texto — a mesma ordem usada por praticamente todo curso introdutório de compiladores — e não a ordem "bottom-up" (hardware → VM → linguagem) do livro original do Nand2Tetris. Construiremos primeiro o front-end (Unidade 1), depois o middle-end (Unidade 2) e por fim o back-end (Unidade 3), sempre com um artefato funcional ao final de cada etapa.
+Este livro segue esse pipeline clássico de livro-texto — a mesma ordem usada por praticamente todo curso introdutório de compiladores — e não a ordem "bottom-up" (hardware → VM → linguagem) do livro original do Nand2Tetris. Construiremos primeiro o front-end (Parte 1), depois o middle-end — o compilador Jack → VM (Parte 2) — e por fim o back-end, em duas partes: o tradutor de VM (Parte 3) e o montador (Parte 4), sempre com um artefato funcional ao final de cada etapa.
 
 ## Por que o Nand2Tetris
 
@@ -66,11 +66,12 @@ Ao longo do curso:
 
 ## Como este livro está organizado
 
-| Unidade | Foco | Fecha com |
-|---|---|---|
-| 1 — Front-end | Fundamentos teóricos, a linguagem Jack, análise léxica e sintática | Um parser completo para Jack |
-| 2 — Middle-end | Representações intermediárias, especificação da VM Hack, tabela de símbolos, geração de código para a VM | Compilador Jack → VM completo + VM Translator (parte 1) |
-| 3 — Back-end | VM Translator (parte 2), geração de código alvo, Assembly e montador | VM Translator completo + Assembler Hack |
+| Parte | Capítulos | Foco | Fecha com |
+|---|---|---|---|
+| 1 — Front-end | 0–5 | Fundamentos teóricos, a linguagem Jack, análise léxica e sintática | Um parser completo para Jack (Project 10) |
+| 2 — O Compilador | 6–10 | Representações intermediárias, especificação da VM Hack, tabela de símbolos, geração de código VM | Compilador Jack → VM completo (Project 11) |
+| 3 — O Tradutor VM | 11–14 | Especificação do Assembly Hack, VM Translator (partes 1 e 2), consolidação da geração de código alvo | VM Translator completo (Projects 7 e 8) |
+| 4 — O Montador | 15 | Montagem em duas passagens | Assembler Hack (Project 6) |
 
 A linguagem de demonstração usada no livro é **Java** — todo o código é construído junto com você, capítulo a capítulo, no espírito de [*Crafting Interpreters*](https://craftinginterpreters.com/contents.html). Mas você não precisa usar Java nas suas atividades práticas: é livre para implementar em qualquer linguagem com a qual se sinta confortável. O que importa é entender cada etapa a fundo o suficiente para reproduzi-la.
 

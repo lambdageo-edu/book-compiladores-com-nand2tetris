@@ -16,8 +16,8 @@ back-end), que é deliberadamente diferente da ordem *bottom-up* do Nand2Tetris 
 | --- | --- | --- |
 | 1 — Front-end | Linguagens, gramáticas, analisador léxico e sintático | Project 10 |
 | 2 — O Compilador | IR, especificação da VM Hack, tabela de símbolos, geração de código VM | Project 11 |
-| 3 — O Tradutor VM | Especificação da VM Hack, tradução VM → Assembly | Projects 7 e 8 |
-| 4 — O Montador | Assembly Hack, montagem em duas passagens | Project 6 |
+| 3 — O Tradutor VM | Especificação do Assembly Hack, tradução VM → Assembly | Projects 7 e 8 |
+| 4 — O Montador | Montagem em duas passagens | Project 6 |
 
 Os apêndices reúnem a gramática completa de Jack, as especificações da VM e do Assembly
 Hack, o guia de ambiente/ferramentas e as referências bibliográficas.

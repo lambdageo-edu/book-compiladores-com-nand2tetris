@@ -6,12 +6,12 @@
 > operações aritméticas/lógicas, controle de fluxo e o protocolo completo de chamada de
 > função.
 
-📖 **Leitura de apoio:** capítulos 7 (especificação da VM), 11 (VM Translator parte 1) e
-12 (VM Translator parte 2) + Apêndices B e C.
+📖 **Leitura de apoio:** capítulos 7 (especificação da VM), 11 (especificação do Assembly Hack),
+12 (VM Translator parte 1) e 13 (VM Translator parte 2) + Apêndices B e C.
 
 > 📌 **Este enunciado cobre as duas partes.** Se a sua oferta dividir em duas entregas,
 > corte na marca `--- PARTE 2 ---` mais abaixo. A Parte 1 corresponde ao **Project 7** e ao
-> capítulo 11; a Parte 2, ao **Project 8** e ao capítulo 12.
+> capítulo 12; a Parte 2, ao **Project 8** e ao capítulo 13.
 
 ---
 
@@ -182,7 +182,7 @@ no topo.
 
 ## 📚 Recursos adicionais
 
-- Capítulos 7, 11 e 12 do livro + Apêndices B e C
+- Capítulos 7, 11, 12 e 13 do livro + Apêndices B e C
 - *The Elements of Computing Systems*, caps. 7 e 8 — <https://www.nand2tetris.org/book>
 - Ferramentas e arquivos de teste oficiais: <https://www.nand2tetris.org/software>
 - Página da turma: {{LINK_TURMA}}

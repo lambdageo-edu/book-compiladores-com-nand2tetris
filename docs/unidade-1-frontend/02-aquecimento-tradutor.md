@@ -1,6 +1,6 @@
 # 2. Aquecimento: um simples tradutor
 
-Antes de atacar a linguagem Jack por completo, vamos construir algo bem menor: um tradutor de expressões aritméticas simples para uma notação pós-fixada (tipo a usada pela VM Hack que veremos na Unidade 2). O objetivo não é o tradutor em si — é praticar, em um problema pequeno, exatamente as técnicas que usaremos nos capítulos 4 e 5 para construir o tokenizador e o parser de Jack: análise léxica, análise sintática descendente recursiva e tradução dirigida pela sintaxe. Vamos construir esse tradutor com você, passo a passo, testando a cada etapa — é assim que todos os capítulos incrementais deste livro funcionam.
+Antes de atacar a linguagem Jack por completo, vamos construir algo bem menor: um tradutor de expressões aritméticas simples para uma notação pós-fixada (tipo a usada pela VM Hack que veremos na Parte 2). O objetivo não é o tradutor em si — é praticar, em um problema pequeno, exatamente as técnicas que usaremos nos capítulos 4 e 5 para construir o tokenizador e o parser de Jack: análise léxica, análise sintática descendente recursiva e tradução dirigida pela sintaxe. Vamos construir esse tradutor com você, passo a passo, testando a cada etapa — é assim que todos os capítulos incrementais deste livro funcionam.
 
 ## Passo 1 — Só o parser, caractere a caractere
 
@@ -215,7 +215,7 @@ public Token nextToken() {
 }
 ```
 
-Testando com `"289-85+0+69"`, o scanner agora devolve `<NUMBER>289</NUMBER>`, `<MINUS>-</MINUS>`, `<NUMBER>85</NUMBER>`, e assim por diante — cada número, não importa quantos dígitos, vira um único token. (Um detalhe curioso: pela definição atual do autômato, uma sequência como `"000"` é reconhecida como **três** tokens `NUMBER` separados, um por zero — o dígito `0` sozinho aciona um caminho diferente do de números maiores. Fica registrado como uma aspereza do autômato, não um bug: seria corrigido generalizando o estado inicial de `number()` para aceitar zeros à esquerda.)
+Testando com `"289-85+0+69"`, o scanner agora devolve `<NUMBER>289</NUMBER>`, `<MINUS>-</MINUS>`, `<NUMBER>85</NUMBER>`, e assim por diante — cada número, não importa quantos dígitos, vira um único token. (Repare que `number()` aceita zeros à esquerda: `"007"` vira um único token `NUMBER` com lexema `007`. A expressão regular de inteiro sem sinal do capítulo 1, `0 | [1...9] [0...9]*`, não aceitaria esse lexema — para o nosso tradutor, e também para Jack, que só pede "um número decimal", essa folga não causa problema.)
 
 O `Parser` é atualizado para comparar `currentToken.type` (não mais o caractere bruto), e a gramática ganha o não-terminal `number`:
 
@@ -243,7 +243,7 @@ Chamado no início de `nextToken()`, isso resolve o problema — e de quebra nos
 
 ## Passo 6 — Identificadores e a primeira palavra reservada
 
-Adicionamos `IDENT` ao `TokenType` e duas funções auxiliares (`isAlpha`, `isAlphaNumeric`) que definem o alfabeto de um identificador — exatamente a expressão regular `([A-Za-z_])([A-Za-z0-9_])*` do capítulo 1, traduzida para código:
+Adicionamos `IDENT` ao `TokenType` e duas funções auxiliares (`isAlpha`, `isAlphaNumeric`) que definem o alfabeto de um identificador — a expressão regular de identificadores do capítulo 1, agora aceitando também `_` na primeira posição, como Jack exige — `([A-Za-z_])([A-Za-z0-9_])*` —, traduzida para código:
 
 ```java
 private Token identifier() {
@@ -343,7 +343,7 @@ switch (command.type) {
 }
 ```
 
-Esse pequeno interpretador não é um capítulo à parte do nosso livro — é, na verdade, uma prévia da **VM Hack** que construiremos na Unidade 2: uma máquina de pilha, comandos aritméticos, `push`/`pop` sobre variáveis nomeadas. O paralelo não é coincidência: é exatamente o tipo de representação intermediária que compiladores reais usam para separar "traduzir a sintaxe" de "executar (ou gerar código para) o resultado".
+Esse pequeno interpretador não é um capítulo à parte do nosso livro — é, na verdade, uma prévia da **VM Hack** que construiremos na Parte 2: uma máquina de pilha, comandos aritméticos, `push`/`pop` sobre variáveis nomeadas. O paralelo não é coincidência: é exatamente o tipo de representação intermediária que compiladores reais usam para separar "traduzir a sintaxe" de "executar (ou gerar código para) o resultado".
 
 ## O que levamos daqui
 

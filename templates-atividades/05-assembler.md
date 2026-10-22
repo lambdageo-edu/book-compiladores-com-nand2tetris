@@ -5,7 +5,7 @@
 > **Objetivo:** desenvolver um **montador** que traduz programas em Assembly Hack (`.asm`)
 > para código de máquina binário (`.hack`), executável pelo CPU Emulator.
 
-📖 **Leitura de apoio:** capítulos 14 (especificação do Assembly Hack) e 15 (construindo o
+📖 **Leitura de apoio:** capítulos 11 (especificação do Assembly Hack) e 15 (construindo o
 Assembler) + Apêndice C.
 
 ---
@@ -282,7 +282,7 @@ projects/06/
 
 ## 📚 Recursos adicionais
 
-- Capítulos 14 e 15 do livro + Apêndice C
+- Capítulos 11 e 15 do livro + Apêndice C
 - *The Elements of Computing Systems*, cap. 6 — <https://www.nand2tetris.org/book>
 - Ferramentas e arquivos de teste oficiais: <https://www.nand2tetris.org/software>
 - Página da turma: {{LINK_TURMA}}

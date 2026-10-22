@@ -1,6 +1,6 @@
 # 6. Representações intermediárias
 
-Com o analisador sintático pronto (Unidade 1), o compilador já *entende* a estrutura de um programa Jack — falta decidir *para onde* traduzi-lo. Antes de especificar a VM Hack (capítulo 7), construir a tabela de símbolos que liga os identificadores de Jack aos segmentos dessa VM (capítulo 8) e começar a gerar código (capítulos 9 e 10), vale um passo atrás: por que compiladores usam uma representação intermediária (IR) em vez de traduzir a linguagem-fonte diretamente para código de máquina? Este capítulo é teoria pura — não constrói nenhum código — mas justifica cada decisão de projeto dos capítulos seguintes.
+Com o analisador sintático pronto (Parte 1), o compilador já *entende* a estrutura de um programa Jack — falta decidir *para onde* traduzi-lo. Antes de especificar a VM Hack (capítulo 7), construir a tabela de símbolos que liga os identificadores de Jack aos segmentos dessa VM (capítulo 8) e começar a gerar código (capítulos 9 e 10), vale um passo atrás: por que compiladores usam uma representação intermediária (IR) em vez de traduzir a linguagem-fonte diretamente para código de máquina? Este capítulo é teoria pura — não constrói nenhum código — mas justifica cada decisão de projeto dos capítulos seguintes.
 
 ## O problema que uma IR resolve
 
@@ -19,7 +19,7 @@ Formalmente (Aho, Lam, Sethi & Ullman): uma IR é um conjunto de estruturas de d
 
 ## Representações gráficas: árvore de derivação e AST
 
-A **árvore de derivação** (*parse tree*), produzida diretamente pelo analisador sintático (Unidade 1), inclui **todos** os símbolos da gramática — parênteses, ponto-e-vírgula, palavras-chave estruturais. Ela é fiel à sintaxe, mas carregada de detalhes irrelevantes para o significado do programa.
+A **árvore de derivação** (*parse tree*), produzida diretamente pelo analisador sintático (Parte 1), inclui **todos** os símbolos da gramática — parênteses, ponto-e-vírgula, palavras-chave estruturais. Ela é fiel à sintaxe, mas carregada de detalhes irrelevantes para o significado do programa.
 
 A **árvore sintática abstrata** (AST) retém apenas a estrutura essencial: operadores, operandos, e a hierarquia que expressa precedência e associatividade — mas descarta tudo que é "só sintaxe". Para uma AST não importa se um bloco é demarcado por chaves, por `begin`/`end`, ou por indentação; importa apenas "isto é um comando condicional, com esta condição, este ramo verdadeiro e este ramo falso".
 
@@ -99,7 +99,7 @@ Note a semelhança estrutural com o pseudocódigo de pilha acima — `LOAD_FAST`
 
 Resumindo o espectro: ASTs preservam mais estrutura, mas são mais difíceis de gerar diretamente durante o parsing e mais custosas para interpretar (é preciso percorrer a árvore). Códigos de três endereços são o padrão em compiladores de produção com otimizador (GCC, LLVM), porque casam bem com arquiteturas RISC modernas — mas exigem alocação de registradores/temporários, uma complexidade extra. Código de pilha é o mais simples de **gerar** (a notação pós-fixa cai direto de uma travessia pós-ordem da árvore de derivação, como veremos no capítulo 9) e o mais simples de **interpretar** — ao custo de gerar mais instruções por operação complexa e não ser diretamente otimizável sem reconstrução.
 
-Como este curso não implementa um otimizador — o foco é corretude e arquitetura, não desempenho —, a VM Hack (uma IR de pilha) é a escolha certa: simples de gerar diretamente durante a análise sintática (fechando o capítulo 9), simples de traduzir para Assembly Hack depois (capítulos 11 e 12), e didaticamente transparente em cada etapa.
+Como este curso não implementa um otimizador — o foco é corretude e arquitetura, não desempenho —, a VM Hack (uma IR de pilha) é a escolha certa: simples de gerar diretamente durante a análise sintática (fechando o capítulo 9), simples de traduzir para Assembly Hack depois (capítulos 12 e 13), e didaticamente transparente em cada etapa.
 
 ## O que vem a seguir
 

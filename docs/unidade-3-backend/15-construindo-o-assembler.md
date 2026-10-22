@@ -1,6 +1,6 @@
 # 15. Construindo o Assembler
 
-Chegamos à última peça da cadeia de tradução: o **Assembler** (Project 6), que converte um arquivo `.asm` escrito na linguagem do capítulo 14 em um arquivo `.hack` — a sequência de instruções binárias de 16 bits que a CPU Hack executa diretamente. Como o VM Translator (capítulos 11-12), este capítulo é teoria + especificação + arquitetura — a implementação completa é sua atividade prática, comparando a saída com os testes oficiais do Nand2Tetris.
+Chegamos à última peça da cadeia de tradução: o **Assembler** (Project 6), que converte um arquivo `.asm` escrito na linguagem do capítulo 11 em um arquivo `.hack` — a sequência de instruções binárias de 16 bits que a CPU Hack executa diretamente. Como o VM Translator (capítulos 12-13), este capítulo é teoria + especificação + arquitetura — a implementação completa é sua atividade prática, comparando a saída com os testes oficiais do Nand2Tetris.
 
 ## O problema central: referência futura
 
@@ -30,7 +30,7 @@ para cada linha do arquivo:
         romAddr = romAddr + 1
 ```
 
-**Segunda passagem — gerar o binário.** Percorra o arquivo de novo, agora traduzindo cada instrução real. Rótulos são ignorados (já cumpriram seu papel na primeira passagem — não geram código). Uma A-instruction com um número literal (`@10`) converte-se diretamente; uma A-instruction com um símbolo consulta a tabela — se já estiver lá (um rótulo, ou uma variável já vista antes), usa o endereço registrado; caso contrário, é a **primeira** aparição de uma variável, e o montador aloca para ela o próximo endereço de RAM disponível, começando em 16. Uma C-instruction é decomposta em `comp`/`dest`/`jump` e cada parte é traduzida pelas tabelas do capítulo 14.
+**Segunda passagem — gerar o binário.** Percorra o arquivo de novo, agora traduzindo cada instrução real. Rótulos são ignorados (já cumpriram seu papel na primeira passagem — não geram código). Uma A-instruction com um número literal (`@10`) converte-se diretamente; uma A-instruction com um símbolo consulta a tabela — se já estiver lá (um rótulo, ou uma variável já vista antes), usa o endereço registrado; caso contrário, é a **primeira** aparição de uma variável, e o montador aloca para ela o próximo endereço de RAM disponível, começando em 16. Uma C-instruction é decomposta em `comp`/`dest`/`jump` e cada parte é traduzida pelas tabelas do capítulo 11.
 
 ```
 ramAddr = 16     // variáveis começam em RAM[16]
@@ -50,7 +50,7 @@ para cada linha do arquivo:
 
 ## Um exemplo completo, passo a passo
 
-Considere de novo o programa de somatória do capítulo 14:
+Considere o programa abaixo, uma variação da somatória do capítulo 11: aqui, `i` começa em `RAM[0]` e é decrementado até zero, e o resultado vai para `RAM[1]`:
 
 ```
 @R0
@@ -83,7 +83,7 @@ M=D
 
 **Primeira passagem** — só rótulos importam:
 
-| Linha | Comando | Tipo | `romAddr` antes | Ação |
+| Comando | Tipo | `romAddr` antes | Ação |
 |---|---|---|---|---|
 | `@R0` | A | 0 | → 1 |
 | `D=M` | C | 1 | → 2 |
@@ -116,16 +116,16 @@ Repare no ponto crucial: `@END`, quando alcançado na segunda passagem, já reso
 
 ## Arquitetura modular
 
-A implementação se organiza naturalmente em quatro módulos com responsabilidades bem separadas — a mesma disciplina de "uma classe, uma responsabilidade" que seguimos desde o `Scanner`/`Parser` da Unidade 1:
+A implementação se organiza naturalmente em quatro módulos com responsabilidades bem separadas — a mesma disciplina de "uma classe, uma responsabilidade" que seguimos desde o `Scanner`/`Parser` da Parte 1:
 
 | Módulo | Responsabilidade |
 |---|---|
 | **Parser** | Lê o `.asm` linha a linha, ignora espaços/comentários, classifica cada comando (`A_COMMAND`, `C_COMMAND`, `L_COMMAND`) e extrai suas partes (`symbol()`, `dest()`, `comp()`, `jump()`) |
-| **SymbolTable** | Um mapa símbolo → endereço, pré-carregado com os símbolos pré-definidos do capítulo 14 (`addEntry`, `contains`, `getAddress`) |
-| **Code** | Traduz cada mnemônico (`dest`, `comp`, `jump`) para sua codificação binária, segundo as tabelas do capítulo 14 |
+| **SymbolTable** | Um mapa símbolo → endereço, pré-carregado com os símbolos pré-definidos do capítulo 11 (`addEntry`, `contains`, `getAddress`) |
+| **Code** | Traduz cada mnemônico (`dest`, `comp`, `jump`) para sua codificação binária, segundo as tabelas do capítulo 11 |
 | **Main** | Orquestra as duas passagens, usando os três módulos acima |
 
-O `Parser` é deliberadamente burro — ele não sabe nada sobre símbolos ou endereços, só sintaxe. O `SymbolTable` é só um dicionário. O `Code` é uma coleção de tabelas de tradução (praticamente uma cópia executável das tabelas do capítulo 14). Toda a "inteligência" das duas passagens — quando registrar um rótulo, quando alocar uma variável — vive no `Main`, que é o único módulo que orquestra os outros três.
+O `Parser` é deliberadamente burro — ele não sabe nada sobre símbolos ou endereços, só sintaxe. O `SymbolTable` é só um dicionário. O `Code` é uma coleção de tabelas de tradução (praticamente uma cópia executável das tabelas do capítulo 11). Toda a "inteligência" das duas passagens — quando registrar um rótulo, quando alocar uma variável — vive no `Main`, que é o único módulo que orquestra os outros três.
 
 ```java
 // esboço do módulo Main — primeira passagem
@@ -171,17 +171,17 @@ while (parser.hasMoreCommands()) {
 
 ## Validação
 
-O Nand2Tetris fornece, para cada programa `.asm` de teste (`Add.asm`, `Max.asm`, `Rect.asm`, `Pong.asm`), o `.hack` esperado — comparação exata de texto, de novo, é o critério de correção. Vale testar em ordem crescente de complexidade: primeiro programas sem símbolo nenhum, depois com rótulos, depois com variáveis, depois combinando os dois — exatamente a mesma disciplina incremental que usamos desde o capítulo 2.
+O Nand2Tetris fornece os programas `.asm` de teste (`Add.asm`, `Max.asm`, `Rect.asm`, `Pong.asm`) e o Assembler de referência (pasta `tools/`), que gera o `.hack` esperado — comparação exata de texto, de novo, é o critério de correção. Vale testar em ordem crescente de complexidade: primeiro os programas sem símbolo nenhum (`Add.asm` e as versões `MaxL.asm`, `RectL.asm` e `PongL.asm`, que já vêm com os símbolos trocados por números), depois com rótulos, depois com variáveis, depois combinando os dois — exatamente a mesma disciplina incremental que usamos desde o capítulo 2.
 
 ## Fechando o livro
 
 Com o Assembler completo, a cadeia de tradução está fechada de ponta a ponta:
 
 ```
-Jack (Unidade 1: léxico + sintático)
-    ↓ Compilador Jack → VM (Unidade 2)
+Jack (Parte 1: léxico + sintático)
+    ↓ Compilador Jack → VM (Parte 2)
 Código VM
-    ↓ VM Translator (capítulos 11-12)
+    ↓ VM Translator (capítulos 12-13)
 Assembly Hack
     ↓ Assembler (este capítulo)
 Código de máquina Hack

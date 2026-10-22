@@ -1,8 +1,8 @@
 # 12. VM Translator — Parte 1: aritmética e memória
 
-Com o compilador Jack → VM completo (capítulos 9 e 10), fechamos a metade "de cima" da nossa cadeia de tradução. Este capítulo começa a outra metade: o **VM Translator**, que traduz código VM (a IR especificada no capítulo 7) para Assembly Hack — a linguagem que o capítulo 14 vai detalhar e que o Assembler (capítulo 15) finalmente converte em código de máquina.
+Com o compilador Jack → VM completo (capítulos 9 e 10), fechamos a metade "de cima" da nossa cadeia de tradução. Este capítulo começa a outra metade: o **VM Translator**, que traduz código VM (a IR especificada no capítulo 7) para Assembly Hack — a linguagem especificada no capítulo 11, que o Assembler (capítulo 15) finalmente converte em código de máquina.
 
-A partir deste capítulo, o livro muda de estilo: em vez de código construído junto com você, capítulo a capítulo (como fizemos com o `JackTokenizer` e o `CompilationEngine`), o VM Translator e o Assembler são apresentados como **teoria + especificação + exercício guiado** — você implementa como atividade prática, comparando sua saída com os testes oficiais do Nand2Tetris. A razão é de escopo: VM Translator e Assembler não são "o compilador Jack" propriamente — são a infraestrutura de back-end que o sustenta.
+Nesta parte do livro, o estilo muda: em vez de código construído junto com você, capítulo a capítulo (como fizemos com o `JackTokenizer` e o `CompilationEngine`), o VM Translator e o Assembler são apresentados como **teoria + especificação + exercício guiado** — você implementa como atividade prática, comparando sua saída com os testes oficiais do Nand2Tetris. A razão é de escopo: VM Translator e Assembler não são "o compilador Jack" propriamente — são a infraestrutura de back-end que o sustenta.
 
 ## Por que o VM Translator é um tradutor, não um compilador
 
@@ -12,7 +12,7 @@ Note a diferença de natureza: o `CompilationEngine` compila uma linguagem de al
 Código Jack (alto nível)
     ↓ CompilationEngine (capítulos 9-10)
 Código VM (intermediário)
-    ↓ VM Translator (capítulos 11-12)
+    ↓ VM Translator (capítulos 12-13)
 Assembly Hack (baixo nível)
     ↓ Assembler (capítulo 15)
 Código de máquina Hack
@@ -34,9 +34,10 @@ A máquina Hack tem uma ROM de instruções e uma RAM de 32K palavras de 16 bits
 | `RAM[16..255]` | — | Variáveis `static` |
 | `RAM[256..2047]` | — | Pilha |
 | `RAM[2048..16383]` | — | Heap (objetos e arrays) |
-| `RAM[16384..24575]` | — | Mapa de memória da tela |
+| `RAM[16384..24575]` | `SCREEN` | Mapa de memória da tela |
+| `RAM[24576]` | `KBD` | Teclado |
 
-O princípio geral: os quatro segmentos "dinâmicos" (`local`, `argument`, `this`, `that`) têm seu endereço-base guardado em um registrador (`LCL`, `ARG`, `THIS`, `THAT`) que muda a cada chamada de função (capítulo 12) — acessar `local i` significa sempre `RAM[LCL + i]`. Já `temp` e `static` têm endereço fixo, calculável em tempo de tradução, sem indireção nenhuma.
+O princípio geral: os quatro segmentos "dinâmicos" (`local`, `argument`, `this`, `that`) têm seu endereço-base guardado em um registrador (`LCL`, `ARG`, `THIS`, `THAT`) que muda a cada chamada de função (capítulo 13) — acessar `local i` significa sempre `RAM[LCL + i]`. Já `temp` e `static` têm endereço fixo, calculável em tempo de tradução, sem indireção nenhuma.
 
 ## Traduzindo `push`/`pop`
 
@@ -76,7 +77,7 @@ A=M            // A = endereço-destino (recuperado)
 M=D            // RAM[endereço-destino] = valor
 ```
 
-**Segmentos com endereço fixo** (`constant`, `temp`, `static`) dispensam esse cálculo intermediário. `constant` nem acessa memória — o valor já *é* o índice:
+**Segmentos com endereço fixo** (`constant`, `temp`, `pointer`, `static`) dispensam esse cálculo intermediário. `constant` nem acessa memória — o valor já *é* o índice:
 
 ```
 // push constant i
@@ -89,7 +90,51 @@ M=D
 M=M+1
 ```
 
-`temp i` é sempre `RAM[5+i]`, e `static i` é mapeado para um rótulo simbólico único por arquivo `.vm` (tipicamente `NomeDoArquivo.i`) — o Assembler (capítulo 15) se encarrega de atribuir um endereço real a esse rótulo, exatamente como faz com qualquer variável.
+`temp i` é sempre `RAM[5+i]`, e `static i` é mapeado para um símbolo único por arquivo `.vm` (tipicamente `NomeDoArquivo.i`) — o Assembler (capítulo 15) se encarrega de atribuir um endereço real a esse símbolo, exatamente como faz com qualquer variável. Em ambos os casos, o endereço vai direto na A-instruction:
+
+```
+// push temp 2
+@7             // 5 + 2
+D=M
+@SP
+A=M
+M=D
+@SP
+M=M+1
+```
+
+```
+// pop static 3   (dentro de Foo.vm)
+@SP
+AM=M-1
+D=M
+@Foo.3
+M=D
+```
+
+**`pointer`** é o segmento que liga a VM aos registradores-base: `pointer 0` é o próprio registrador `THIS` (`RAM[3]`) e `pointer 1` é `THAT` (`RAM[4]`) — ou seja, `pointer i` é `RAM[3+i]`, um endereço fixo como `temp`. A diferença é o efeito: escrever em `pointer` não grava um dado, e sim **muda a base** dos segmentos `this`/`that`. É assim que o `pop pointer 0` gerado pelo compilador nos construtores e métodos (capítulo 10) ancora `this` no objeto:
+
+```
+// pop pointer 0
+@SP
+AM=M-1
+D=M
+@THIS          // RAM[3 + 0]
+M=D            // THIS = valor desempilhado
+```
+
+```
+// push pointer 1
+@THAT          // RAM[3 + 1]
+D=M
+@SP
+A=M
+M=D
+@SP
+M=M+1
+```
+
+Depois de um `pop pointer 0`, todo `this i` traduzido pela regra dos segmentos dinâmicos já usa o novo endereço-base — é a mesma ideia do exemplo `push constant 8000`, `pop pointer 0` do capítulo 7, agora em Assembly.
 
 ## Traduzindo comandos aritméticos e lógicos
 
@@ -168,4 +213,4 @@ Os testes oficiais do Nand2Tetris para esta parte (pasta `projects/07`) incluem 
 
 ## O que vem a seguir
 
-Esta parte cobre apenas metade do VM Translator — falta o controle de fluxo em escopo de função (rótulos qualificados) e, principalmente, o protocolo completo de `call`/`return` com *stack frames*, que é o que torna possível compilar chamadas de função recursivas. Essa é exatamente a fronteira que separa esta unidade da próxima: o capítulo 12, que abre a Unidade 3, completa o VM Translator (Project 8) antes de seguirmos para geração de código alvo e o Assembler.
+Esta parte cobre apenas metade do VM Translator — falta o controle de fluxo em escopo de função (rótulos qualificados) e, principalmente, o protocolo completo de `call`/`return` com *stack frames*, que é o que torna possível compilar chamadas de função recursivas. É o assunto do capítulo 13, que completa o VM Translator (Project 8) antes de seguirmos para a consolidação da geração de código alvo (capítulo 14) e o Assembler (capítulo 15).

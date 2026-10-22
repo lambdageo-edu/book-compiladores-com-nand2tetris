@@ -1,6 +1,6 @@
 # 8. Tabela de símbolos
 
-O capítulo 7 definiu o alvo: cada variável de Jack mora em um segmento da VM (`local`, `argument`, `static` ou `this`), em uma posição dada por um índice. Para gerar um único `push` ou `pop`, portanto, o compilador precisa responder a uma pergunta toda vez que encontra um identificador: *o que é isso?* Uma variável local? Um campo do objeto? Um parâmetro? De que tipo? Em que posição, dentro do seu segmento, ela vive? Este capítulo constrói a estrutura de dados que responde a essas perguntas — a **tabela de símbolos** — e a integra ao `CompilationEngine` da Unidade 1, fechando a lacuna de análise semântica que faltava para começar a gerar código de verdade nos capítulos 9 e 10.
+O capítulo 7 definiu o alvo: cada variável de Jack mora em um segmento da VM (`local`, `argument`, `static` ou `this`), em uma posição dada por um índice. Para gerar um único `push` ou `pop`, portanto, o compilador precisa responder a uma pergunta toda vez que encontra um identificador: *o que é isso?* Uma variável local? Um campo do objeto? Um parâmetro? De que tipo? Em que posição, dentro do seu segmento, ela vive? Este capítulo constrói a estrutura de dados que responde a essas perguntas — a **tabela de símbolos** — e a integra ao `CompilationEngine` da Parte 1, fechando a lacuna de análise semântica que faltava para começar a gerar código de verdade nos capítulos 9 e 10.
 
 ## Por que uma tabela de símbolos
 
@@ -30,18 +30,75 @@ A tabela expõe uma API pequena e direta:
 | `varCount(kind)` | Quantas variáveis de uma dada categoria já foram definidas no escopo atual |
 | `resolve(name)` | Busca um identificador, devolvendo categoria, tipo e índice |
 
-O índice devolvido por `resolve` (e atribuído automaticamente por `define`) é sempre relativo à sua própria categoria: a primeira `field` é índice 0, a segunda `field` é índice 1, mesmo que entre elas haja uma `static` (que tem sua própria contagem independente). É exatamente esse índice — categoria + posição — que vira o segmento e o deslocamento de um comando `push`/`pop` da VM. Por exemplo, na classe `Point` com `field int x, y;` e um método `distance(Point other)` com `var int dx, dy;`, a tabela fica:
+O índice devolvido por `resolve` (e atribuído automaticamente por `define`) é sempre relativo à sua própria categoria: a primeira `field` é índice 0, a segunda `field` é índice 1, e uma `static` declarada na mesma classe começa a sua própria contagem em 0. É exatamente esse índice — categoria + posição — que vira o segmento e o deslocamento de um comando `push`/`pop` da VM.
+
+## Um exemplo completo
+
+Considere a classe `Point`, que representa um ponto no plano e conta quantos pontos já foram criados:
+
+```java
+class Point {
+    field int x, y;
+    static int pointCount;
+
+    constructor Point new(int ax, int ay) {
+        let x = ax;
+        let y = ay;
+        let pointCount = pointCount + 1;
+        return this;
+    }
+
+    method int getx() { return x; }
+    method int gety() { return y; }
+
+    method int distance(Point other) {
+        var int dx, dy;
+        let dx = x - other.getx();
+        let dy = y - other.gety();
+        return Math.sqrt((dx * dx) + (dy * dy));
+    }
+}
+```
+
+Ao terminar de ler as declarações do início da classe, o compilador tem a **tabela de classe** preenchida. Ela vale para todas as subroutines de `Point`:
 
 | Nome | Tipo | Categoria | Índice | Acesso na VM |
 |---|---|---|---|---|
 | `x` | `int` | `field` | 0 | `this 0` |
 | `y` | `int` | `field` | 1 | `this 1` |
+| `pointCount` | `int` | `static` | 0 | `static 0` |
+
+Repare que `pointCount` recebe índice 0, embora seja a terceira variável declarada: `static` e `field` são contadas separadamente.
+
+A **tabela de subroutine**, por sua vez, é recriada a cada subroutine. Ao compilar `distance`, ela fica assim:
+
+| Nome | Tipo | Categoria | Índice | Acesso na VM |
+|---|---|---|---|---|
 | `this` | `Point` | `arg` | 0 | `argument 0` |
 | `other` | `Point` | `arg` | 1 | `argument 1` |
 | `dx` | `int` | `var` | 0 | `local 0` |
 | `dy` | `int` | `var` | 1 | `local 1` |
 
-e `let dx = x - other.getx();` só pode ser traduzido porque a tabela informa que `x` é `this 0`, `other` é `argument 1` e `dx` é `local 0`.
+A entrada `this` não aparece no código-fonte: o compilador a insere porque `distance` é um `method`, que recebe o objeto como argumento implícito (veremos como, adiante neste capítulo). Por isso o primeiro parâmetro declarado, `other`, fica com índice 1. Compare com a tabela do construtor `new`, compilado antes de `distance` com a tabela de subroutine vazia:
+
+| Nome | Tipo | Categoria | Índice | Acesso na VM |
+|---|---|---|---|---|
+| `ax` | `int` | `arg` | 0 | `argument 0` |
+| `ay` | `int` | `arg` | 1 | `argument 1` |
+
+Um construtor não recebe `this` como argumento — é ele quem cria o objeto —, então `ax` começa em 0.
+
+Com as duas tabelas, o comando `let dx = x - other.getx();` de `distance` pode ser traduzido: a busca encontra `x` na tabela de classe (`this 0`), e `other` e `dx` na tabela de subroutine (`argument 1` e `local 0`):
+
+```
+push this 0           // x
+push argument 1       // other (o objeto sobre o qual getx opera)
+call Point.getx 1
+sub
+pop local 0           // dx
+```
+
+Da mesma forma, `let pointCount = pointCount + 1;` no construtor vira `push static 0`, `push constant 1`, `add`, `pop static 0`.
 
 !!! note "Comparação com a API do Nand2Tetris"
     O livro do Nand2Tetris propõe uma API com três consultas separadas — `kindOf(name)`, `typeOf(name)` e `indexOf(name)`. Aqui elas foram reunidas em `resolve(name)`, que devolve as três informações de uma vez em um `Symbol` (ou `null`, o equivalente ao `NONE` de `kindOf`). `startSubroutine`, `define` e `varCount` têm o mesmo papel nas duas versões.
@@ -92,7 +149,7 @@ Repare em `resolve`: a busca acontece **primeiro** no escopo de subroutine e só
 
 ## Integrando ao parser
 
-A tabela se popula em exatamente três pontos da gramática — todos já reconhecidos pelo `CompilationEngine` da Unidade 1, agora ganhando uma linha de `symbolTable.define(...)` cada:
+A tabela se popula em exatamente três pontos da gramática — todos já reconhecidos pelo `CompilationEngine` da Parte 1, agora ganhando uma linha de `symbolTable.define(...)` cada:
 
 **Variáveis de classe** (`classVarDec`, dentro de `parseClass`):
 
@@ -161,4 +218,4 @@ Esta tabela responde "que categoria, que tipo, que índice" — o suficiente par
 
 ## O que vem a seguir
 
-Com a tabela de símbolos pronta, temos as três peças: a estrutura do programa (o parser da Unidade 1), o alvo (a VM Hack do capítulo 7) e a ponte entre os nomes de Jack e os segmentos da VM. Os capítulos 9 e 10 juntam as três e começam a gerar código de verdade, agora que sabemos exatamente onde cada identificador vive.
+Com a tabela de símbolos pronta, temos as três peças: a estrutura do programa (o parser da Parte 1), o alvo (a VM Hack do capítulo 7) e a ponte entre os nomes de Jack e os segmentos da VM. Os capítulos 9 e 10 juntam as três e começam a gerar código de verdade, agora que sabemos exatamente onde cada identificador vive.

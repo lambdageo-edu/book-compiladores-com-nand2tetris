@@ -74,14 +74,37 @@ void parseClass() {
 }
 ```
 
-O comando `function` só pode ser emitido depois que **todas** as variáveis locais já foram registradas na tabela de símbolos (capítulo 8) — porque `nLocais` é exatamente `symbolTable.varCount(Kind.VAR)`. Por isso a emissão acontece no corpo da subroutine, não na sua declaração:
+O comando `function` só pode ser emitido depois que **todas** as variáveis locais já foram registradas na tabela de símbolos (capítulo 8) — porque `nLocais` é exatamente `symbolTable.varCount(Kind.VAR)`. Por isso a emissão acontece no corpo da subroutine, não na sua declaração. `parseSubroutineDec` reúne tudo o que o corpo vai precisar — o nome completo da função e o tipo de subroutine — e passa adiante:
 
 ```java
-void parseSubroutineBody(String functionName) {
+void parseSubroutineDec() {
+    symbolTable.startSubroutine();       // capítulo 8
+    ifLabelNum = 0;                      // capítulo 9
+    whileLabelNum = 0;
+
+    expectPeek(CONSTRUCTOR, FUNCTION, METHOD);
+    TokenType subroutineType = currentToken.type;
+    if (subroutineType == METHOD) {
+        symbolTable.define("this", className, Kind.ARG);
+    }
+
+    expectPeek(VOID, INT, CHAR, BOOLEAN, IDENT);   // tipo de retorno
+    expectPeek(IDENT);
+    String functionName = className + "." + currentToken.lexeme;
+
+    expectPeek(LPAREN);
+    parseParameterList();
+    expectPeek(RPAREN);
+
+    parseSubroutineBody(functionName, subroutineType);
+}
+
+void parseSubroutineBody(String functionName, TokenType subroutineType) {
     expectPeek(LBRACE);
     while (peekTokenIs(VAR)) parseVarDec();
 
     vmWriter.writeFunction(functionName, symbolTable.varCount(Kind.VAR));
+    // prólogo de construtor ou de método — ver as duas próximas seções
 
     parseStatements();
     expectPeek(RBRACE);
@@ -114,7 +137,7 @@ void testSimpleFunctions() {
 
 ## Construtores: alocando o objeto
 
-Um `constructor` precisa, antes de mais nada, alocar espaço no heap para o novo objeto — e apontar `this` (via `pointer 0`) para esse espaço recém-alocado. O tamanho a alocar é exatamente o número de `field`s da classe, já conhecido pela tabela de símbolos:
+Um `constructor` precisa, antes de mais nada, alocar espaço no heap para o novo objeto — e apontar `this` (via `pointer 0`) para esse espaço recém-alocado. O tamanho a alocar é exatamente o número de `field`s da classe, já conhecido pela tabela de símbolos. Este trecho entra em `parseSubroutineBody`, no lugar do comentário de prólogo, logo depois do `writeFunction` — a alocação precisa ser a primeira coisa que a função faz:
 
 ```java
 if (subroutineType == CONSTRUCTOR) {
@@ -149,7 +172,7 @@ return                    // return this
 
 ## Métodos: recebendo `this`
 
-Um método Jack (`p.getX()`) é, na VM, uma função comum que recebe o objeto receptor como **primeiro argumento**. O capítulo 8 já garantiu que, ao compilar um método, `"this"` foi registrado como `arg` de índice 0 — falta apenas, no prólogo do método, **materializar** esse argumento no registrador `pointer 0`, para que o restante do corpo possa usar `this 0`, `this 1` etc. normalmente:
+Um método Jack (`p.getX()`) é, na VM, uma função comum que recebe o objeto receptor como **primeiro argumento**. O capítulo 8 já garantiu que, ao compilar um método, `"this"` foi registrado como `arg` de índice 0 — falta apenas, no prólogo do método (o mesmo ponto de `parseSubroutineBody`, logo depois do `writeFunction`), **materializar** esse argumento no registrador `pointer 0`, para que o restante do corpo possa usar `this 0`, `this 1` etc. normalmente:
 
 ```java
 if (subroutineType == METHOD) {
@@ -293,8 +316,8 @@ Como exercício de verificação, vale compilar mentalmente (ou de fato, testand
 
 ## Fechando o Project 11
 
-Com variáveis, funções, construtores, métodos, chamadas e arrays todos gerando código VM, o compilador Jack → VM está completo — qualquer arquivo `.jack` válido, de qualquer complexidade, agora compila para um `.vm` executável no VM Emulator do Nand2Tetris. É um bom momento para rodar contra os programas de teste do Project 11, nesta ordem — `Seven` (expressão com constantes, `do` e `return`), `ConvertToBin` (comandos procedurais e funções), `Square` (construtores, métodos e campos), `Average` (arrays e strings), `Pong` (aplicação orientada a objetos completa, com variáveis `static`) e `ComplexArrays` (índices de array aninhados) — e comparar a saída. Quando ela não bate byte a byte com a referência oficial, normalmente ainda é possível validar comportamentalmente, executando ambos no VM Emulator e comparando o resultado observável. Para executar, carregue no emulador o diretório inteiro do programa: o VM Emulator já traz uma implementação embutida das oito classes do sistema operacional Jack; em qualquer outro ambiente, os oito arquivos `.vm` do sistema operacional (capítulo 7) precisam estar no mesmo diretório dos `.vm` gerados.
+Com variáveis, funções, construtores, métodos, chamadas e arrays todos gerando código VM, o compilador Jack → VM está completo — qualquer arquivo `.jack` válido, de qualquer complexidade, agora compila para um `.vm` executável no VM Emulator do Nand2Tetris. É um bom momento para rodar contra os programas de teste do Project 11, nesta ordem — `Seven` (expressão com constantes, `do` e `return`), `ConvertToBin` (comandos procedurais e funções), `Square` (construtores, métodos e campos), `Average` (arrays e strings), `Pong` (aplicação orientada a objetos completa, com variáveis `static`) e `ComplexArrays` (índices de array aninhados) — e comparar a saída com a do `JackCompiler` de referência (pasta `tools/` do Nand2Tetris; o Project 11 não traz arquivos `.vm` esperados). Quando ela não bate byte a byte, normalmente ainda é possível validar comportamentalmente, executando ambos no VM Emulator e comparando o resultado observável. Para executar, carregue no emulador o diretório inteiro do programa: o VM Emulator já traz uma implementação embutida das oito classes do sistema operacional Jack; em qualquer outro ambiente, os oito arquivos `.vm` do sistema operacional (capítulo 7) precisam estar no mesmo diretório dos `.vm` gerados.
 
 ## O que vem a seguir
 
-O compilador está pronto, mas ele só produz código VM — que ainda não roda em hardware nenhum. A Unidade 3 fecha essa lacuna: o capítulo 11 (ainda nesta unidade) começa o VM Translator, traduzindo aritmética e acesso à memória para Assembly Hack; o capítulo 12 completa o protocolo de função (`call`/`return`, *stack frames*); e os capítulos 13–15 tratam da geração de código alvo final e do Assembler.
+O compilador está pronto, mas ele só produz código VM — que ainda não roda em hardware nenhum. As Partes 3 e 4 fecham essa lacuna: o capítulo 11 especifica o Assembly Hack, a linguagem-alvo do próximo tradutor; os capítulos 12 e 13 constroem o VM Translator (primeiro aritmética e acesso à memória, depois controle de fluxo e o protocolo `call`/`return`); o capítulo 14 consolida o caminho percorrido; e o capítulo 15 constrói o Assembler.

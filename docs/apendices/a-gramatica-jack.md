@@ -8,7 +8,7 @@ Referência completa, para consulta rápida durante os capítulos 4 e 5. A nota�
 |---|---|
 | `keyword` | `class` \| `constructor` \| `function` \| `method` \| `field` \| `static` \| `var` \| `int` \| `char` \| `boolean` \| `void` \| `true` \| `false` \| `null` \| `this` \| `let` \| `do` \| `if` \| `else` \| `while` \| `return` |
 | `symbol` | `{` `}` `(` `)` `[` `]` `.` `,` `;` `+` `-` `*` `/` `&` `|` `<` `>` `=` `~` |
-| `integerConstant` | Um número decimal |
+| `integerConstant` | Um número decimal entre 0 e 32767 (o `-` de um número negativo é o operador unário) |
 | `stringConstant` | Sequência de caracteres Unicode, sem aspas duplas nem quebra de linha |
 | `identifier` | Sequência de letras, dígitos e `_`, não iniciando com dígito |
 

@@ -1,6 +1,6 @@
 # Apêndice B — Especificação da VM Hack
 
-Referência compacta, extraída do capítulo 7, para consulta rápida durante os capítulos 9–12.
+Referência compacta, extraída do capítulo 7, para consulta rápida durante os capítulos 9–13.
 
 ## Segmentos
 

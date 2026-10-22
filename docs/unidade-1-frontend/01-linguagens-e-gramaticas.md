@@ -117,7 +117,7 @@ Formalmente, uma GLC é uma quádrupla G = (T, NT, S, P):
 
 - **T** — símbolos terminais (as categorias sintáticas devolvidas pelo analisador léxico: os tokens);
 - **NT** — símbolos não-terminais (variáveis sintáticas que dão estrutura às produções);
-- **S** — o não-terminal inicial (será `Class`, na gramática de Jack);
+- **S** — o não-terminal inicial (será `class`, na gramática de Jack);
 - **P** — as produções, cada uma da forma `NT → (T ∪ NT)*`.
 
 ### Notação BNF
@@ -135,7 +135,7 @@ Op   → + | - | x | ÷
 
 a cadeia `(a + b) x c` pode ser derivada tanto pela substituição sempre do não-terminal **mais à direita** (derivação mais à direita) quanto sempre do **mais à esquerda** (derivação mais à esquerda). Quando a gramática é bem comportada, ambas produzem a mesma árvore de derivação.
 
-Uma gramática é **ambígua** quando alguma cadeia admite mais de uma derivação mais à esquerda (ou mais à direita) distinta — ou seja, mais de uma árvore de derivação válida. Um exemplo clássico: `E → E+E | E*E | (E) | a` é ambígua para `a + a * a` (o `*` pode ser agrupado com o segundo `a` de duas formas diferentes, uma delas violando a precedência esperada). Não existe um procedimento geral para detectar ou eliminar ambiguidade — cada caso exige uma reescrita específica da gramática, tipicamente introduzindo não-terminais que codificam a precedência desejada (como fizemos, implicitamente, ao separar `expr`, `term` e `fact` no exemplo acima).
+Uma gramática é **ambígua** quando alguma cadeia admite mais de uma derivação mais à esquerda (ou mais à direita) distinta — ou seja, mais de uma árvore de derivação válida. Um exemplo clássico: `E → E+E | E*E | (E) | a` é ambígua para `a + a * a` (o `*` pode ser agrupado com o segundo `a` de duas formas diferentes, uma delas violando a precedência esperada). Não existe um procedimento geral para detectar ou eliminar ambiguidade — cada caso exige uma reescrita específica da gramática, tipicamente introduzindo não-terminais que codificam a precedência desejada (é o que faz a gramática de expressões com `expr`, `term` e `fact` que aparece logo adiante, na seção sobre recursão à esquerda).
 
 ### Gramáticas LL e análise preditiva
 
@@ -147,7 +147,7 @@ Gramáticas que permitem essa escolha unívoca são chamadas **LL(1)** — a lei
 2. se α começa com um não-terminal, todos os terminais que iniciam alguma produção desse não-terminal entram em FIRST(α);
 3. se α pode derivar a cadeia vazia (ε), então ε também está em FIRST(α).
 
-Para um não-terminal com produções alternativas `A → α | β`, o parser preditivo só funciona se **FIRST(α) e FIRST(β) forem disjuntos**: ao ver o token de lookahead, o parser escolhe α se o token estiver em FIRST(α), ou β se estiver em FIRST(β) — sem qualquer ambiguidade. Essa é a formalização exata do que já fazíamos informalmente nos métodos `if`/`else if` dos capítulos 2, 4 e 5: cada `case` de um `switch(lookahead)` (ou cada ramo de um `if`/`else if`) corresponde a uma produção cujo FIRST contém aquele token:
+Para um não-terminal com produções alternativas `A → α | β`, o parser preditivo só funciona se **FIRST(α) e FIRST(β) forem disjuntos**: ao ver o token de lookahead, o parser escolhe α se o token estiver em FIRST(α), ou β se estiver em FIRST(β) — sem qualquer ambiguidade. Essa é a formalização exata do que faremos, de modo informal, nos métodos `if`/`else if` dos capítulos 2, 4 e 5: cada `case` de um `switch(lookahead)` (ou cada ramo de um `if`/`else if`) corresponde a uma produção cujo FIRST contém aquele token:
 
 ```c
 void inst() {
@@ -213,7 +213,7 @@ expr  → expr + digit                expr  → expr + digit { print('+') }
 digit → 0 | ... | 9                 digit → 0 { print('0') } | ... | 9 { print('9') }
 ```
 
-A regra de ouro é posicional: se a ação aparece depois do símbolo `X` na produção, ela deve ser copiada para o método gerado logo **depois** da chamada/casamento correspondente a `X`. Construir um tradutor dirigido por sintaxe é, portanto, apenas um passo além de construir um analisador preditivo: constrói-se o parser preditivo normalmente, e depois se copiam as ações semânticas para dentro de cada método, respeitando essa posição relativa. É exatamente esse o nome — e o método — que dá título a esta disciplina, e é o que faremos concretamente já no capítulo 2 (onde as "ações" são `System.out.println("push ...")`, `println("add")` etc.) e, em escala completa, nos capítulos 9 e 10 da Unidade 2.
+A regra de ouro é posicional: se a ação aparece depois do símbolo `X` na produção, ela deve ser copiada para o método gerado logo **depois** da chamada/casamento correspondente a `X`. Construir um tradutor dirigido por sintaxe é, portanto, apenas um passo além de construir um analisador preditivo: constrói-se o parser preditivo normalmente, e depois se copiam as ações semânticas para dentro de cada método, respeitando essa posição relativa. É exatamente esse o nome — e o método — que dá título a esta disciplina, e é o que faremos concretamente já no capítulo 2 (onde as "ações" são `System.out.println("push ...")`, `println("add")` etc.) e, em escala completa, nos capítulos 9 e 10 da Parte 2.
 
 ### Os limites de uma gramática
 

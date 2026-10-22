@@ -1,6 +1,6 @@
 # 7. A VM Hack (especificação)
 
-Este capítulo é a especificação de referência da VM Hack — a representação intermediária baseada em pilha para a qual o compilador Jack (capítulos 9 e 10) vai gerar código, e que o VM Translator (capítulos 11 e 12) vai traduzir para Assembly Hack. Não há código de compilador aqui; é a "planta" que orienta os próximos quatro capítulos.
+Este capítulo é a especificação de referência da VM Hack — a representação intermediária baseada em pilha para a qual o compilador Jack (capítulos 9 e 10) vai gerar código, e que o VM Translator (capítulos 12 e 13) vai traduzir para Assembly Hack. Não há código de compilador aqui; é a "planta" que orienta o restante da Parte 2 e o VM Translator.
 
 ## Modelo de memória
 
@@ -30,7 +30,7 @@ pop this 1           // RAM[8001] = 17
 
 É esse mecanismo de endereçamento indireto que o compilador vai usar para acessar campos de objetos (via `this`) e elementos de arrays (via `that`).
 
-Além dos segmentos, duas áreas adicionais completam o modelo: a **pilha** (*stack*), usada para armazenar valores temporários durante a avaliação de expressões e para implementar o protocolo de chamada de função (capítulo 12); e o **heap**, a região de RAM dedicada ao armazenamento de objetos e arrays, gerenciada dinamicamente pelas funções `Memory.alloc`/`Memory.deAlloc` do sistema operacional Jack.
+Além dos segmentos, duas áreas adicionais completam o modelo: a **pilha** (*stack*), usada para armazenar valores temporários durante a avaliação de expressões e para implementar o protocolo de chamada de função (capítulo 13); e o **heap**, a região de RAM dedicada ao armazenamento de objetos e arrays, gerenciada dinamicamente pelas funções `Memory.alloc`/`Memory.deAlloc` do sistema operacional Jack.
 
 ## Comandos de acesso à memória
 
@@ -77,7 +77,7 @@ goto rótulo        // salto incondicional
 if-goto rótulo     // desempilha o topo; se for verdadeiro (≠ 0), salta
 ```
 
-Rótulos têm escopo de função — dois `label LOOP` em funções diferentes não colidem (o capítulo 12 detalha a qualificação `funcao$rótulo` usada pelo VM Translator para garantir isso na tradução final para Assembly). É com apenas essas três primitivas que o capítulo 9 vai mapear `if`/`else` e `while` de Jack.
+Rótulos têm escopo de função — dois `label LOOP` em funções diferentes não colidem (o capítulo 13 detalha a qualificação `funcao$rótulo` usada pelo VM Translator para garantir isso na tradução final para Assembly). É com apenas essas três primitivas que o capítulo 9 vai mapear `if`/`else` e `while` de Jack.
 
 ## Funções
 
@@ -106,11 +106,11 @@ function Main.main 1
     return
 ```
 
-O nome de uma função é sempre `Classe.nomeDaSubroutine` — é assim que construtores, métodos e funções (na terminologia Jack) se tornam, todos igualmente, "funções" no nível da VM. O mecanismo completo de `call`/`return` (salvar e restaurar o estado do chamador, o *stack frame*) é o assunto do capítulo 12; por ora, basta saber a interface: argumentos entram empilhados, o resultado sai empilhado.
+O nome de uma função é sempre `Classe.nomeDaSubroutine` — é assim que construtores, métodos e funções (na terminologia Jack) se tornam, todos igualmente, "funções" no nível da VM. O mecanismo completo de `call`/`return` (salvar e restaurar o estado do chamador, o *stack frame*) é o assunto do capítulo 13; por ora, basta saber a interface: argumentos entram empilhados, o resultado sai empilhado.
 
 ## Um programa completo
 
-Todo programa VM começa executando `Main.main`. Um exemplo simples — somar de 1 a `n` e imprimir o resultado — ilustra push/pop, aritmética, controle de fluxo e chamada de função juntos:
+Todo programa Jack começa executando `Main.main` — mais precisamente, a máquina começa por `Sys.init`, uma função do sistema operacional Jack que inicializa as demais classes do SO e então chama `Main.main` (o capítulo 13 mostra esse *bootstrap*). Um exemplo simples — somar de 1 a `n` e imprimir o resultado — ilustra push/pop, aritmética, controle de fluxo e chamada de função juntos:
 
 ```
 function Soma.soma 2        // variáveis locais: sum (0), i (1)
@@ -185,6 +185,6 @@ A VM não sabe nada de classes, objetos ou métodos. Para que programas Jack com
 
 ## O que vem a seguir
 
-Com a especificação da VM Hack e o mapeamento padrão em mãos, sabemos exatamente *onde* cada variável Jack precisa morar. O próximo capítulo constrói a estrutura que guarda essa informação durante a compilação — a **tabela de símbolos** —, e os capítulos 9 e 10 evoluem o `CompilationEngine` da Unidade 1 para efetivamente gerar este código, expressão por expressão, comando por comando — fechando o compilador Jack → VM (Project 11) por completo. Os capítulos 11 e 12, na Unidade 3, tratam do outro lado: como traduzir esse código VM para Assembly Hack.
+Com a especificação da VM Hack e o mapeamento padrão em mãos, sabemos exatamente *onde* cada variável Jack precisa morar. O próximo capítulo constrói a estrutura que guarda essa informação durante a compilação — a **tabela de símbolos** —, e os capítulos 9 e 10 evoluem o `CompilationEngine` da Parte 1 para efetivamente gerar este código, expressão por expressão, comando por comando — fechando o compilador Jack → VM (Project 11) por completo. Os capítulos 12 e 13, na Parte 3, tratam do outro lado: como traduzir esse código VM para Assembly Hack.
 
 Uma versão tabular desta especificação, para consulta rápida durante esses capítulos, está no [Apêndice B](../apendices/b-especificacao-vm.md).

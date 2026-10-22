@@ -1,6 +1,6 @@
 # 13. VM Translator — Parte 2: controle de fluxo e funções
 
-A Parte 1 (capítulo 11) traduziu aritmética e acesso à memória — comandos que não atravessam fronteiras de função. Este capítulo fecha o VM Translator (Project 8) com a parte mais sofisticada do tradutor: **rótulos com escopo de função** e o protocolo completo de **chamada de função** (`call`/`function`/`return`), que é o que torna possível compilar recursão corretamente. Ao final, teremos uma cadeia de tradução completa: Jack → VM → Assembly Hack.
+A primeira metade do VM Translator (capítulo 12) traduziu aritmética e acesso à memória — comandos que não atravessam fronteiras de função. Este capítulo fecha o VM Translator (Project 8) com a parte mais sofisticada do tradutor: **rótulos com escopo de função** e o protocolo completo de **chamada de função** (`call`/`function`/`return`), que é o que torna possível compilar recursão corretamente. Ao final, teremos uma cadeia de tradução completa: Jack → VM → Assembly Hack.
 
 ## Rótulos com escopo de função
 
@@ -31,21 +31,30 @@ Dois princípios sustentam esse mecanismo:
 Na VM Hack, o registro de ativação é uma sequência determinística de valores na pilha:
 
 ```
-┌─────────────────────────────┐
-│  variáveis locais            │  ← LCL aponta aqui
-├─────────────────────────────┤
-│  THAT salvo (do chamador)    │
-│  THIS salvo (do chamador)    │
-│  ARG salvo (do chamador)     │
-│  LCL salvo (do chamador)     │
-│  endereço de retorno          │
-├─────────────────────────────┤
-│  argumentos (nArgs valores)   │  ← ARG aponta aqui
-├─────────────────────────────┤
-│  frames de chamadas anteriores│
-└─────────────────────────────┘
-                                  ↑ SP
+              ┌──────────────────────────────┐
+     SP  →    │  (próxima posição livre)      │   endereços mais altos
+              ├──────────────────────────────┤
+              │  pilha de trabalho da função  │
+              ├──────────────────────────────┤
+              │  local nLocais-1              │
+              │  ...                          │
+     LCL →    │  local 0                      │
+              ├──────────────────────────────┤
+              │  THAT salvo (do chamador)     │   LCL - 1
+              │  THIS salvo (do chamador)     │   LCL - 2
+              │  ARG salvo (do chamador)      │   LCL - 3
+              │  LCL salvo (do chamador)      │   LCL - 4
+              │  endereço de retorno          │   LCL - 5
+              ├──────────────────────────────┤
+              │  argument nArgs-1             │
+              │  ...                          │
+     ARG →    │  argument 0                   │
+              ├──────────────────────────────┤
+              │  frames de chamadas anteriores│   endereços mais baixos
+              └──────────────────────────────┘
 ```
+
+A pilha cresce para endereços mais altos (a partir de `RAM[256]`): os argumentos foram empilhados pelo chamador antes do `call`, os cinco valores salvos são empilhados pelo próprio `call`, e as variáveis locais pelo comando `function`. Os deslocamentos à direita — `LCL - 1` a `LCL - 5` — são exatamente os que o `return` vai usar para desmontar o frame.
 
 Vale notar uma simplificação importante da VM Hack em relação a linguagens com procedimentos aninhados (Pascal, Scheme): o frame guarda apenas um **control link** — a cadeia de retorno, que permite restaurar o chamador — mas nenhum **access link** (que permitiria acessar variáveis de um escopo léxico envolvente). Como Jack não tem subroutines aninhadas, essa complexidade simplesmente não existe aqui, e o acesso a variáveis é sempre direto, via `LCL`/`ARG` da própria função.
 
@@ -180,7 +189,10 @@ A=M
 0;JMP
 ```
 
-Por que salvar `retAddr` em `R15` e `endFrame` em `R14`? Porque `LCL` é justamente um dos registradores que estamos prestes a sobrescrever — sem guardar seu valor original em algum lugar seguro, perderíamos a referência para localizar os demais metadados salvos.
+Por que guardar `endFrame` e `retAddr` antes de qualquer outra coisa? São dois motivos diferentes:
+
+- **`endFrame` em `R14`**: `LCL` é um dos registradores que o passo 5 vai sobrescrever. Sem uma cópia do seu valor original, perderíamos a referência para localizar os metadados salvos.
+- **`retAddr` em `R15`**: o passo 3 grava o valor de retorno em `*ARG`. Se a função foi chamada com **zero argumentos**, `ARG` aponta exatamente para a posição onde o `call` guardou o endereço de retorno (`LCL - 5`) — e o passo 3 o apagaria. Lendo o endereço de retorno no passo 2, antes disso, o problema desaparece.
 
 ## Recursão: o teste definitivo
 
@@ -222,6 +234,30 @@ M=D
 
 seguido de um `call Sys.init 0` — usando exatamente o mesmo mecanismo de `call` descrito acima. Esse código de bootstrap é emitido uma única vez, no início do arquivo `.asm` final, antes da tradução de qualquer arquivo `.vm`.
 
+## Traduzindo um programa inteiro
+
+Até aqui, cada comando foi traduzido isoladamente. Um programa real, porém, é um **diretório** com vários arquivos `.vm` — um por classe Jack, mais os do sistema operacional —, e o VM Translator precisa juntar tudo em um único `.asm`:
+
+- **Entrada:** um arquivo `Xxx.vm` (gera `Xxx.asm`) ou um diretório `Xxx/` (gera `Xxx/Xxx.asm`, com a tradução de todos os `.vm` do diretório, um depois do outro).
+- **`static` por arquivo:** o prefixo do símbolo de `static i` é o nome do arquivo **sendo traduzido no momento** — `static 0` em `Main.vm` vira `@Main.0`, em `Ball.vm` vira `@Ball.0`. É isso que dá a cada classe o seu próprio segmento `static`.
+- **Rótulos únicos no programa todo:** os rótulos de retorno do `call` (`RETURN_LABEL_42`) e os de comparação do capítulo 12 (`TRUE_EQ_0`) precisam ser únicos no `.asm` final, não só dentro de cada arquivo. Um contador global — ou um prefixo com o nome da função corrente, como `Main.fibonacci$ret.3` — resolve.
+- **Bootstrap só quando há `Sys.init`:** os primeiros testes do Project 8 não têm `Sys.vm` e inicializam a máquina pelo próprio script `.tst`; eles devem ser traduzidos **sem** o bootstrap. Os testes que trazem `Sys.vm` exigem o bootstrap.
+
+## Exercício guiado
+
+Sua atividade é completar o `VMTranslator` do capítulo 12 com `label`, `goto`, `if-goto`, `function`, `call` e `return`, mais a tradução de diretórios e o bootstrap. Os testes oficiais (pasta `projects/08`), na ordem sugerida:
+
+| Teste | O que exercita | Bootstrap? |
+|---|---|---|
+| `ProgramFlow/BasicLoop` | `label`, `if-goto` | não |
+| `ProgramFlow/FibonacciSeries` | `goto`, `if-goto`, laços com memória | não |
+| `FunctionCalls/SimpleFunction` | `function` e `return` com variáveis locais | não |
+| `FunctionCalls/NestedCall` | chamadas aninhadas; preservação de todos os registradores do frame | sim |
+| `FunctionCalls/FibonacciElement` | recursão, vários arquivos (`Main.vm` + `Sys.vm`) | sim |
+| `FunctionCalls/StaticsTest` | `static` separado por arquivo | sim |
+
+Como no capítulo 12, rode cada `.asm` gerado no CPU Emulator com o script `.tst` correspondente e compare o resultado com o `.cmp`.
+
 ## Comparação com convenções de chamada reais
 
 Vale posicionar esse protocolo ao lado de convenções usadas em processadores reais, para enxergar o que é essencial e o que é escolha de projeto:
@@ -238,4 +274,4 @@ A VM Hack sacrifica desempenho (um overhead fixo e relativamente alto por chamad
 
 ## O que vem a seguir
 
-Com o VM Translator completo (Partes 1 e 2), qualquer programa Jack — via o compilador da Unidade 2 — já pode ser traduzido, em duas etapas, até Assembly Hack. Falta uma última peça: transformar esse Assembly em código de máquina de verdade. Os capítulos 13 a 15 fecham essa lacuna: uma consolidação teórica do caminho até aqui, a especificação completa da linguagem Assembly Hack, e finalmente a construção do Assembler.
+Com o VM Translator completo (capítulos 12 e 13), qualquer programa Jack — via o compilador da Parte 2 — já pode ser traduzido, em duas etapas, até Assembly Hack. Falta uma última peça: transformar esse Assembly em código de máquina de verdade. Os capítulos 14 e 15 fecham essa lacuna: uma consolidação teórica do caminho até aqui e, finalmente, a construção do Assembler.
