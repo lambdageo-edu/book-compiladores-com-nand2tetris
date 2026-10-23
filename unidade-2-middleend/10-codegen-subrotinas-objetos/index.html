@@ -1777,6 +1777,42 @@
 <a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a><span class="n">vmWriter</span><span class="p">.</span><span class="na">writePush</span><span class="p">(</span><span class="n">Segment</span><span class="p">.</span><span class="na">THAT</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
 </code></pre></div>
 <p>Como exercício de verificação, vale compilar mentalmente (ou de fato, testando) uma expressão deliberadamente hostil como <code>let a[a[i]] = a[b[a[b[j]]]]</code> — se o <code>temp 0</code> intermediário estiver no lugar certo, mesmo esse emaranhado de acessos aninhados produz código correto.</p>
+<details class="note">
+<summary>Gabarito (supondo <code>var Array a, b; var int i, j;</code>, ou seja, <code>local 0</code> a <code>local 3</code>)</summary>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>// lado esquerdo: endereço de a[a[i]]
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>push local 0        // a
+<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a>push local 0        // a
+<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a>push local 2        // i
+<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a>add
+<a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a>pop pointer 1
+<a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a>push that 0         // a[i]
+<a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a>add                 // endereço de a[a[i]] fica na pilha
+<a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a>// lado direito: a[b[a[b[j]]]], de dentro para fora
+<a id="__codelineno-18-10" name="__codelineno-18-10" href="#__codelineno-18-10"></a>push local 0        // a
+<a id="__codelineno-18-11" name="__codelineno-18-11" href="#__codelineno-18-11"></a>push local 1        // b
+<a id="__codelineno-18-12" name="__codelineno-18-12" href="#__codelineno-18-12"></a>push local 0        // a
+<a id="__codelineno-18-13" name="__codelineno-18-13" href="#__codelineno-18-13"></a>push local 1        // b
+<a id="__codelineno-18-14" name="__codelineno-18-14" href="#__codelineno-18-14"></a>push local 3        // j
+<a id="__codelineno-18-15" name="__codelineno-18-15" href="#__codelineno-18-15"></a>add
+<a id="__codelineno-18-16" name="__codelineno-18-16" href="#__codelineno-18-16"></a>pop pointer 1
+<a id="__codelineno-18-17" name="__codelineno-18-17" href="#__codelineno-18-17"></a>push that 0         // b[j]
+<a id="__codelineno-18-18" name="__codelineno-18-18" href="#__codelineno-18-18"></a>add
+<a id="__codelineno-18-19" name="__codelineno-18-19" href="#__codelineno-18-19"></a>pop pointer 1
+<a id="__codelineno-18-20" name="__codelineno-18-20" href="#__codelineno-18-20"></a>push that 0         // a[b[j]]
+<a id="__codelineno-18-21" name="__codelineno-18-21" href="#__codelineno-18-21"></a>add
+<a id="__codelineno-18-22" name="__codelineno-18-22" href="#__codelineno-18-22"></a>pop pointer 1
+<a id="__codelineno-18-23" name="__codelineno-18-23" href="#__codelineno-18-23"></a>push that 0         // b[a[b[j]]]
+<a id="__codelineno-18-24" name="__codelineno-18-24" href="#__codelineno-18-24"></a>add
+<a id="__codelineno-18-25" name="__codelineno-18-25" href="#__codelineno-18-25"></a>pop pointer 1
+<a id="__codelineno-18-26" name="__codelineno-18-26" href="#__codelineno-18-26"></a>push that 0         // a[b[a[b[j]]]]
+<a id="__codelineno-18-27" name="__codelineno-18-27" href="#__codelineno-18-27"></a>// a atribuição
+<a id="__codelineno-18-28" name="__codelineno-18-28" href="#__codelineno-18-28"></a>pop temp 0
+<a id="__codelineno-18-29" name="__codelineno-18-29" href="#__codelineno-18-29"></a>pop pointer 1       // that aponta para a[a[i]]
+<a id="__codelineno-18-30" name="__codelineno-18-30" href="#__codelineno-18-30"></a>push temp 0
+<a id="__codelineno-18-31" name="__codelineno-18-31" href="#__codelineno-18-31"></a>pop that 0
+</code></pre></div>
+<p>Repare que o endereço do lado esquerdo fica <strong>na pilha</strong>, e não em <code>pointer 1</code>, durante toda a avaliação do lado direito — por isso as quatro leituras do lado direito podem usar <code>pointer 1</code> à vontade. Simulando essa sequência com arrays e índices aleatórios, o resultado bate sempre com a atribuição esperada.</p>
+</details>
 <h2 id="fechando-o-project-11">Fechando o Project 11<a class="headerlink" href="#fechando-o-project-11" title="Permanent link">&para;</a></h2>
 <p>Com variáveis, funções, construtores, métodos, chamadas e arrays todos gerando código VM, o compilador Jack → VM está completo — qualquer arquivo <code>.jack</code> válido, de qualquer complexidade, agora compila para um <code>.vm</code> executável no VM Emulator do Nand2Tetris. É um bom momento para rodar contra os programas de teste do Project 11, nesta ordem — <code>Seven</code> (expressão com constantes, <code>do</code> e <code>return</code>), <code>ConvertToBin</code> (comandos procedurais e funções), <code>Square</code> (construtores, métodos e campos), <code>Average</code> (arrays e strings), <code>Pong</code> (aplicação orientada a objetos completa, com variáveis <code>static</code>) e <code>ComplexArrays</code> (índices de array aninhados) — e comparar a saída com a do <code>JackCompiler</code> de referência (pasta <code>tools/</code> do Nand2Tetris; o Project 11 não traz arquivos <code>.vm</code> esperados). Quando ela não bate byte a byte, normalmente ainda é possível validar comportamentalmente, executando ambos no VM Emulator e comparando o resultado observável. Para executar, carregue no emulador o diretório inteiro do programa: o VM Emulator já traz uma implementação embutida das oito classes do sistema operacional Jack; em qualquer outro ambiente, os oito arquivos <code>.vm</code> do sistema operacional (capítulo 7) precisam estar no mesmo diretório dos <code>.vm</code> gerados.</p>
 <h2 id="o-que-vem-a-seguir">O que vem a seguir<a class="headerlink" href="#o-que-vem-a-seguir" title="Permanent link">&para;</a></h2>

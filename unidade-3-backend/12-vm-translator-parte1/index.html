@@ -1705,7 +1705,7 @@
 <p>Sua atividade prática nesta parte do curso é implementar um <code>VMTranslator</code> que recebe um arquivo <code>.vm</code> (ou uma pasta com vários) e produz o <code>.asm</code> correspondente, cobrindo:</p>
 <ol>
 <li>Todos os comandos aritméticos/lógicos (<code>add</code>, <code>sub</code>, <code>neg</code>, <code>eq</code>, <code>gt</code>, <code>lt</code>, <code>and</code>, <code>or</code>, <code>not</code>).</li>
-<li><code>push</code>/<code>pop</code> para todos os oito segmentos.</li>
+<li><code>push</code> para todos os oito segmentos e <code>pop</code> para sete deles (não existe <code>pop constant</code>: <code>constant</code> é um segmento virtual, só de leitura).</li>
 <li>Rótulos únicos para cada comparação traduzida (um contador incremental é suficiente).</li>
 </ol>
 <p>Os testes oficiais do Nand2Tetris para esta parte (pasta <code>projects/07</code>) incluem <code>SimpleAdd</code>, <code>StackTest</code> (aritmética e lógica combinadas), <code>BasicTest</code>, <code>PointerTest</code> e <code>StaticTest</code> (os quatro segmentos e os dois casos especiais <code>pointer</code>/<code>static</code>) — rode cada <code>.asm</code> gerado no CPU Emulator e compare o estado final da RAM com o script <code>.tst</code>/<code>.cmp</code> de referência.</p>

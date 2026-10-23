@@ -1689,7 +1689,7 @@
 <p>Com um <code>JackTokenizer</code> completo e validado, o próximo capítulo constrói o analisador sintático: um método por não-terminal da gramática do capítulo 3, cada um consumindo tokens deste tokenizador e emitindo (inicialmente) uma árvore sintática em XML — o mesmo tipo de validação por comparação que usamos aqui, agora para a estrutura completa do programa.</p>
 <div class="admonition note">
 <p class="admonition-title">Atividade</p>
-<p>Como exercício de fixação, tente escrever a especificação léxica de Jack inteira como uma única expressão regular por categoria de token (símbolos, inteiros, identificadores, strings) na linguagem que você escolher para o seu projeto. Depois de feito, reflita: quais as desvantagens de usar expressões regulares (ao invés de um scanner ad-hoc escrito à mão) para ler um arquivo inteiro e devolver a lista de tokens reconhecidos?</p>
+<p>Como exercício de fixação, tente escrever a especificação léxica de Jack inteira como uma única expressão regular por categoria de token (palavras-chave, símbolos, inteiros, strings e identificadores), mais as expressões do que deve ser <strong>descartado</strong> (espaços em branco e os dois tipos de comentário, <code>// ...</code> e <code>/* ... */</code>), na linguagem que você escolher para o seu projeto. Repare que as palavras-chave também casam com a expressão de identificadores: decida como a sua solução resolve esse conflito (e compare com a tabela de palavras-chave do capítulo 2). Depois de feito, reflita: quais as desvantagens de usar expressões regulares (ao invés de um scanner ad-hoc escrito à mão) para ler um arquivo inteiro e devolver a lista de tokens reconhecidos?</p>
 </div>
 
 
