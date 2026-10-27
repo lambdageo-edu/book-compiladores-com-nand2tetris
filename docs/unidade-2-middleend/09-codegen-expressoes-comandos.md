@@ -2,6 +2,41 @@
 
 Chegou a hora de evoluir o `CompilationEngine` — que na Parte 1 apenas *reconhecia* a estrutura de um programa Jack, emitindo uma árvore XML — para efetivamente **gerar código VM**. A boa notícia é que a maior parte do trabalho já está feita: a gramática, o parser recursivo descendente e a tabela de símbolos já existem. Falta "só" substituir `printNonTerminal` por chamadas que emitem comandos VM reais, nos pontos certos — exatamente a técnica de **tradução dirigida por sintaxe** formalizada no capítulo 1.
 
+## O desafio: um programa, cinco problemas
+
+Antes de escrever qualquer linha do compilador, vale olhar para o problema de frente. A função abaixo calcula a raiz quadrada inteira de `x` por busca binária: mantém um intervalo `[low, high)` que sempre contém a resposta e o divide ao meio até sobrar um único número.
+
+```
+class Main {
+    function int raiz(int x) {
+        var int low, high, mid;
+        let low = 0;
+        let high = x + 1;
+        while ((high - low) > 1) {
+            let mid = (high + low) / 2;
+            if ((mid * mid) > x) {
+                let high = mid;
+            } else {
+                let low = mid;
+            }
+        }
+        return low;
+    }
+}
+```
+
+Traduzi-la para a VM Hack, que só conhece `push`, `pop`, aritmética, `label`, `goto`, `if-goto`, `function`, `call` e `return`, exige resolver cinco problemas diferentes — e é essa a divisão dos dois capítulos de geração de código:
+
+| Problema | Na função acima | Onde resolvemos |
+|---|---|---|
+| **Expressões** | `(high + low) / 2`, `(mid * mid) > x` | este capítulo |
+| **Controle de fluxo** | o `while` e o `if`/`else` | este capítulo |
+| **Variáveis** | `x`, `low`, `high`, `mid` | capítulo 10 |
+| **Objetos** | (não há aqui) construtores, métodos, campos | capítulo 10 |
+| **Arrays** | (não há aqui) `a[i]` | capítulo 10 |
+
+Para cada construção, vamos seguir sempre a mesma ordem: primeiro **o que** gerar — um molde mostrando o código Jack e o código VM lado a lado —, e só depois **como** gerar, no `CompilationEngine`. Ao final do capítulo, voltaremos a esta função e a veremos inteiramente traduzida.
+
 ## O VMWriter
 
 Assim como tivemos um `Scanner` dedicado a produzir tokens, vamos ter uma classe dedicada a produzir código VM: o `VMWriter`. Sua única responsabilidade é formatar comandos — ele não sabe nada sobre a gramática de Jack, apenas escreve o que lhe é pedido:
@@ -38,6 +73,92 @@ public class VMWriter {
 ```
 
 O `Parser` ganha uma instância de `VMWriter` (além do `SymbolTable` do capítulo 8), e um método `VMOutput()` espelhando o `XMLOutput()` que já existia. A partir daqui, cada seção da gramática de expressões e comandos ganha, além do reconhecimento sintático, a emissão de código correspondente — construída e testada incrementalmente, como sempre.
+
+## Expressões: da árvore à pilha
+
+Uma expressão pode ser escrita de três formas, conforme a posição do operador:
+
+| Notação | `a * (b + c)` escrita como | Para quem é natural |
+|---|---|---|
+| prefixa | `* a + b c` (ou `*(a, +(b, c))`) | funções: `f(x, y)` |
+| infixa | `a * (b + c)` | pessoas (e Jack) |
+| pós-fixa | `a b c + *` | máquinas de pilha |
+
+A VM é uma máquina de pilha, então gerar código para uma expressão é, no fundo, **converter a forma infixa na pós-fixa**: cada operando vira um `push`, e cada operador vem **depois** dos seus operandos, consumindo-os do topo da pilha. Quando o código termina de executar, o valor da expressão está no topo da pilha.
+
+Uma forma de ver a conversão é pela árvore da expressão. Para `x + g(2, y, -z) * 5` — lembrando que Jack avalia da esquerda para a direita, sem precedência (capítulo 3), o que dá `(x + g(2, y, -z)) * 5` —, a árvore é:
+
+```
+              *
+            /   \
+           +     5
+          / \
+         x   g
+           / | \
+          2  y  -
+                |
+                z
+```
+
+Percorrer a árvore em **pós-ordem** (primeiro os filhos, da esquerda para a direita, depois o nó) produz exatamente o código de pilha:
+
+```
+push x
+push constant 2
+push y
+push z
+neg            // o "-" unário
+call g 3
+add
+push constant 5
+call Math.multiply 2
+```
+
+O percurso cabe numa função recursiva de poucas linhas, que vale ter em mente durante todo o capítulo (aqui em pseudocódigo):
+
+```
+gerar(exp):
+    se exp é um número n:            emita "push constant n"
+    se exp é uma variável v:         emita "push v"     (o segmento certo vem no capítulo 10)
+    se exp é "exp1 op exp2":         gerar(exp1); gerar(exp2); emita op
+    se exp é "op exp1" (unário):     gerar(exp1); emita op
+    se exp é "f(exp1, ..., expN)":   gerar(exp1); ...; gerar(expN); emita "call f N"
+```
+
+O nosso compilador **não** constrói essa árvore. Ele faz a mesma coisa num único passo: o parser recursivo da Parte 1 já visita a expressão na ordem certa, e a pilha de chamadas de `parseExpression`/`parseTerm` faz o papel da árvore. Basta emitir o comando VM do nó **na hora em que o método termina de compilar os filhos**. Compare a saída do parser da Parte 1 com a que vamos gerar agora, para `let x = a + b - c;`:
+
+=== "Parte 1: só reconhecer"
+
+    ```xml
+    <letStatement>
+      <keyword> let </keyword>
+      <identifier> x </identifier>
+      <symbol> = </symbol>
+      <expression>
+        <term> <identifier> a </identifier> </term>
+        <symbol> + </symbol>
+        <term> <identifier> b </identifier> </term>
+        <symbol> - </symbol>
+        <term> <identifier> c </identifier> </term>
+      </expression>
+      <symbol> ; </symbol>
+    </letStatement>
+    ```
+
+=== "Parte 2: reconhecer e gerar"
+
+    ```
+    push a
+    push b
+    add
+    push c
+    sub
+    pop x
+    ```
+
+(Aqui, e até o capítulo 10, escrevemos as variáveis pelo nome — `push a`, `pop x` —, como pseudocódigo; constantes já aparecem na forma real, `push constant n`. Trocar cada nome pelo segmento certo, como `push local 0`, é o problema das variáveis, que a tabela de símbolos resolve no capítulo 10.)
+
+As próximas seções implementam a função `gerar` caso a caso, dentro dos métodos que já temos: literais e variáveis em `parseTerm`, operadores em `parseExpression`.
 
 ## Literais
 
@@ -196,7 +317,38 @@ whileLabelNum = 0;
 
 Zerar a cada subroutine é suficiente porque rótulos VM têm escopo de função (capítulo 7): o `IF_TRUE0` de `Main.main` e o de `Main.foo` não colidem.
 
-**`if`/`else`** mapeia para o seguinte esqueleto (o algoritmo aqui é o mesmo usado pelo compilador de referência do Nand2Tetris — não o único possível, mas o que facilita comparar sua saída com a oficial):
+Comecemos pelos moldes, na forma mais enxuta, que é a que costuma aparecer nos livros-texto (e nos slides do Nand2Tetris). Os rótulos `L1`, `L2` são inventados pelo compilador:
+
+=== "if/else"
+
+    ```
+    // if (cond) { s1 } else { s2 }
+        código VM de cond
+        not
+        if-goto L1          // condição falsa: pula para o else
+        código VM de s1
+        goto L2
+    label L1
+        código VM de s2
+    label L2
+    ```
+
+=== "while"
+
+    ```
+    // while (cond) { s }
+    label L1
+        código VM de cond
+        not
+        if-goto L2          // condição falsa: sai do laço
+        código VM de s
+        goto L1
+    label L2
+    ```
+
+Em ambos, o código de cada parte (`cond`, `s1`, `s2`, `s`) é gerado pelos métodos que já existem, recursivamente — um `if` dentro de um `while` simplesmente aparece dentro do "código VM de s". O compilador só precisa encaixar as peças e inventar rótulos que não colidam.
+
+**`if`/`else`**, no nosso compilador, usa uma variação desse molde: o seguinte esqueleto (o algoritmo aqui é o mesmo usado pelo compilador de referência do Nand2Tetris — não o único possível, mas o que facilita comparar sua saída com a oficial):
 
 ```
 código VM da condição
@@ -269,6 +421,58 @@ void parseWhile() {
     vmWriter.writeLabel(labelEnd);
 }
 ```
+
+## O exemplo inicial, traduzido
+
+Com expressões e controle de fluxo, já conseguimos traduzir quase toda a função `raiz` do início do capítulo — ainda com as variáveis pelo nome:
+
+```
+function Main.raiz ?          // quantas variáveis locais? (capítulo 10)
+    push constant 0
+    pop low                   // let low = 0;
+    push x
+    push constant 1
+    add
+    pop high                  // let high = x + 1;
+label WHILE_EXP0
+    push high
+    push low
+    sub
+    push constant 1
+    gt                        // (high - low) > 1
+    not
+    if-goto WHILE_END0
+    push high
+    push low
+    add
+    push constant 2
+    call Math.divide 2
+    pop mid                   // let mid = (high + low) / 2;
+    push mid
+    push mid
+    call Math.multiply 2
+    push x
+    gt                        // (mid * mid) > x
+    if-goto IF_TRUE0
+    goto IF_FALSE0
+label IF_TRUE0
+    push mid
+    pop high                  // let high = mid;
+    goto IF_END0
+label IF_FALSE0
+    push mid
+    pop low                   // let low = mid;
+label IF_END0
+    goto WHILE_EXP0
+label WHILE_END0
+    push low
+    return                    // return low;
+```
+
+Dos cinco problemas, dois estão resolvidos. Os nomes `x`, `low`, `high` e `mid` — e o `?` do cabeçalho — são o que falta: é com eles que o capítulo 10 começa.
+
+!!! tip "Verifique você mesmo"
+    Esse código (com as variáveis já trocadas pelos segmentos, como no capítulo 10) dá a resposta certa para todo `x` de 0 a 361. Acima disso, `mid * mid` passa de 32767 e estoura os 16 bits da máquina — um lembrete de que a VM Hack só conhece inteiros de 16 bits.
 
 ## O que levamos daqui
 

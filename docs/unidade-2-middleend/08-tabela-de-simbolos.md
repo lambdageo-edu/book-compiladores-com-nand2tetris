@@ -212,6 +212,31 @@ void parseSubroutineDec() {
 
 O truque de `if (subroutineType == METHOD) symbolTable.define("this", className, Kind.ARG)` merece destaque: pelo mapeamento padrão (capítulo 7), um método é sempre chamado com o objeto receptor como **primeiro argumento implícito** (o compilador insere isso na chamada, como veremos no capítulo 10) — logo, registrá-lo como `arg` de índice 0 *antes* de processar a lista de parâmetros declarados garante que o primeiro parâmetro *de fato* declarado pelo programador já saia com índice 1, exatamente onde ele estará em tempo de execução.
 
+## Testando a tabela antes de gerar código
+
+Um erro na tabela de símbolos (um índice que não zera em `startSubroutine`, um `this` esquecido) só aparece, nos capítulos seguintes, como código VM sutilmente errado — e é difícil rastreá-lo de volta. Vale, por isso, testar a tabela **sozinha**, antes de gerar uma única linha de VM, aproveitando a saída XML que o parser da Parte 1 já produz: basta enriquecer cada `<identifier>` com o que a tabela sabe sobre ele.
+
+Para cada identificador, imprima a **categoria** (`var`, `argument`, `static`, `field`, ou `class`/`subroutine` para os nomes que não estão na tabela), o **índice** (para as quatro categorias de variável) e se aquele ponto do código é uma **declaração** ou um **uso**. Para a classe `Point` do exemplo acima, um trecho da saída ficaria assim:
+
+```xml
+<keyword> field </keyword>
+<keyword> int </keyword>
+<identifier category="field" index="0" usage="declared"> x </identifier>
+<symbol> , </symbol>
+<identifier category="field" index="1" usage="declared"> y </identifier>
+...
+<keyword> let </keyword>
+<identifier category="field" index="0" usage="used"> x </identifier>
+<symbol> = </symbol>
+<expression>
+  <term>
+    <identifier category="argument" index="0" usage="used"> ax </identifier>
+  </term>
+</expression>
+```
+
+Não há arquivo de referência para comparar (essa saída não faz parte do Nand2Tetris), mas a conferência é visual e rápida: rode o parser sobre `Point.jack` e confira, linha a linha, se cada índice bate com a tabela montada à mão na seção "Um exemplo completo". Quando bater, a tabela está pronta — e os atributos extras podem ser removidos, ou deixados atrás de uma opção de depuração.
+
 ## O que a tabela ainda não faz
 
 Esta tabela responde "que categoria, que tipo, que índice" — o suficiente para gerar `push`/`pop` corretos nos capítulos 9 e 10. Ela **não** faz verificação de tipos (não impede que você some um `int` com um `boolean`), nem detecta redeclaração além do básico, nem resolve sobrecarga (que nem existe em Jack). Esse é o escopo deliberadamente mínimo de análise semântica deste curso — o suficiente para gerar código correto, sem se tornar um verificador de tipos completo.
