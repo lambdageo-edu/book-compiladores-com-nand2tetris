@@ -25,7 +25,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.0">
     
     
       
@@ -33,10 +33,10 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.57a0d79d.min.css">
       
         
-        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.fb2fffe2.min.css">
       
       
 
@@ -771,6 +771,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#testando-a-tabela-antes-de-gerar-codigo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Testando a tabela antes de gerar código
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#o-que-a-tabela-ainda-nao-faz" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1409,6 +1420,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#testando-a-tabela-antes-de-gerar-codigo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Testando a tabela antes de gerar código
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#o-que-a-tabela-ainda-nao-faz" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1758,6 +1780,25 @@
 <a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="p">}</span>
 </code></pre></div>
 <p>O truque de <code>if (subroutineType == METHOD) symbolTable.define("this", className, Kind.ARG)</code> merece destaque: pelo mapeamento padrão (capítulo 7), um método é sempre chamado com o objeto receptor como <strong>primeiro argumento implícito</strong> (o compilador insere isso na chamada, como veremos no capítulo 10) — logo, registrá-lo como <code>arg</code> de índice 0 <em>antes</em> de processar a lista de parâmetros declarados garante que o primeiro parâmetro <em>de fato</em> declarado pelo programador já saia com índice 1, exatamente onde ele estará em tempo de execução.</p>
+<h2 id="testando-a-tabela-antes-de-gerar-codigo">Testando a tabela antes de gerar código<a class="headerlink" href="#testando-a-tabela-antes-de-gerar-codigo" title="Permanent link">&para;</a></h2>
+<p>Um erro na tabela de símbolos (um índice que não zera em <code>startSubroutine</code>, um <code>this</code> esquecido) só aparece, nos capítulos seguintes, como código VM sutilmente errado — e é difícil rastreá-lo de volta. Vale, por isso, testar a tabela <strong>sozinha</strong>, antes de gerar uma única linha de VM, aproveitando a saída XML que o parser da Parte 1 já produz: basta enriquecer cada <code>&lt;identifier&gt;</code> com o que a tabela sabe sobre ele.</p>
+<p>Para cada identificador, imprima a <strong>categoria</strong> (<code>var</code>, <code>argument</code>, <code>static</code>, <code>field</code>, ou <code>class</code>/<code>subroutine</code> para os nomes que não estão na tabela), o <strong>índice</strong> (para as quatro categorias de variável) e se aquele ponto do código é uma <strong>declaração</strong> ou um <strong>uso</strong>. Para a classe <code>Point</code> do exemplo acima, um trecho da saída ficaria assim:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nt">&lt;keyword&gt;</span><span class="w"> </span>field<span class="w"> </span><span class="nt">&lt;/keyword&gt;</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="nt">&lt;keyword&gt;</span><span class="w"> </span>int<span class="w"> </span><span class="nt">&lt;/keyword&gt;</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="nt">&lt;identifier</span><span class="w"> </span><span class="na">category=</span><span class="s">"field"</span><span class="w"> </span><span class="na">index=</span><span class="s">"0"</span><span class="w"> </span><span class="na">usage=</span><span class="s">"declared"</span><span class="nt">&gt;</span><span class="w"> </span>x<span class="w"> </span><span class="nt">&lt;/identifier&gt;</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="nt">&lt;symbol&gt;</span><span class="w"> </span>,<span class="w"> </span><span class="nt">&lt;/symbol&gt;</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="nt">&lt;identifier</span><span class="w"> </span><span class="na">category=</span><span class="s">"field"</span><span class="w"> </span><span class="na">index=</span><span class="s">"1"</span><span class="w"> </span><span class="na">usage=</span><span class="s">"declared"</span><span class="nt">&gt;</span><span class="w"> </span>y<span class="w"> </span><span class="nt">&lt;/identifier&gt;</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>...
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="nt">&lt;keyword&gt;</span><span class="w"> </span>let<span class="w"> </span><span class="nt">&lt;/keyword&gt;</span>
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="nt">&lt;identifier</span><span class="w"> </span><span class="na">category=</span><span class="s">"field"</span><span class="w"> </span><span class="na">index=</span><span class="s">"0"</span><span class="w"> </span><span class="na">usage=</span><span class="s">"used"</span><span class="nt">&gt;</span><span class="w"> </span>x<span class="w"> </span><span class="nt">&lt;/identifier&gt;</span>
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="nt">&lt;symbol&gt;</span><span class="w"> </span>=<span class="w"> </span><span class="nt">&lt;/symbol&gt;</span>
+<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="nt">&lt;expression&gt;</span>
+<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="w">  </span><span class="nt">&lt;term&gt;</span>
+<a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a><span class="w">    </span><span class="nt">&lt;identifier</span><span class="w"> </span><span class="na">category=</span><span class="s">"argument"</span><span class="w"> </span><span class="na">index=</span><span class="s">"0"</span><span class="w"> </span><span class="na">usage=</span><span class="s">"used"</span><span class="nt">&gt;</span><span class="w"> </span>ax<span class="w"> </span><span class="nt">&lt;/identifier&gt;</span>
+<a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="w">  </span><span class="nt">&lt;/term&gt;</span>
+<a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a><span class="nt">&lt;/expression&gt;</span>
+</code></pre></div>
+<p>Não há arquivo de referência para comparar (essa saída não faz parte do Nand2Tetris), mas a conferência é visual e rápida: rode o parser sobre <code>Point.jack</code> e confira, linha a linha, se cada índice bate com a tabela montada à mão na seção "Um exemplo completo". Quando bater, a tabela está pronta — e os atributos extras podem ser removidos, ou deixados atrás de uma opção de depuração.</p>
 <h2 id="o-que-a-tabela-ainda-nao-faz">O que a tabela ainda não faz<a class="headerlink" href="#o-que-a-tabela-ainda-nao-faz" title="Permanent link">&para;</a></h2>
 <p>Esta tabela responde "que categoria, que tipo, que índice" — o suficiente para gerar <code>push</code>/<code>pop</code> corretos nos capítulos 9 e 10. Ela <strong>não</strong> faz verificação de tipos (não impede que você some um <code>int</code> com um <code>boolean</code>), nem detecta redeclaração além do básico, nem resolve sobrecarga (que nem existe em Jack). Esse é o escopo deliberadamente mínimo de análise semântica deste curso — o suficiente para gerar código correto, sem se tornar um verificador de tipos completo.</p>
 <h2 id="o-que-vem-a-seguir">O que vem a seguir<a class="headerlink" href="#o-que-vem-a-seguir" title="Permanent link">&para;</a></h2>
@@ -1824,10 +1865,10 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.sections", "navigation.expand", "navigation.top", "search.highlight", "search.share", "content.code.annotate", "content.code.copy", "content.tabs.link", "content.tooltips", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copiado para \u00e1rea de transfer\u00eancia", "clipboard.copy": "Copiar para \u00e1rea de transfer\u00eancia", "search.result.more.one": "Mais 1 nesta p\u00e1gina", "search.result.more.other": "Mais # nesta p\u00e1gina", "search.result.none": "Nenhum resultado encontrado", "search.result.one": "1 resultado encontrado", "search.result.other": "# resultados encontrados", "search.result.placeholder": "Digite para iniciar a busca", "search.result.term.missing": "Ausente", "select.version": "Selecione a vers\u00e3o"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.sections", "navigation.expand", "navigation.top", "search.highlight", "search.share", "content.code.annotate", "content.code.copy", "content.tabs.link", "content.tooltips", "toc.follow"], "search": "../../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copiado para \u00e1rea de transfer\u00eancia", "clipboard.copy": "Copiar para \u00e1rea de transfer\u00eancia", "search.result.more.one": "Mais 1 nesta p\u00e1gina", "search.result.more.other": "Mais # nesta p\u00e1gina", "search.result.none": "Nenhum resultado encontrado", "search.result.one": "1 resultado encontrado", "search.result.other": "# resultados encontrados", "search.result.placeholder": "Digite para iniciar a busca", "search.result.term.missing": "Ausente", "select.version": "Selecione a vers\u00e3o"}, "version": null}</script>
     
     
-      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      <script src="../../assets/javascripts/bundle.c21346df.min.js"></script>
       
         <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
       
