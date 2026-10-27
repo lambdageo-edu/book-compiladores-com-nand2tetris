@@ -2,6 +2,192 @@
 
 Com o `JackTokenizer` completo, chegamos à etapa central do front-end: o analisador sintático, ou `CompilationEngine`. Ele consome a sequência de tokens do capítulo anterior e reconhece a estrutura da gramática de Jack (capítulo 3) — por enquanto, apenas *reconhecendo*, sem gerar nenhum código ainda (isso fica para os capítulos 9 e 10, na Parte 2). A saída deste capítulo é uma árvore sintática em XML, que — assim como fizemos com os tokens — vamos validar por comparação byte a byte com arquivos de referência do próprio Nand2Tetris.
 
+## O que significa "analisar"
+
+Antes de qualquer código, vale fixar o que o parser faz, com uma gramática pequena o bastante para caber na cabeça — um recorte de Jack, só com comandos e expressões simples:
+
+```
+statements     -> statement*
+statement      -> ifStatement | whileStatement | letStatement
+ifStatement    -> 'if' '(' expression ')' '{' statements '}'
+whileStatement -> 'while' '(' expression ')' '{' statements '}'
+letStatement   -> 'let' varName '=' expression ';'
+expression     -> term (op term)?
+term           -> varName | integerConstant
+op             -> '+' | '-' | '=' | '>' | '<'
+```
+
+Essas oito regras já descrevem infinitos programas. Todas as entradas abaixo **pertencem** à linguagem — cada uma pode ser obtida aplicando as regras, a partir de `statements`:
+
+```
+let x = 100;
+
+let x = x + 1;
+
+while (n < lim) {
+    let n = n + 1;
+}
+
+while (lim < 100) {
+    if (x = 1) {
+        let z = 100;
+        while (z > 0) {
+            let z = z - 1;
+        }
+    }
+    let lim = lim + 10;
+}
+```
+
+E estas **não** pertencem: `let x = 1 + 2 + 3;` (nesta gramática, uma expressão tem no máximo um operador), `while x < 3 { }` (faltam os parênteses) e `let = 5;` (falta o `varName`).
+
+**Analisar** (*parse*) uma entrada é fazer duas coisas ao mesmo tempo:
+
+1. **decidir** se ela pertence à linguagem da gramática;
+2. se pertencer, **descobrir sua estrutura**: que regra gerou cada pedaço.
+
+A segunda parte é a que interessa ao compilador. Saber que `let n = n + 1;` está dentro do corpo do `while`, e que `n + 1` é a expressão do `let`, é exatamente a informação de que a geração de código vai precisar na Parte 2.
+
+## A árvore sintática
+
+A estrutura descoberta pelo parser é uma **árvore**: cada nó interno é uma regra (um não-terminal), e as folhas são os tokens, na ordem em que aparecem na entrada. Para `while (count < 100) { let count = count + 1; }`:
+
+```
+whileStatement
+├── while
+├── (
+├── expression
+│   ├── term ── count
+│   ├── <
+│   └── term ── 100
+├── )
+├── {
+├── statements
+│   └── letStatement
+│       ├── let
+│       ├── count
+│       ├── =
+│       ├── expression
+│       │   ├── term ── count
+│       │   ├── +
+│       │   └── term ── 1
+│       └── ;
+└── }
+```
+
+Lendo as folhas da esquerda para a direita, recuperamos a entrada original. Lendo os nós internos, recuperamos **por que** cada token está onde está.
+
+Desenhar a árvore numa tela não é prático para testar um compilador, mas há um formato de texto que representa árvores naturalmente: o **XML**. Cada nó interno vira um par de tags, e cada folha, uma linha com o tipo do token. É a mesma árvore, só que serializada — e é exatamente o que o nosso parser vai produzir (a indentação é só para leitura):
+
+```xml
+<whileStatement>
+  <keyword> while </keyword>
+  <symbol> ( </symbol>
+  <expression>
+    <term>
+      <identifier> count </identifier>
+    </term>
+    <symbol> &lt; </symbol>
+    <term>
+      <integerConstant> 100 </integerConstant>
+    </term>
+  </expression>
+  <symbol> ) </symbol>
+  <symbol> { </symbol>
+  <statements>
+    <letStatement>
+      <keyword> let </keyword>
+      <identifier> count </identifier>
+      <symbol> = </symbol>
+      <expression>
+        <term>
+          <identifier> count </identifier>
+        </term>
+        <symbol> + </symbol>
+        <term>
+          <integerConstant> 1 </integerConstant>
+        </term>
+      </expression>
+      <symbol> ; </symbol>
+    </letStatement>
+  </statements>
+  <symbol> } </symbol>
+</whileStatement>
+```
+
+(O `<` da comparação aparece como `&lt;`, pelo escape de XML visto no capítulo 4.) Por isso o Nand2Tetris usa XML como saída do Project 10: se o nosso XML bate com o de referência, o parser descobriu a estrutura certa — antes de gerarmos uma única instrução.
+
+## Da gramática ao código: um método por regra
+
+O parser que vamos construir é um conjunto de métodos, **um por regra**, e o corpo de cada método é a tradução mecânica do lado direito da regra. A correspondência é sempre a mesma:
+
+| Na regra | No método |
+|---|---|
+| um terminal (`'while'`, `'('`, `';'`) | consome o token, conferindo que é o esperado (`expectPeek`) |
+| um não-terminal (`expression`, `statements`) | chama o método dele (`parseExpression()`, `parseStatements()`) |
+| `x?` (opcional) | `if`: o próximo token indica se `x` está presente |
+| `x*` (zero ou mais) | `while`: repete enquanto o próximo token indicar mais um `x` |
+| `a \| b \| c` (alternativas) | `switch`/`if` sobre o próximo token, que diz qual alternativa seguir |
+
+Aplicada a `whileStatement -> 'while' '(' expression ')' '{' statements '}'`, a tabela dá, linha a linha (em pseudocódigo):
+
+```
+parseWhile():
+    abre <whileStatement>
+    consome 'while'
+    consome '('
+    parseExpression()
+    consome ')'
+    consome '{'
+    parseStatements()
+    consome '}'
+    fecha </whileStatement>
+```
+
+Cada método é responsável só pela **sua** parte da entrada: consome os tokens da sua regra e delega o resto a quem sabe tratá-lo.
+
+## O parser em ação
+
+Vale acompanhar, passo a passo, o que acontece quando esse parser lê `while (count < 100) { let count = count + 1; }`. À esquerda, os métodos ativos (a indentação mostra quem chamou quem); à direita, o XML produzido naquele passo:
+
+```
+parseWhile                         <whileStatement>
+  consome 'while'                    <keyword> while </keyword>
+  consome '('                        <symbol> ( </symbol>
+  parseExpression                    <expression>
+    parseTerm                          <term>
+      consome 'count'                    <identifier> count </identifier>
+    (fim de parseTerm)                 </term>
+    consome '<'                        <symbol> &lt; </symbol>
+    parseTerm                          <term>
+      consome '100'                      <integerConstant> 100 </integerConstant>
+    (fim de parseTerm)                 </term>
+  (fim de parseExpression)           </expression>
+  consome ')'                        <symbol> ) </symbol>
+  consome '{'                        <symbol> { </symbol>
+  parseStatements                    <statements>
+    parseLet                           <letStatement>
+      consome 'let'                      <keyword> let </keyword>
+      consome 'count'                    <identifier> count </identifier>
+      consome '='                        <symbol> = </symbol>
+      parseExpression                    <expression>
+        parseTerm ...                      <term> ... </term>
+        consome '+'                        <symbol> + </symbol>
+        parseTerm ...                      <term> ... </term>
+      (fim de parseExpression)           </expression>
+      consome ';'                        <symbol> ; </symbol>
+    (fim de parseLet)                  </letStatement>
+  (fim de parseStatements)           </statements>
+  consome '}'                        <symbol> } </symbol>
+(fim de parseWhile)                </whileStatement>
+```
+
+Três coisas para observar:
+
+- **A pilha de chamadas desenha a árvore.** Cada método ativo é um nó interno da árvore da seção anterior; quando ele termina, o nó está completo. O parser nunca guarda a árvore na memória: ela existe só no formato da execução recursiva, e é escrita no XML enquanto acontece.
+- **Cada decisão olha um token à frente.** `parseStatements` só chama `parseLet` porque o próximo token é `let`; `parseExpression` só consome o `<` porque o próximo token é um operador; e sabe que acabou quando vê `)`.
+- **Não há volta atrás.** Nenhum token é lido duas vezes, nenhum caminho é tentado e desfeito. Isso só é possível porque a gramática foi escrita para isso — é o assunto da próxima seção.
+
 ## Bottom-up ou top-down?
 
 Existem duas famílias opostas de algoritmo para construir uma árvore sintática a partir de uma cadeia de tokens:
@@ -362,7 +548,15 @@ public void testParserWithSquare() throws IOException {
 }
 ```
 
-O pacote de testes do Nand2Tetris inclui uma variante interessante para progressão incremental: os arquivos `ExpressionLessSquare/*.jack` substituem expressões complexas por espaços reservados simples, permitindo validar a "casca" da gramática (classes, subroutines, comandos) antes de enfrentar a gramática de expressões por completo.
+O Project 10 traz três programas de teste, que sugerem uma ordem de construção em duas versões do parser:
+
+| Programa | O que testa | Quando usar |
+|---|---|---|
+| `ExpressionLessSquare` | a mesma classe `Square` do jogo, mas com toda expressão trocada por um único termo simples (`let size = size;`, `if (x) { ... }`) | **versão básica**: só `parseTerm` simples, sem operadores, e toda a "casca" da gramática — classes, subroutines e comandos |
+| `Square` | o jogo completo, com as expressões de verdade | **versão completa**: expressões com operadores, chamadas de subroutine dentro de `term` |
+| `ArrayTest` | um programa que lê números para um array e calcula a média | acesso a array (`a[i]`) dos dois lados do `=` e chamadas com strings como argumento |
+
+O código de `ExpressionLessSquare` não faz sentido (`let size = size;` não muda nada), mas é gramaticalmente válido — e é isso que importa para testar o parser: a estrutura de classes e comandos fica validada antes de enfrentarmos a parte mais delicada, a gramática de expressões.
 
 !!! note "Dica de processo"
     Não tente compilar de uma vez um arquivo `.jack` inteiro contra a gramática completa. Construa o parser exatamente na ordem que fomos construindo aqui: primeiro `term` simples, depois `expression`, depois cada comando isoladamente (com testes próprios, como fizemos com `parseLet` e `parseDo`), só então subindo para `parseStatements`, `parseSubroutineDec` e finalmente `parseClass`. É a mesma disciplina de "um passo por vez, com teste a cada passo" que usamos desde o capítulo 2.
