@@ -51,7 +51,7 @@ A ULA (unidade lógica e aritmética) de Hack computa uma dentre um conjunto fix
 | `!D`, `!A`/`!M` | negação bit a bit (NOT) | `D+A`/`D+M` | soma |
 | `-D`, `-A`/`-M` | negação aritmética | `D-A`/`D-M`, `A-D`/`M-D` | subtração |
 | | | `D&A`/`D&M` | E bit a bit |
-| | | `D\|A`/`D\|M` | OU bit a bit |
+| | | `D|A`/`D|M` | OU bit a bit |
 
 Cada expressão que usa `A` tem uma variante gêmea que usa `M` em seu lugar (`A+1`/`M+1`, `D-A`/`D-M`, etc.) — a diferença, no binário, é um único bit (chamado `a`) que seleciona entre os dois.
 

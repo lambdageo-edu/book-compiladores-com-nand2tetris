@@ -127,7 +127,7 @@ O parser que vamos construir é um conjunto de métodos, **um por regra**, e o c
 | um não-terminal (`expression`, `statements`) | chama o método dele (`parseExpression()`, `parseStatements()`) |
 | `x?` (opcional) | `if`: o próximo token indica se `x` está presente |
 | `x*` (zero ou mais) | `while`: repete enquanto o próximo token indicar mais um `x` |
-| `a \| b \| c` (alternativas) | `switch`/`if` sobre o próximo token, que diz qual alternativa seguir |
+| `a | b | c` (alternativas) | `switch`/`if` sobre o próximo token, que diz qual alternativa seguir |
 
 Aplicada a `whileStatement -> 'while' '(' expression ')' '{' statements '}'`, a tabela dá, linha a linha (em pseudocódigo):
 
