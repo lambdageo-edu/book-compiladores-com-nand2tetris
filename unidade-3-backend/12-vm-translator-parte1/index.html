@@ -900,10 +900,32 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#revisao-a-maquina-de-pilha-que-vamos-implementar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Revisão: a máquina de pilha que vamos implementar
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#modelo-de-memoria-hack" class="md-nav__link">
     <span class="md-ellipsis">
       
         Modelo de memória: Hack
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#antes-do-assembly-ponteiros-e-pseudocodigo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Antes do Assembly: ponteiros e pseudocódigo
       
     </span>
   </a>
@@ -937,6 +959,39 @@
     <span class="md-ellipsis">
       
         Uma tabela de custos
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#arquitetura-do-tradutor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Arquitetura do tradutor
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testando-o-plano-de-desenvolvimento" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Testando: o plano de desenvolvimento
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#teste-rapido" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Teste rápido
       
     </span>
   </a>
@@ -1365,10 +1420,32 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#revisao-a-maquina-de-pilha-que-vamos-implementar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Revisão: a máquina de pilha que vamos implementar
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#modelo-de-memoria-hack" class="md-nav__link">
     <span class="md-ellipsis">
       
         Modelo de memória: Hack
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#antes-do-assembly-ponteiros-e-pseudocodigo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Antes do Assembly: ponteiros e pseudocódigo
       
     </span>
   </a>
@@ -1402,6 +1479,39 @@
     <span class="md-ellipsis">
       
         Uma tabela de custos
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#arquitetura-do-tradutor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Arquitetura do tradutor
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testando-o-plano-de-desenvolvimento" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Testando: o plano de desenvolvimento
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#teste-rapido" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Teste rápido
       
     </span>
   </a>
@@ -1463,8 +1573,89 @@
 <a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    ↓ Assembler (capítulo 15)
 <a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>Código de máquina Hack
 </code></pre></div>
+<p>O trabalho do tradutor é, comando a comando, <strong>realizar a abstração da VM sobre uma máquina que não a tem</strong>: o Hack não tem pilha, não tem segmentos, não tem <code>add</code> de dois operandos na memória — tem só dois registradores (<code>A</code> e <code>D</code>) e uma RAM. Tudo o que a VM promete precisa ser construído com esses recursos.</p>
+<h2 id="revisao-a-maquina-de-pilha-que-vamos-implementar">Revisão: a máquina de pilha que vamos implementar<a class="headerlink" href="#revisao-a-maquina-de-pilha-que-vamos-implementar" title="Permanent link">&para;</a></h2>
+<p>Antes de traduzir, vale relembrar <em>o que</em> estamos implementando (a especificação completa está no capítulo 7). A VM é uma <strong>máquina de pilha</strong>: toda operação lê seus operandos do topo da pilha e deixa ali o resultado. O comando <code>x = 17 + 19</code>, por exemplo, vira:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>push constant 17     // pilha: 17
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>push constant 19     // pilha: 17 19
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>add                  // pilha: 36
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>pop local 0          // pilha: (vazia)   x = 36
+</code></pre></div>
+<p>E qualquer expressão, por mais complexa, se reduz a uma sequência desse tipo — por exemplo, <code>d = (2 - x) + (y + 9)</code>, com <code>x</code>, <code>y</code> e <code>d</code> nas posições 0, 1 e 2 do segmento <code>local</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>push constant 2
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>push local 0         // x
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>sub                  // 2 - x
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>push local 1         // y
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>push constant 9
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>add                  // y + 9
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>add                  // (2 - x) + (y + 9)
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>pop local 2          // d = ...
+</code></pre></div>
+<p>Repare que esse código usa só dois tipos de comando: <strong>acesso à memória</strong> (<code>push</code>/<code>pop</code> num segmento) e <strong>aritmética/lógica</strong> (<code>add</code>, <code>sub</code>, ...). São exatamente esses dois grupos — os comandos que não atravessam fronteiras de função — que este capítulo traduz. Controle de fluxo e funções ficam para o capítulo 13.</p>
+<p>Também vale relembrar <em>por que</em> existem oito segmentos: cada um corresponde a um tipo de variável de Jack, o que permite ao compilador esquecer os nomes e trabalhar só com "segmento + índice":</p>
+<table>
+<thead>
+<tr>
+<th>Segmento</th>
+<th>O que guarda</th>
+<th>Exemplo em Jack</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>argument</code></td>
+<td>parâmetros da subrotina corrente</td>
+<td><code>x</code>, <code>y</code> em <code>function int bar(int x, int y)</code></td>
+</tr>
+<tr>
+<td><code>local</code></td>
+<td>variáveis locais (<code>var</code>)</td>
+<td><code>var int c;</code></td>
+</tr>
+<tr>
+<td><code>static</code></td>
+<td>variáveis <code>static</code> da classe</td>
+<td><code>static int s1;</code></td>
+</tr>
+<tr>
+<td><code>this</code></td>
+<td>campos (<code>field</code>) do objeto corrente</td>
+<td><code>field int f;</code></td>
+</tr>
+<tr>
+<td><code>that</code></td>
+<td>elementos de um array</td>
+<td><code>a[i]</code></td>
+</tr>
+<tr>
+<td><code>constant</code></td>
+<td>constantes (segmento virtual, só leitura)</td>
+<td><code>17</code></td>
+</tr>
+<tr>
+<td><code>pointer</code></td>
+<td>as bases de <code>this</code> e <code>that</code></td>
+<td>usado por construtores, métodos e arrays</td>
+</tr>
+<tr>
+<td><code>temp</code></td>
+<td>rascunho do compilador</td>
+<td><code>pop temp 0</code> após um <code>do</code></td>
+</tr>
+</tbody>
+</table>
+<p>Na classe <code>Foo</code> abaixo, por exemplo, a atribuição <code>let c = s1 + y;</code> compila para <code>push static 0</code>, <code>push argument 1</code>, <code>add</code>, <code>pop local 2</code> — os nomes desaparecem, e só os segmentos (definidos pelo <strong>tipo</strong> da variável) e os índices (definidos pela <strong>ordem</strong> de declaração) restam:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>class Foo {
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    static int s1, s2;
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    function int bar(int x, int y) {
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>        var int a, b, c;
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>        let c = s1 + y;
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>        ...
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>    }
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>}
+</code></pre></div>
 <h2 id="modelo-de-memoria-hack">Modelo de memória: Hack<a class="headerlink" href="#modelo-de-memoria-hack" title="Permanent link">&para;</a></h2>
-<p>A máquina Hack tem uma ROM de instruções e uma RAM de 32K palavras de 16 bits. Os primeiros endereços da RAM têm papéis pré-definidos, que sustentam todo o mapeamento de segmentos VM → memória real:</p>
+<p>O Hack tem uma memória de instruções (ROM) e um espaço de endereços de dados de 32K palavras de 16 bits, do qual só os endereços 0 a 24576 são usados: 16K de RAM propriamente dita, 8K mapeados na tela e um endereço para o teclado. Os primeiros endereços da RAM têm papéis pré-definidos, que sustentam todo o mapeamento de segmentos VM → memória real — o chamado <strong>mapeamento padrão</strong> da VM sobre o Hack:</p>
 <table>
 <thead>
 <tr>
@@ -1506,13 +1697,13 @@
 </tr>
 <tr>
 <td><code>RAM[13..15]</code></td>
-<td>—</td>
+<td><code>R13</code>–<code>R15</code></td>
 <td>Uso interno do VM Translator (registradores de trabalho)</td>
 </tr>
 <tr>
 <td><code>RAM[16..255]</code></td>
 <td>—</td>
-<td>Variáveis <code>static</code></td>
+<td>Variáveis <code>static</code> (de todos os arquivos <code>.vm</code>)</td>
 </tr>
 <tr>
 <td><code>RAM[256..2047]</code></td>
@@ -1537,125 +1728,185 @@
 </tbody>
 </table>
 <p>O princípio geral: os quatro segmentos "dinâmicos" (<code>local</code>, <code>argument</code>, <code>this</code>, <code>that</code>) têm seu endereço-base guardado em um registrador (<code>LCL</code>, <code>ARG</code>, <code>THIS</code>, <code>THAT</code>) que muda a cada chamada de função (capítulo 13) — acessar <code>local i</code> significa sempre <code>RAM[LCL + i]</code>. Já <code>temp</code> e <code>static</code> têm endereço fixo, calculável em tempo de tradução, sem indireção nenhuma.</p>
-<h2 id="traduzindo-pushpop">Traduzindo <code>push</code>/<code>pop</code><a class="headerlink" href="#traduzindo-pushpop" title="Permanent link">&para;</a></h2>
-<p>A tradução de <code>push</code>/<code>pop</code> se divide em dois casos, com custos bem diferentes.</p>
-<p><strong>Segmentos dinâmicos</strong> (<code>local</code>, <code>argument</code>, <code>this</code>, <code>that</code>) exigem calcular um endereço antes de acessar — carregar o registrador-base, somar o índice, então desreferenciar:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>// push local i
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>@LCL
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>D=M            // D = valor de LCL (o endereço-base)
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>@i
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>A=D+A          // A = LCL + i
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>D=M            // D = RAM[LCL + i]
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>@SP
-<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>A=M
-<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>M=D            // RAM[SP] = D
-<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>@SP
-<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>M=M+1          // SP++
-</code></pre></div>
-<p><code>pop</code> para um segmento dinâmico é mais delicado: é preciso calcular o endereço-destino <strong>e</strong> desempilhar um valor, mas só temos os registradores <code>A</code>/<code>D</code>/<code>M</code> para trabalhar — nenhum dos dois cálculos pode "esperar" sem ser guardado em algum lugar. A solução clássica é um registrador de uso geral (<code>R13</code>, uma das células reservadas da tabela acima) como área de rascunho:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>// pop local i
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>@LCL
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>D=M
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>@i
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>D=D+A          // D = LCL + i (o endereço-destino)
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>@R13
-<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>M=D            // R13 = endereço-destino (guardado)
-<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>@SP
-<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>AM=M-1         // SP--; A = SP (nova posição do topo)
-<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>D=M            // D = valor desempilhado
-<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>@R13
-<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>A=M            // A = endereço-destino (recuperado)
-<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>M=D            // RAM[endereço-destino] = valor
-</code></pre></div>
-<p><strong>Segmentos com endereço fixo</strong> (<code>constant</code>, <code>temp</code>, <code>pointer</code>, <code>static</code>) dispensam esse cálculo intermediário. <code>constant</code> nem acessa memória — o valor já <em>é</em> o índice:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>// push constant i
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>@i
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>D=A            // D = i (não M — não há memória a ler; o valor é o próprio literal)
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>@SP
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>A=M
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>M=D
-<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>@SP
-<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>M=M+1
-</code></pre></div>
-<p><code>temp i</code> é sempre <code>RAM[5+i]</code>, e <code>static i</code> é mapeado para um símbolo único por arquivo <code>.vm</code> (tipicamente <code>NomeDoArquivo.i</code>) — o Assembler (capítulo 15) se encarrega de atribuir um endereço real a esse símbolo, exatamente como faz com qualquer variável. Em ambos os casos, o endereço vai direto na A-instruction:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>// push temp 2
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>@7             // 5 + 2
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>D=M
+<p>Os símbolos <code>SP</code>, <code>LCL</code>, <code>ARG</code>, <code>THIS</code>, <code>THAT</code> e <code>R13</code>–<code>R15</code> são <strong>pré-definidos</strong> no Assembly Hack (capítulo 11): o código gerado pode escrever <code>@SP</code> em vez de <code>@0</code>, o que o torna bem mais legível.</p>
+<h2 id="antes-do-assembly-ponteiros-e-pseudocodigo">Antes do Assembly: ponteiros e pseudocódigo<a class="headerlink" href="#antes-do-assembly-ponteiros-e-pseudocodigo" title="Permanent link">&para;</a></h2>
+<p>Quase tudo que o tradutor gera é manipulação de <strong>ponteiros</strong>: <code>SP</code> não guarda o valor do topo da pilha, guarda o <em>endereço</em> da próxima posição livre; <code>LCL</code> não guarda uma variável local, guarda o <em>endereço</em> onde o segmento começa. Por isso vale adotar uma notação curta, emprestada de C, antes de escrever qualquer Assembly:</p>
+<table>
+<thead>
+<tr>
+<th>Notação</th>
+<th>Significado</th>
+<th>Em Assembly Hack</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>D = *p</code></td>
+<td>D recebe o valor <strong>apontado</strong> por <code>p</code></td>
+<td><code>@p</code>, <code>A=M</code>, <code>D=M</code></td>
+</tr>
+<tr>
+<td><code>*q = 9</code></td>
+<td>a célula apontada por <code>q</code> recebe 9</td>
+<td><code>@9</code>, <code>D=A</code>, <code>@q</code>, <code>A=M</code>, <code>M=D</code></td>
+</tr>
+<tr>
+<td><code>p--</code></td>
+<td>o ponteiro passa a apontar para a célula anterior</td>
+<td><code>@p</code>, <code>M=M-1</code></td>
+</tr>
+<tr>
+<td><code>q++</code></td>
+<td>o ponteiro passa a apontar para a próxima célula</td>
+<td><code>@q</code>, <code>M=M+1</code></td>
+</tr>
+</tbody>
+</table>
+<p>O padrão a memorizar é o par <code>@p</code> / <code>A=M</code>: a primeira instrução seleciona a célula <strong>onde está o ponteiro</strong>; a segunda copia o conteúdo dela (um endereço) para <code>A</code>, de modo que o próximo <code>M</code> já é a célula <strong>apontada</strong>.</p>
+<p>Com essa notação, a pilha inteira se descreve em duas linhas. Empilhar um valor <code>x</code> é <code>*SP = x; SP++</code>; desempilhar para <code>D</code> é <code>SP--; D = *SP</code>. Por exemplo, <code>push constant 17</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>// *SP = 17
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>@17
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>D=A
 <a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>@SP
 <a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>A=M
 <a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>M=D
-<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>@SP
-<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>M=M+1
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>// SP++
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>@SP
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>M=M+1
 </code></pre></div>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>// pop static 3   (dentro de Foo.vm)
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>@SP
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>AM=M-1
-<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>D=M
-<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>@Foo.3
-<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>M=D
+<p>A estratégia para o resto do capítulo é sempre a mesma, em dois passos: primeiro descrever cada comando VM em <strong>pseudocódigo com ponteiros</strong>, depois traduzir o pseudocódigo para Assembly. O primeiro passo é onde está o raciocínio; o segundo é quase mecânico.</p>
+<h2 id="traduzindo-pushpop">Traduzindo <code>push</code>/<code>pop</code><a class="headerlink" href="#traduzindo-pushpop" title="Permanent link">&para;</a></h2>
+<p>A tradução de <code>push</code>/<code>pop</code> se divide em dois casos, com custos bem diferentes.</p>
+<p><strong>Segmentos dinâmicos</strong> (<code>local</code>, <code>argument</code>, <code>this</code>, <code>that</code>) exigem calcular um endereço antes de acessar. Em pseudocódigo:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>push local i   →   addr = LCL + i;  *SP = *addr;  SP++
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>pop local i    →   addr = LCL + i;  SP--;  *addr = *SP
 </code></pre></div>
-<p><strong><code>pointer</code></strong> é o segmento que liga a VM aos registradores-base: <code>pointer 0</code> é o próprio registrador <code>THIS</code> (<code>RAM[3]</code>) e <code>pointer 1</code> é <code>THAT</code> (<code>RAM[4]</code>) — ou seja, <code>pointer i</code> é <code>RAM[3+i]</code>, um endereço fixo como <code>temp</code>. A diferença é o efeito: escrever em <code>pointer</code> não grava um dado, e sim <strong>muda a base</strong> dos segmentos <code>this</code>/<code>that</code>. É assim que o <code>pop pointer 0</code> gerado pelo compilador nos construtores e métodos (capítulo 10) ancora <code>this</code> no objeto:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>// pop pointer 0
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>@SP
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>AM=M-1
-<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>D=M
-<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>@THIS          // RAM[3 + 0]
-<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>M=D            // THIS = valor desempilhado
+<p>Em Assembly, <code>push</code> carrega o registrador-base, soma o índice e desreferencia:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>// push local i
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>@LCL
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>D=M            // D = valor de LCL (o endereço-base)
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>@i
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>A=D+A          // A = LCL + i  (addr)
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>D=M            // D = RAM[LCL + i]  (*addr)
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>@SP
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>A=M
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>M=D            // *SP = D
+<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a>@SP
+<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a>M=M+1          // SP++
 </code></pre></div>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>// push pointer 1
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>@THAT          // RAM[3 + 1]
+<p><code>pop</code> para um segmento dinâmico é mais delicado: é preciso calcular o endereço-destino <strong>e</strong> desempilhar um valor, mas só temos os registradores <code>A</code>/<code>D</code> para trabalhar — nenhum dos dois resultados pode "esperar" sem ser guardado em algum lugar. A solução clássica é um registrador de uso geral (<code>R13</code>, uma das células reservadas da tabela acima) como área de rascunho para <code>addr</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>// pop local i
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>@LCL
 <a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>D=M
-<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>@SP
-<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>A=M
-<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>M=D
-<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>@SP
-<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>M=M+1
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>@i
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>D=D+A          // D = LCL + i (addr)
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>@R13
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>M=D            // R13 = addr (guardado)
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>@SP
+<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>AM=M-1         // SP--; A = SP (nova posição do topo)
+<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a>D=M            // D = *SP (valor desempilhado)
+<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a>@R13
+<a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a>A=M            // A = addr (recuperado)
+<a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a>M=D            // *addr = valor
 </code></pre></div>
-<p>Depois de um <code>pop pointer 0</code>, todo <code>this i</code> traduzido pela regra dos segmentos dinâmicos já usa o novo endereço-base — é a mesma ideia do exemplo <code>push constant 8000</code>, <code>pop pointer 0</code> do capítulo 7, agora em Assembly.</p>
-<h2 id="traduzindo-comandos-aritmeticos-e-logicos">Traduzindo comandos aritméticos e lógicos<a class="headerlink" href="#traduzindo-comandos-aritmeticos-e-logicos" title="Permanent link">&para;</a></h2>
-<p>Um comando binário (<code>add</code>, <code>sub</code>, <code>and</code>, <code>or</code>) desempilha dois valores, calcula, e empilha o resultado — mas a implementação evita uma escrita extra fazendo a operação <strong>"in-place"</strong>, sobrescrevendo diretamente a posição onde o resultado deve ficar:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>// add
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>@SP
-<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>AM=M-1         // SP--; A = posição do segundo operando
-<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>D=M            // D = segundo operando
-<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>A=A-1          // A = posição do primeiro operando (SP já foi decrementado uma vez)
-<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>M=D+M          // RAM[primeiro] = primeiro + segundo (resultado fica exatamente onde deve)
+<p><code>argument</code>, <code>this</code> e <code>that</code> são idênticos, trocando <code>@LCL</code> por <code>@ARG</code>, <code>@THIS</code> ou <code>@THAT</code>.</p>
+<p><strong>Segmentos com endereço fixo</strong> (<code>constant</code>, <code>temp</code>, <code>pointer</code>, <code>static</code>) dispensam esse cálculo intermediário. <code>constant</code> nem acessa memória — o valor já <em>é</em> o índice (<code>*SP = i; SP++</code>):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>// push constant i
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>@i
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>D=A            // D = i (não M — não há memória a ler; o valor é o próprio literal)
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>@SP
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>A=M
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>M=D
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>@SP
+<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>M=M+1
 </code></pre></div>
-<p>Repare que <strong>nenhum novo <code>M=M+1</code> é necessário</strong>: a pilha já encolheu de dois elementos para um só (um <code>AM=M-1</code> implícito), e o resultado ocupa a posição que sobrou — sem incrementar <code>SP</code> de volta.</p>
-<p>Comandos unários (<code>neg</code>, <code>not</code>) são ainda mais diretos, porque não há segundo operando a desempilhar:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>// neg
-<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>@SP
-<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>A=M-1
-<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>M=-M
+<p><code>temp i</code> é sempre <code>RAM[5+i]</code>, e <code>static i</code> é mapeado para um símbolo único por arquivo <code>.vm</code> (<code>NomeDoArquivo.i</code>) — o Assembler (capítulo 15) se encarrega de atribuir um endereço real a esse símbolo, exatamente como faz com qualquer variável, a partir de <code>RAM[16]</code>. Em ambos os casos, o endereço vai direto na A-instruction:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>// push temp 2
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>@7             // 5 + 2
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>D=M
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>@SP
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>A=M
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>M=D
+<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a>@SP
+<a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a>M=M+1
 </code></pre></div>
-<p><strong>Comparações</strong> (<code>eq</code>, <code>lt</code>, <code>gt</code>) são o caso mais elaborado, porque a VM não tem um comando de "comparar e produzir booleano" nativo em Assembly — é preciso simular com um salto condicional:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>// eq
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>// pop static 3   (dentro de Foo.vm)
 <a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>@SP
 <a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>AM=M-1
 <a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>D=M
-<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>A=A-1
-<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>D=M-D           // D = primeiro - segundo (zero se iguais)
-<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>@TRUE_EQ_0
-<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a>D;JEQ            // se D == 0, salta para o ramo "verdadeiro"
-<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a>@SP
-<a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a>A=M-1
-<a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a>M=0             // falso: 0
-<a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a>@END_EQ_0
-<a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a>0;JMP
-<a id="__codelineno-10-14" name="__codelineno-10-14" href="#__codelineno-10-14"></a>(TRUE_EQ_0)
-<a id="__codelineno-10-15" name="__codelineno-10-15" href="#__codelineno-10-15"></a>@SP
-<a id="__codelineno-10-16" name="__codelineno-10-16" href="#__codelineno-10-16"></a>A=M-1
-<a id="__codelineno-10-17" name="__codelineno-10-17" href="#__codelineno-10-17"></a>M=-1             // verdadeiro: -1 (todos os bits em 1)
-<a id="__codelineno-10-18" name="__codelineno-10-18" href="#__codelineno-10-18"></a>(END_EQ_0)
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>@Foo.3
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>M=D
 </code></pre></div>
-<p><code>lt</code> e <code>gt</code> seguem exatamente o mesmo esqueleto, trocando apenas <code>JEQ</code> por <code>JLT</code>/<code>JGT</code>. E, como no capítulo 9, os rótulos (<code>TRUE_EQ_0</code>, <code>END_EQ_0</code>) precisam de um contador único por comando de comparação traduzido, para não colidir entre múltiplas comparações no mesmo arquivo.</p>
+<p>O símbolo <code>Foo.3</code> explica por que <code>static</code> é compartilhado por todas as subrotinas de uma classe e, ao mesmo tempo, separado entre classes: <code>static 3</code> em <code>Foo.vm</code> e <code>static 3</code> em <code>Bar.vm</code> viram <code>@Foo.3</code> e <code>@Bar.3</code> — duas variáveis distintas do Assembly.</p>
+<p><strong><code>pointer</code></strong> é o segmento que liga a VM aos registradores-base: <code>pointer 0</code> é o próprio registrador <code>THIS</code> (<code>RAM[3]</code>) e <code>pointer 1</code> é <code>THAT</code> (<code>RAM[4]</code>) — ou seja, <code>pointer i</code> é <code>RAM[3+i]</code>, um endereço fixo como <code>temp</code>. A diferença é o efeito: escrever em <code>pointer</code> não grava um dado, e sim <strong>muda a base</strong> dos segmentos <code>this</code>/<code>that</code>. É assim que o <code>pop pointer 0</code> gerado pelo compilador nos construtores e métodos (capítulo 10) ancora <code>this</code> no objeto:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>// pop pointer 0
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>@SP
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>AM=M-1
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>D=M
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>@THIS          // RAM[3 + 0]
+<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>M=D            // THIS = valor desempilhado
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>// push pointer 1
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>@THAT          // RAM[3 + 1]
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>D=M
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>@SP
+<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>A=M
+<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>M=D
+<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a>@SP
+<a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a>M=M+1
+</code></pre></div>
+<p>Depois de um <code>pop pointer 0</code>, todo <code>this i</code> traduzido pela regra dos segmentos dinâmicos já usa o novo endereço-base — é a mesma ideia do exemplo <code>push constant 8000</code>, <code>pop pointer 0</code> do capítulo 7, agora em Assembly.</p>
+<h2 id="traduzindo-comandos-aritmeticos-e-logicos">Traduzindo comandos aritméticos e lógicos<a class="headerlink" href="#traduzindo-comandos-aritmeticos-e-logicos" title="Permanent link">&para;</a></h2>
+<p>Em pseudocódigo, um comando binário (<code>add</code>, <code>sub</code>, <code>and</code>, <code>or</code>) desempilha dois valores, calcula, e empilha o resultado:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>add   →   SP--;  y = *SP;  SP--;  x = *SP;  *SP = x + y;  SP++
+</code></pre></div>
+<p>A implementação evita metade desse trabalho fazendo a operação <strong>"in-place"</strong>: o resultado sobrescreve diretamente a posição de <code>x</code>, que é onde ele deve ficar:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>// add
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>@SP
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>AM=M-1         // SP--; A = posição do segundo operando (y)
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>D=M            // D = y
+<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>A=A-1          // A = posição do primeiro operando (x)
+<a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a>M=D+M          // x = x + y (resultado fica exatamente onde deve)
+</code></pre></div>
+<p>Repare que <strong>nenhum <code>M=M+1</code> é necessário</strong>: a pilha encolheu de dois elementos para um só com um único decremento, e o resultado ocupa a posição que sobrou. <code>sub</code>, <code>and</code> e <code>or</code> mudam apenas a última linha (<code>M=M-D</code>, <code>M=D&amp;M</code>, <code>M=D|M</code>) — atenção à ordem em <code>sub</code>: o resultado é <code>x - y</code>, ou seja, <code>M-D</code>.</p>
+<p>Comandos unários (<code>neg</code>, <code>not</code>) são ainda mais diretos, porque não há segundo operando a desempilhar — o topo é modificado no lugar:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>// neg
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>@SP
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>A=M-1
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>M=-M           // (para not: M=!M)
+</code></pre></div>
+<p><strong>Comparações</strong> (<code>eq</code>, <code>lt</code>, <code>gt</code>) são o caso mais elaborado, porque o Hack não tem uma instrução de "comparar e produzir booleano" — é preciso simular com um salto condicional. Lembrando que, na VM, verdadeiro é <code>-1</code> (todos os bits em 1) e falso é <code>0</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>// eq
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>@SP
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>AM=M-1
+<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a>D=M
+<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a>A=A-1
+<a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a>D=M-D           // D = x - y (zero se iguais)
+<a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a>@TRUE_EQ_0
+<a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a>D;JEQ            // se D == 0, salta para o ramo "verdadeiro"
+<a id="__codelineno-16-9" name="__codelineno-16-9" href="#__codelineno-16-9"></a>@SP
+<a id="__codelineno-16-10" name="__codelineno-16-10" href="#__codelineno-16-10"></a>A=M-1
+<a id="__codelineno-16-11" name="__codelineno-16-11" href="#__codelineno-16-11"></a>M=0             // falso: 0
+<a id="__codelineno-16-12" name="__codelineno-16-12" href="#__codelineno-16-12"></a>@END_EQ_0
+<a id="__codelineno-16-13" name="__codelineno-16-13" href="#__codelineno-16-13"></a>0;JMP
+<a id="__codelineno-16-14" name="__codelineno-16-14" href="#__codelineno-16-14"></a>(TRUE_EQ_0)
+<a id="__codelineno-16-15" name="__codelineno-16-15" href="#__codelineno-16-15"></a>@SP
+<a id="__codelineno-16-16" name="__codelineno-16-16" href="#__codelineno-16-16"></a>A=M-1
+<a id="__codelineno-16-17" name="__codelineno-16-17" href="#__codelineno-16-17"></a>M=-1             // verdadeiro: -1 (todos os bits em 1)
+<a id="__codelineno-16-18" name="__codelineno-16-18" href="#__codelineno-16-18"></a>(END_EQ_0)
+</code></pre></div>
+<p><code>lt</code> e <code>gt</code> seguem exatamente o mesmo esqueleto, trocando apenas <code>JEQ</code> por <code>JLT</code>/<code>JGT</code>. Os rótulos (<code>TRUE_EQ_0</code>, <code>END_EQ_0</code>) precisam de um contador único por comparação traduzida, para não colidir entre múltiplas comparações no mesmo programa — <code>TRUE_EQ_0</code>, <code>TRUE_LT_1</code>, <code>TRUE_EQ_2</code>, ...</p>
+<div class="admonition note">
+<p class="admonition-title">Um limite do esqueleto de comparação</p>
+<p>O teste <code>x - y</code> pode <strong>transbordar</strong> quando <code>x</code> e <code>y</code> têm sinais opostos e magnitudes grandes: com <code>x = 20000</code> e <code>y = -20000</code>, a subtração dá 40000, que em 16 bits vira um número negativo — e <code>lt</code> responde "verdadeiro" para <code>20000 &lt; -20000</code>. Os testes oficiais não exercitam esse caso, e o esqueleto acima é o que a maioria das implementações usa. Uma versão robusta compara primeiro os sinais de <code>x</code> e <code>y</code> e só subtrai quando são iguais — um bom desafio extra depois que todos os testes passarem.</p>
+</div>
 <h2 id="uma-tabela-de-custos">Uma tabela de custos<a class="headerlink" href="#uma-tabela-de-custos" title="Permanent link">&para;</a></h2>
-<p>Vale a pena registrar, em número de instruções Assembly geradas, o custo relativo de cada comando VM — é uma boa intuição para entender por que um código VM aparentemente pequeno vira um Assembly bem maior:</p>
+<p>Vale a pena registrar, em número de instruções Assembly geradas, o custo de cada comando VM nas traduções mostradas — é uma boa intuição para entender por que um código VM aparentemente pequeno vira um Assembly bem maior:</p>
 <table>
 <thead>
 <tr>
 <th>Comando VM</th>
-<th>Instruções Assembly (aprox.)</th>
+<th>Instruções Assembly</th>
 </tr>
 </thead>
 <tbody>
@@ -1664,8 +1915,12 @@
 <td>7</td>
 </tr>
 <tr>
-<td><code>push</code>/<code>pop</code> segmento dinâmico</td>
-<td>10–12</td>
+<td><code>push local</code>/<code>argument</code>/<code>this</code>/<code>that</code></td>
+<td>10</td>
+</tr>
+<tr>
+<td><code>pop local</code>/<code>argument</code>/<code>this</code>/<code>that</code></td>
+<td>12</td>
 </tr>
 <tr>
 <td><code>push temp</code>/<code>static</code>/<code>pointer</code></td>
@@ -1685,7 +1940,7 @@
 </tr>
 <tr>
 <td><code>eq</code>/<code>lt</code>/<code>gt</code></td>
-<td>~16</td>
+<td>15</td>
 </tr>
 <tr>
 <td><code>label</code></td>
@@ -1701,14 +1956,104 @@
 </tr>
 </tbody>
 </table>
+<p>(As três últimas linhas antecipam o capítulo 13.) O exemplo <code>d = (2 - x) + (y + 9)</code> acima, com 8 comandos VM, vira 7 + 10 + 5 + 10 + 7 + 5 + 5 + 12 = 61 instruções Assembly.</p>
+<h2 id="arquitetura-do-tradutor">Arquitetura do tradutor<a class="headerlink" href="#arquitetura-do-tradutor" title="Permanent link">&para;</a></h2>
+<p>Como o Assembler do capítulo 15 e o analisador da Parte 1, o VM Translator se organiza em três módulos:</p>
+<ul>
+<li><strong><code>Parser</code></strong> — lê um arquivo <code>.vm</code>, descarta espaços e comentários, e entrega um comando por vez, já decomposto: o <strong>tipo</strong> do comando (aritmético, <code>push</code>, <code>pop</code>; no capítulo 13, também <code>label</code>, <code>goto</code>, <code>if</code>, <code>function</code>, <code>call</code>, <code>return</code>), seu primeiro argumento (<code>arg1</code>: o nome do segmento, ou o próprio comando no caso aritmético) e o segundo (<code>arg2</code>: o índice).</li>
+<li><strong><code>CodeWriter</code></strong> — gera o Assembly de cada comando: <code>writeArithmetic(comando)</code> e <code>writePushPop(comando, segmento, índice)</code>. Guarda o estado de que a tradução precisa: o nome do arquivo corrente (para os símbolos <code>static</code>) e o contador de rótulos das comparações.</li>
+<li><strong><code>Main</code></strong> (ou <code>VMTranslator</code>) — recebe <code>Xxx.vm</code>, cria um <code>Parser</code> e um <code>CodeWriter</code> com saída em <code>Xxx.asm</code>, e percorre o arquivo comando a comando.</li>
+</ul>
+<p>Uma convenção que facilita muito a depuração: antes do Assembly de cada comando, o <code>CodeWriter</code> escreve o <strong>próprio comando VM como comentário</strong>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>// push constant 17
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>@17
+<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>D=A
+<a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a>@SP
+<a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a>A=M
+<a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a>M=D
+<a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a>@SP
+<a id="__codelineno-17-8" name="__codelineno-17-8" href="#__codelineno-17-8"></a>M=M+1
+<a id="__codelineno-17-9" name="__codelineno-17-9" href="#__codelineno-17-9"></a>// push constant 19
+<a id="__codelineno-17-10" name="__codelineno-17-10" href="#__codelineno-17-10"></a>@19
+<a id="__codelineno-17-11" name="__codelineno-17-11" href="#__codelineno-17-11"></a>...
+</code></pre></div>
+<p>Comentários não custam nada (o Assembler os descarta), e quando o CPU Emulator mostrar um resultado errado, você vai saber exatamente qual comando VM gerou cada trecho.</p>
+<h2 id="testando-o-plano-de-desenvolvimento">Testando: o plano de desenvolvimento<a class="headerlink" href="#testando-o-plano-de-desenvolvimento" title="Permanent link">&para;</a></h2>
+<p>Os testes oficiais (pasta <code>projects/07</code>) foram pensados para serem feitos <strong>em ordem</strong>, cada um exercitando um pedaço novo do tradutor:</p>
+<table>
+<thead>
+<tr>
+<th>Teste</th>
+<th>O que exercita</th>
+<th>O que o script <code>.tst</code> inicializa</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>StackArithmetic/SimpleAdd</code></td>
+<td><code>push constant</code> e <code>add</code></td>
+<td><code>SP</code></td>
+</tr>
+<tr>
+<td><code>StackArithmetic/StackTest</code></td>
+<td>todos os comandos aritméticos e lógicos, inclusive comparações</td>
+<td><code>SP</code></td>
+</tr>
+<tr>
+<td><code>MemoryAccess/BasicTest</code></td>
+<td><code>push</code>/<code>pop</code> em <code>constant</code>, <code>local</code>, <code>argument</code>, <code>this</code>, <code>that</code>, <code>temp</code></td>
+<td><code>SP</code>, <code>LCL</code>, <code>ARG</code>, <code>THIS</code>, <code>THAT</code></td>
+</tr>
+<tr>
+<td><code>MemoryAccess/PointerTest</code></td>
+<td><code>pointer</code>, <code>this</code> e <code>that</code></td>
+<td><code>SP</code></td>
+</tr>
+<tr>
+<td><code>MemoryAccess/StaticTest</code></td>
+<td><code>static</code></td>
+<td><code>SP</code></td>
+</tr>
+</tbody>
+</table>
+<p>Para cada teste, o ciclo é sempre o mesmo:</p>
+<ol>
+<li><strong>(Opcional)</strong> Carregue <code>XxxVME.tst</code> no <strong>VM Emulator</strong> — ele carrega o próprio <code>Xxx.vm</code> e o executa passo a passo, mostrando a pilha e os segmentos. É a melhor forma de entender o que o programa <strong>deveria</strong> fazer antes de olhar o seu Assembly.</li>
+<li>Rode o seu tradutor sobre <code>Xxx.vm</code>, gerando <code>Xxx.asm</code>.</li>
+<li><strong>Inspecione</strong> o <code>Xxx.asm</code> (os comentários com os comandos VM ajudam aqui).</li>
+<li>Carregue <code>Xxx.tst</code> no <strong>CPU Emulator</strong>: o script carrega o seu <code>Xxx.asm</code>, executa um número fixo de ciclos e compara o estado final da RAM com <code>Xxx.cmp</code>.</li>
+</ol>
+<p>A coluna da direita da tabela merece atenção. Neste projeto, ainda não há <code>function</code>, <code>call</code> nem <code>return</code> — e são justamente esses comandos que, no capítulo 13, vão inicializar <code>SP</code>, <code>LCL</code>, <code>ARG</code>, <code>THIS</code> e <code>THAT</code>. Sem eles, quem faz esse papel é o <strong>script de teste</strong>: <code>BasicTest.tst</code>, por exemplo, começa com <code>set RAM[0] 256, set RAM[1] 300, set RAM[2] 400, set RAM[3] 3000, set RAM[4] 3010</code> antes de executar <code>repeat 600 { ticktock; }</code>. Por isso o seu <code>.asm</code> <strong>não</strong> deve inicializar esses registradores neste projeto — o teste já os preparou, e sobrescrevê-los faria o resultado não bater com o <code>.cmp</code>.</p>
+<h2 id="teste-rapido">Teste rápido<a class="headerlink" href="#teste-rapido" title="Permanent link">&para;</a></h2>
+<details class="question">
+<summary>1. Traduza <code>push argument 3</code> para Assembly.</summary>
+<p><code>@ARG</code>, <code>D=M</code>, <code>@3</code>, <code>A=D+A</code>, <code>D=M</code>, <code>@SP</code>, <code>A=M</code>, <code>M=D</code>, <code>@SP</code>, <code>M=M+1</code> — o mesmo esqueleto de <code>push local i</code>, com <code>ARG</code> como base.</p>
+</details>
+<details class="question">
+<summary>2. Em Jack, <code>let static 2 = argument 1</code> não é uma linha válida, mas a ideia é: copiar o segundo argumento para a terceira variável estática. Que comandos VM fazem isso, e qual o Assembly, dentro de <code>Foo.vm</code>?</summary>
+<p><code>push argument 1</code>, <code>pop static 2</code>. O <code>push</code> é o esqueleto dos segmentos dinâmicos (10 instruções); o <code>pop</code> termina em <code>@Foo.2</code>, <code>M=D</code> (5 instruções).</p>
+</details>
+<details class="question">
+<summary>3. Por que <code>pop local i</code> precisa de <code>R13</code>, mas <code>pop temp i</code> não?</summary>
+<p>Porque o endereço de <code>local i</code> (<code>LCL + i</code>) só é conhecido em tempo de execução e ocupa o registrador <code>D</code> enquanto ainda falta desempilhar o valor, que também precisa de <code>D</code>. O endereço de <code>temp i</code> (<code>5 + i</code>) é conhecido em tempo de tradução e vai direto numa A-instruction, depois que o valor já está em <code>D</code>.</p>
+</details>
+<details class="question">
+<summary>4. Depois de <code>push constant 7</code>, <code>push constant 3</code>, <code>sub</code>, o que fica no topo da pilha? E se a última linha do <code>sub</code> fosse <code>M=D-M</code>?</summary>
+<p><code>7 - 3 = 4</code>. Com <code>M=D-M</code>, o resultado seria <code>3 - 7 = -4</code>: na tradução in-place, <code>D</code> guarda o <strong>segundo</strong> operando (<code>y</code>) e <code>M</code> o primeiro (<code>x</code>), e por isso <code>sub</code> é <code>M=M-D</code>.</p>
+</details>
+<details class="question">
+<summary>5. Por que o rótulo <code>TRUE_EQ_0</code> precisa do contador no nome?</summary>
+<p>Porque um mesmo arquivo pode ter vários <code>eq</code>. Se todos usassem <code>(TRUE_EQ)</code>, o Assembler encontraria o rótulo declarado várias vezes, e todos os saltos iriam para o mesmo lugar.</p>
+</details>
 <h2 id="exercicio-guiado">Exercício guiado<a class="headerlink" href="#exercicio-guiado" title="Permanent link">&para;</a></h2>
-<p>Sua atividade prática nesta parte do curso é implementar um <code>VMTranslator</code> que recebe um arquivo <code>.vm</code> (ou uma pasta com vários) e produz o <code>.asm</code> correspondente, cobrindo:</p>
+<p>Sua atividade prática nesta parte do curso é implementar um <code>VMTranslator</code> que recebe um arquivo <code>.vm</code> e produz o <code>.asm</code> correspondente, cobrindo:</p>
 <ol>
 <li>Todos os comandos aritméticos/lógicos (<code>add</code>, <code>sub</code>, <code>neg</code>, <code>eq</code>, <code>gt</code>, <code>lt</code>, <code>and</code>, <code>or</code>, <code>not</code>).</li>
 <li><code>push</code> para todos os oito segmentos e <code>pop</code> para sete deles (não existe <code>pop constant</code>: <code>constant</code> é um segmento virtual, só de leitura).</li>
 <li>Rótulos únicos para cada comparação traduzida (um contador incremental é suficiente).</li>
+<li>Os comandos VM como comentários no <code>.asm</code> gerado.</li>
 </ol>
-<p>Os testes oficiais do Nand2Tetris para esta parte (pasta <code>projects/07</code>) incluem <code>SimpleAdd</code>, <code>StackTest</code> (aritmética e lógica combinadas), <code>BasicTest</code>, <code>PointerTest</code> e <code>StaticTest</code> (os quatro segmentos e os dois casos especiais <code>pointer</code>/<code>static</code>) — rode cada <code>.asm</code> gerado no CPU Emulator e compare o estado final da RAM com o script <code>.tst</code>/<code>.cmp</code> de referência.</p>
+<p>Siga a ordem da tabela de testes acima: <code>SimpleAdd</code> só precisa de <code>push constant</code> e <code>add</code>, e já valida o esqueleto do <code>Parser</code> e do <code>CodeWriter</code>; cada teste seguinte acrescenta uma família de comandos.</p>
 <h2 id="o-que-vem-a-seguir">O que vem a seguir<a class="headerlink" href="#o-que-vem-a-seguir" title="Permanent link">&para;</a></h2>
 <p>Esta parte cobre apenas metade do VM Translator — falta o controle de fluxo em escopo de função (rótulos qualificados) e, principalmente, o protocolo completo de <code>call</code>/<code>return</code> com <em>stack frames</em>, que é o que torna possível compilar chamadas de função recursivas. É o assunto do capítulo 13, que completa o VM Translator (Project 8) antes de seguirmos para a consolidação da geração de código alvo (capítulo 14) e o Assembler (capítulo 15).</p>
 
